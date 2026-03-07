@@ -26,6 +26,7 @@ Thumbs.db
 .idea/
 .env
 backend/.env
+backend/alembic.ini
 .secrets/
 *.dpapi
 backend/RUNBOOK.md

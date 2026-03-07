@@ -10,7 +10,9 @@ from app.db.base import Base
 import app.models  # noqa: F401
 
 config = context.config
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+# Convert async DATABASE_URL to sync for Alembic
+_sync_url = settings.DATABASE_URL.replace("+asyncpg", "+psycopg2").replace("+aiosqlite", "")
+config.set_main_option("sqlalchemy.url", _sync_url)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
