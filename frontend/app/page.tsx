@@ -32,37 +32,42 @@ export default function HomePage() {
     <main className="min-h-screen bg-[#f7f5f3] text-[#37322f]">
       <Header />
 
-      <section className="mx-auto max-w-[1060px] px-4 py-16">
-        <p className="inline-flex rounded-full border border-[#e0dedb] bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide">
-          Summit Volunteer Platform
-        </p>
+      {/* MNTN-style Hero Section */}
+      <section
+        className="relative min-h-screen bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage:
+            "url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=80')",
+        }}
+      >
+        {/* Dark overlay gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
-        <h1 className="mt-6 max-w-4xl text-4xl font-semibold tracking-tight md:text-6xl">
-          Make volunteer discovery fast, meaningful, and aligned with student passion.
-        </h1>
+        {/* Content positioned bottom-left */}
+        <div className="relative z-10 flex min-h-screen flex-col justify-end px-8 pb-24 md:px-16 lg:px-24">
+          {/* Subtitle with decorative line */}
+          <div className="flex items-center gap-4">
+            <span className="h-[2px] w-12 bg-[#D4A853]" />
+            <p
+              className="text-sm uppercase tracking-widest"
+              style={{ color: "#D4A853" }}
+            >
+              Lorem Ipsum Dolor
+            </p>
+          </div>
 
-        <p className="mt-5 max-w-3xl text-base text-[#605a57] md:text-lg">
-          Summit connects students to local businesses and nonprofits offering high-impact volunteer opportunities.
-          Instead of mindless hours, students discover causes they care about, while organizations get reliable help.
-        </p>
-
-        <div className="mt-8 flex flex-wrap gap-3">
-          <a
-            href="https://github.com/nix-life/Hack-Canada-2026"
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-full bg-[#37322f] px-5 py-2 text-sm font-medium text-white hover:bg-[#2e2926]"
+          {/* Main headline */}
+          <h1
+            className="mt-6 max-w-3xl text-4xl leading-tight text-white md:text-5xl lg:text-6xl"
+            style={{
+              fontFamily: "'Times New Roman', Times, serif",
+              fontStyle: "italic",
+            }}
           >
-            View GitHub Repo
-          </a>
-          <a
-            href="https://github.com/nix-life/Hack-Canada-2026"
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-full border border-[#d6d1cc] bg-white px-5 py-2 text-sm font-medium hover:bg-[#f3f0ed]"
-          >
-            Devpost Link
-          </a>
+            Consectetur Adipiscing Elit
+            <br />
+            Sed Do Eiusmod Tempor!
+          </h1>
         </div>
       </section>
 
