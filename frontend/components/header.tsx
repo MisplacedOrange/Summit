@@ -5,9 +5,11 @@ import { usePathname } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 
+import { useAuth } from "@/app/auth-context"
 import { Button } from "@/components/ui/button"
 
 export function Header() {
+  const { user, loading } = useAuth()
   const pathname = usePathname()
   const isHomePage = pathname === "/"
   const [isScrolled, setIsScrolled] = useState(false)
@@ -28,6 +30,7 @@ export function Header() {
   // Determine header styles based on page and scroll state
   const isTransparent = isHomePage && !isScrolled
   const isGlassmorphism = isHomePage && isScrolled
+  const displayName = user?.full_name?.trim() || user?.email?.split("@")[0] || "Profile"
 
   return (
     <header
@@ -85,17 +88,45 @@ export function Header() {
               </Link>
             </div>
           </div>
-          <Button
-            asChild
-            variant="ghost"
-            className={`transition-colors duration-300 ${
-              isTransparent
-                ? "text-white hover:bg-white/10"
-                : "text-[#37322f] hover:bg-[#37322f]/5"
-            }`}
-          >
-            <Link href="/login">Log in</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            {!loading && user ? (
+              <Button
+                asChild
+                variant="ghost"
+                className={`transition-colors duration-300 ${
+                  isTransparent
+                    ? "text-white hover:bg-white/10"
+                    : "text-[#37322f] hover:bg-[#37322f]/5"
+                }`}
+              >
+                <Link href="/profile">{displayName}</Link>
+              </Button>
+            ) : (
+              <>
+                <Button
+                  asChild
+                  variant="ghost"
+                  className={`transition-colors duration-300 ${
+                    isTransparent
+                      ? "text-white hover:bg-white/10"
+                      : "text-[#37322f] hover:bg-[#37322f]/5"
+                  }`}
+                >
+                  <Link href="/login">Log in</Link>
+                </Button>
+                <Button
+                  asChild
+                  className={`transition-colors duration-300 ${
+                    isTransparent
+                      ? "bg-white text-[#37322f] hover:bg-white/90"
+                      : "bg-[#37322f] text-white hover:bg-[#2d2825]"
+                  }`}
+                >
+                  <Link href="/signup">Sign up</Link>
+                </Button>
+              </>
+            )}
+          </div>
         </nav>
       </div>
     </header>

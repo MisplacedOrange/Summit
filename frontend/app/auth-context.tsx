@@ -86,6 +86,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const login = useCallback(async ({ email, password }: LoginInput) => {
+    if (!email?.trim() || !password) {
+      throw new Error("Email and password are required")
+    }
+
     const response = await fetch(`${API_BASE}/v1/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

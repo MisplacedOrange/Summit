@@ -1,16 +1,15 @@
 from __future__ import annotations
 
-import httpx
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config import settings
 from app.db.session import get_db
+from app.models.auth_credential import UserCredential
 from app.models.user import User
 from app.schemas.user import UserRead
-from app.security import create_local_access_token
+from app.security import create_local_access_token, hash_password, verify_password
 
 router = APIRouter()
 
@@ -55,12 +54,8 @@ def _build_user_read(user: User) -> UserRead:
     )
 
 
-def _ensure_supabase_configured() -> None:
-    if not settings.SUPABASE_URL or not settings.SUPABASE_ANON_KEY:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Supabase auth is not configured on backend",
-        )
+def _normalize_email(email: str) -> str:
+    return email.strip().lower()
 
 
 async def _upsert_local_user(
@@ -97,93 +92,48 @@ async def register(payload: RegisterRequest, db: AsyncSession = Depends(get_db))
     if payload.role not in {"student", "organization"}:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid role")
 
-    _ensure_supabase_configured()
-    signup_url = f"{settings.SUPABASE_URL.rstrip('/')}/auth/v1/signup"
+    email = _normalize_email(payload.email)
+    if not email:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Email is required")
+    if len(payload.password) < 8:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Password must be at least 8 characters")
 
-    async with httpx.AsyncClient(timeout=12.0) as client:
-        try:
-            response = await client.post(
-                signup_url,
-                headers={
-                    "apikey": settings.SUPABASE_ANON_KEY,
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "email": payload.email,
-                    "password": payload.password,
-                    "data": {"full_name": payload.full_name or payload.email.split("@")[0]},
-                },
-            )
-        except httpx.HTTPError as exc:
-            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Auth provider unavailable") from exc
+    existing = await db.execute(select(User).where(func.lower(User.email) == email))
+    if existing.scalar_one_or_none() is not None:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="An account with this email already exists")
 
-    if response.status_code >= 400:
-        message = response.json().get("msg") if response.headers.get("content-type", "").startswith("application/json") else "Registration failed"
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=message or "Registration failed")
-
-    body = response.json()
-    provider_user = body.get("user") or {}
-    provider_user_id = provider_user.get("id")
-    if not provider_user_id:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Registration succeeded but user id missing")
-
-    full_name = payload.full_name or provider_user.get("user_metadata", {}).get("full_name")
-    user = await _upsert_local_user(
-        db=db,
-        provider_user_id=provider_user_id,
-        email=payload.email,
+    full_name = payload.full_name or email.split("@")[0]
+    user = User(
+        auth0_id=f"local:{email}",
+        email=email,
         full_name=full_name,
         role=payload.role,
     )
+    db.add(user)
+    await db.flush()
 
-    session = body.get("session")
-    if session:
-        token = create_local_access_token(subject=user.auth0_id)
-        return AuthResponse(access_token=token, token_type="bearer", requires_email_verification=False, user=_build_user_read(user))
+    credential = UserCredential(user_id=user.id, password_hash=hash_password(payload.password))
+    db.add(credential)
 
-    return AuthResponse(access_token=None, token_type=None, requires_email_verification=True, user=_build_user_read(user))
+    await db.commit()
+    await db.refresh(user)
+
+    token = create_local_access_token(subject=user.auth0_id)
+    return AuthResponse(access_token=token, token_type="bearer", requires_email_verification=False, user=_build_user_read(user))
 
 
 @router.post("/login", response_model=AuthResponse)
 async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)) -> AuthResponse:
-    _ensure_supabase_configured()
-    login_url = f"{settings.SUPABASE_URL.rstrip('/')}/auth/v1/token"
+    email = _normalize_email(payload.email)
+    user_result = await db.execute(select(User).where(func.lower(User.email) == email))
+    user = user_result.scalar_one_or_none()
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid login credentials")
 
-    async with httpx.AsyncClient(timeout=12.0) as client:
-        try:
-            response = await client.post(
-                login_url,
-                params={"grant_type": "password"},
-                headers={
-                    "apikey": settings.SUPABASE_ANON_KEY,
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "email": payload.email,
-                    "password": payload.password,
-                },
-            )
-        except httpx.HTTPError as exc:
-            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Auth provider unavailable") from exc
-
-    if response.status_code >= 400:
-        message = response.json().get("msg") if response.headers.get("content-type", "").startswith("application/json") else "Invalid login credentials"
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=message or "Invalid login credentials")
-
-    body = response.json()
-    provider_user = body.get("user") or {}
-    provider_user_id = provider_user.get("id")
-    if not provider_user_id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid login response")
-
-    full_name = provider_user.get("user_metadata", {}).get("full_name") or payload.email.split("@")[0]
-    user = await _upsert_local_user(
-        db=db,
-        provider_user_id=provider_user_id,
-        email=payload.email,
-        full_name=full_name,
-        role="student",
-    )
+    cred_result = await db.execute(select(UserCredential).where(UserCredential.user_id == user.id))
+    credential = cred_result.scalar_one_or_none()
+    if credential is None or not verify_password(payload.password, credential.password_hash):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid login credentials")
 
     token = create_local_access_token(subject=user.auth0_id)
     return AuthResponse(access_token=token, token_type="bearer", requires_email_verification=False, user=_build_user_read(user))

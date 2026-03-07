@@ -10,6 +10,26 @@ We built an app that allows users to browse countless opportunities that align w
 
 # Implementation 
 
+# Backend Deployment
+
+Use one of these setups:
+
+1. Deploy from repo root (Heroku/Render/Railway style)
+	- Build command: `pip install -r requirements.txt`
+	- Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT --app-dir backend`
+
+2. Deploy with service root set to `backend/`
+	- Build command: `pip install -r requirements.txt`
+	- Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+
+Required backend environment variables:
+- `DATABASE_URL`
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `APP_JWT_SECRET`
+- `APP_JWT_EXPIRE_HOURS`
+- `ALLOWED_ORIGINS` (JSON array string, for example `["https://your-frontend-domain.com"]`)
+
 # Contributors
 - Dinesh Sinnathamby
 - Charlie Shao
