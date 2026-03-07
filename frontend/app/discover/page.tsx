@@ -1,8 +1,10 @@
 "use client"
 
 import dynamic from "next/dynamic"
+import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useAuth } from "../auth-context"
+import { mapOpportunityRead, type V1OpportunityRead } from "@/lib/utils"
 
 const OpportunityMap = dynamic(() => import("@/components/opportunity-map"), { ssr: false, loading: () => <div className="flex h-[380px] items-center justify-center rounded-xl bg-[#F9F6F2]"><p className="text-sm text-[#999]">Loading map…</p></div> })
 
@@ -24,12 +26,8 @@ type Opportunity = {
   longitude: number
 }
 
-type OpportunityResponse = {
-  query: string
-  count: number
-  source: string
-  items: Opportunity[]
-}
+type V1ListResponse = { total: number; items: V1OpportunityRead[] }
+type V1RecommendationResponse = { items: Array<{ opportunity: V1OpportunityRead; score: number }> }
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000"
 
@@ -106,7 +104,8 @@ function EmptyState({ isError, onRetry }: { isError?: boolean; onRetry: () => vo
 
 
 export default function ImpactMatchPage() {
-  const { user, loading: authLoading, login, logout } = useAuth()
+  const { user, token, loading: authLoading, login, logout } = useAuth()
+  const router = useRouter()
 
   const [query, setQuery] = useState("student volunteer opportunities Toronto")
   const [cause, setCause] = useState("")
@@ -140,6 +139,13 @@ export default function ImpactMatchPage() {
   useEffect(() => {
     requestGeolocation()
   }, [requestGeolocation])
+
+  // First-run gate: redirect new users with no preferences to onboarding
+  useEffect(() => {
+    if (!authLoading && user && user.preferences === null) {
+      router.push("/onboarding/interests")
+    }
+  }, [authLoading, user, router])
 
   // Populate inputs from saved preferences when user logs in
   useEffect(() => {
@@ -179,21 +185,20 @@ export default function ImpactMatchPage() {
     setIsAiResult(false)
     setError(null)
     try {
-      const interests = interestsInput
-      const skills = skillsInput
-      const url = new URL(`${API_BASE}/api/volunteer-organizations`)
+      const url = new URL(`${API_BASE}/v1/opportunities`)
       url.searchParams.set("q", query)
-      url.searchParams.set("location", location)
       url.searchParams.set("limit", "16")
-      if (cause) url.searchParams.set("cause", cause)
-      if (interests) url.searchParams.set("interests", interests)
-      if (skills) url.searchParams.set("skills", skills)
+      if (cause) url.searchParams.set("category", cause)
+      if (userCoords) {
+        url.searchParams.set("lat", String(userCoords.lat))
+        url.searchParams.set("lng", String(userCoords.lng))
+      }
 
       const response = await fetch(url.toString())
       if (!response.ok) throw new Error(`Backend returned ${response.status}`)
-      const data: OpportunityResponse = await response.json()
-      setItems(data.items)
-      setSource(data.source)
+      const data: V1ListResponse = await response.json()
+      setItems(data.items.map((r) => mapOpportunityRead(r)))
+      setSource("ImpactMatch v1")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error")
     } finally {
@@ -202,36 +207,24 @@ export default function ImpactMatchPage() {
   }
 
   async function runAiMatch() {
+    if (!token) {
+      alert("Sign in to use AI matching")
+      return
+    }
     setLoading(true)
     setAiMatching(true)
     setError(null)
     try {
-      const payload = {
-        interests: interestsInput
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean),
-        skills: skillsInput
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean),
-        availability,
-        location,
-        max_distance_km: 20,
-        limit: 16,
-      }
-
-      const response = await fetch(`${API_BASE}/api/recommendations`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+      const response = await fetch(`${API_BASE}/v1/recommendations`, {
+        headers: { Authorization: `Bearer ${token}` },
       })
       if (!response.ok) throw new Error(`Backend returned ${response.status}`)
-      const data: OpportunityResponse = await response.json()
-      setItems(data.items)
-      setSource(data.source)
+      const data: V1RecommendationResponse = await response.json()
+      const mapped = data.items.map((item) =>
+        mapOpportunityRead(item.opportunity, Math.round(item.score * 100)),
+      )
+      setItems(mapped)
+      setSource("AI Matched")
       setIsAiResult(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error")
@@ -404,7 +397,8 @@ export default function ImpactMatchPage() {
                         ? "border border-purple-300 bg-purple-50 text-purple-700"
                         : "border border-[#CFC7C1] bg-white hover:border-purple-300 hover:bg-purple-50"
                   }`}
-                  disabled={loading}
+                  disabled={loading || !token}
+                  title={!token ? "Sign in to use AI matching" : undefined}
                 >
                   {aiMatching ? (
                     <span className="inline-flex items-center gap-1.5">
