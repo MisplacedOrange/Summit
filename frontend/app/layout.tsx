@@ -1,7 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter, Instrument_Serif } from "next/font/google"
-import "./globals.css"
+import "./globals.scss"
 
 const inter = Inter({
   subsets: ["latin"],
