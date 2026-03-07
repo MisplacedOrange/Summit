@@ -144,23 +144,33 @@ async def exchange_token(payload: AuthExchangeRequest, db: AsyncSession = Depend
     if payload.role not in {"student", "organization"}:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid role")
 
+    email = _normalize_email(payload.email)
+    if not email:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Email is required")
+
     result = await db.execute(select(User).where(User.auth0_id == payload.auth0_id))
     user = result.scalar_one_or_none()
 
     if user is None:
         user = User(
             auth0_id=payload.auth0_id,
-            email=payload.email,
+            email=email,
             full_name=payload.full_name,
             role=payload.role,
         )
         db.add(user)
     else:
-        user.email = payload.email
+        user.email = email
         user.full_name = payload.full_name
         user.role = payload.role
 
     await db.commit()
     await db.refresh(user)
 
-    return {"id": user.id, "role": user.role}
+    token = create_local_access_token(subject=user.auth0_id)
+    return {
+        "id": user.id,
+        "role": user.role,
+        "access_token": token,
+        "token_type": "bearer",
+    }
