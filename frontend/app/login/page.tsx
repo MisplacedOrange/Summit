@@ -1,9 +1,60 @@
+"use client"
+
+import { FormEvent, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 import FooterSection from "@/components/footer-section"
 import { Header } from "@/components/header"
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000"
+
 export default function LoginPage() {
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setLoading(true)
+    setErrorMessage(null)
+
+    const formData = new FormData(event.currentTarget)
+    const email = String(formData.get("email") ?? "").trim()
+    const password = String(formData.get("password") ?? "")
+
+    if (!email || !password) {
+      setErrorMessage("Please enter both email and password.")
+      setLoading(false)
+      return
+    }
+
+    try {
+      const response = await fetch(`${API_BASE}/v1/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        throw new Error(data.detail ?? "Unable to sign in.")
+      }
+
+      if (!data.access_token) {
+        throw new Error("Login succeeded but no access token was returned.")
+      }
+
+      localStorage.setItem("im_token", data.access_token)
+      router.push("/dashboard")
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to sign in."
+      setErrorMessage(message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <main className="min-h-screen bg-[#f7f5f3] text-[#37322f]">
       <Header />
@@ -13,7 +64,7 @@ export default function LoginPage() {
           <h1 className="text-3xl font-semibold tracking-tight">Log in</h1>
           <p className="mt-2 text-sm text-[#605a57]">Access your Summit dashboard and volunteer opportunities.</p>
 
-          <form className="mt-6 space-y-4">
+          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div>
               <label htmlFor="email" className="mb-2 block text-sm font-medium">
                 Email
@@ -42,11 +93,14 @@ export default function LoginPage() {
 
             <button
               type="submit"
+              disabled={loading}
               className="w-full rounded-md bg-[#37322f] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#2d2825]"
             >
-              Continue
+              {loading ? "Signing in..." : "Continue"}
             </button>
           </form>
+
+          {errorMessage ? <p className="mt-3 text-sm text-red-700">{errorMessage}</p> : null}
 
           <p className="mt-4 text-sm text-[#605a57]">
             New here?{" "}

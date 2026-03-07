@@ -1,6 +1,7 @@
 "use client"
 
 import dynamic from "next/dynamic"
+import Link from "next/link"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useAuth } from "../auth-context"
 
@@ -108,7 +109,7 @@ function EmptyState({ isError, onRetry }: { isError?: boolean; onRetry: () => vo
 
 
 export default function ImpactMatchPage() {
-  const { user, loading: authLoading, login, logout } = useAuth()
+  const { user, loading: authLoading, logout } = useAuth()
 
   const [query, setQuery] = useState("student volunteer opportunities Toronto")
   const [cause, setCause] = useState("")
@@ -280,12 +281,12 @@ export default function ImpactMatchPage() {
                 </button>
               </div>
             ) : (
-              <button
-                onClick={login}
+              <Link
+                href="/login"
                 className="rounded-full bg-[#37322F] px-4 py-1.5 text-sm font-medium text-white"
               >
                 Sign in
-              </button>
+              </Link>
             )}
           </div>
           <h1 className="mt-4 text-2xl font-semibold leading-tight sm:text-3xl md:text-5xl">

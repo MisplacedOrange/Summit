@@ -10,6 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
 
 if TYPE_CHECKING:
+    from app.models.auth_credential import UserCredential
     from app.models.volunteer_record import VolunteerRecord
 
 try:
@@ -35,6 +36,7 @@ class User(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     preferences: Mapped["UserPreference | None"] = relationship(back_populates="user", cascade="all, delete-orphan", uselist=False)
+    credential: Mapped["UserCredential | None"] = relationship(back_populates="user", cascade="all, delete-orphan", uselist=False)
     volunteer_records: Mapped[list["VolunteerRecord"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
 

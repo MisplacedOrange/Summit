@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import settings
 from app.db.session import get_db
 from app.models.user import User
+from app.security import decode_local_access_token
 
 security = HTTPBearer(auto_error=False)
 
@@ -45,6 +46,19 @@ async def get_current_user(
                 await db.commit()
                 await db.refresh(user)
             return user
+
+        # Backend-issued local JWT tokens.
+        local_payload = decode_local_access_token(token)
+        if local_payload is not None:
+            local_subject = local_payload.get("sub")
+            if not local_subject:
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token missing subject")
+
+            result = await db.execute(select(User).where(User.auth0_id == local_subject))
+            local_user = result.scalar_one_or_none()
+            if local_user is None:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+            return local_user
 
         jwks = await fetch_auth0_jwks()
         payload = jwt.decode(
