@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 
@@ -35,6 +35,20 @@ function createIcon(cause: string, urgency: string) {
   })
 }
 
+function createUserIcon() {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28">
+    <circle cx="14" cy="14" r="13" fill="#3b82f6" fill-opacity="0.15" stroke="#3b82f6" stroke-width="1.5"/>
+    <circle cx="14" cy="14" r="6" fill="#3b82f6" stroke="white" stroke-width="2.5"/>
+  </svg>`
+  return L.divIcon({
+    html: svg,
+    className: "",
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+    popupAnchor: [0, -16],
+  })
+}
+
 export type MapOpportunity = {
   id: string
   title: string
@@ -50,13 +64,16 @@ export type MapOpportunity = {
 type OpportunityMapProps = {
   items: MapOpportunity[]
   className?: string
+  userLocation?: { lat: number; lng: number } | null
+  onLocateMe?: () => void
   onMarkerClick?: (id: string) => void
 }
 
-export default function OpportunityMap({ items, className, onMarkerClick }: OpportunityMapProps) {
+export default function OpportunityMap({ items, className, userLocation, onLocateMe, onMarkerClick }: OpportunityMapProps) {
   const mapRef = useRef<L.Map | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const markersRef = useRef<L.LayerGroup | null>(null)
+  const userMarkerRef = useRef<L.Marker | null>(null)
 
   // Initialize map once
   useEffect(() => {
@@ -123,14 +140,51 @@ export default function OpportunityMap({ items, className, onMarkerClick }: Oppo
       group.addLayer(marker)
     }
 
-    // Fit bounds to show all markers
-    if (validItems.length > 0) {
-      const bounds = L.latLngBounds(validItems.map((i) => [i.latitude, i.longitude] as [number, number]))
+    // Fit bounds to show all markers + user location
+    const allCoords: [number, number][] = validItems.map((i) => [i.latitude, i.longitude] as [number, number])
+    if (userLocation) {
+      allCoords.push([userLocation.lat, userLocation.lng])
+    }
+    if (allCoords.length > 0) {
+      const bounds = L.latLngBounds(allCoords)
       map.fitBounds(bounds, { padding: [40, 40], maxZoom: 13 })
     }
-  }, [validItems, onMarkerClick])
+  }, [validItems, onMarkerClick, userLocation])
+
+  // User location marker
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+
+    if (userMarkerRef.current) {
+      map.removeLayer(userMarkerRef.current)
+      userMarkerRef.current = null
+    }
+
+    if (userLocation) {
+      const marker = L.marker([userLocation.lat, userLocation.lng], { icon: createUserIcon(), zIndexOffset: 1000 })
+        .bindPopup('<div style="font-family:system-ui,sans-serif;font-size:13px;font-weight:600">You are here</div>')
+        .addTo(map)
+      userMarkerRef.current = marker
+    }
+  }, [userLocation])
 
   return (
-    <div ref={containerRef} className={className ?? "h-[380px] w-full rounded-xl"} />
+    <div className="relative">
+      <div ref={containerRef} className={className ?? "h-[380px] w-full rounded-xl"} />
+      {onLocateMe && (
+        <button
+          type="button"
+          onClick={onLocateMe}
+          title="Find my location"
+          className="absolute top-3 right-3 z-[1000] flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-md border border-gray-200 hover:bg-gray-50 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 2v4m0 12v4M2 12h4m12 0h4"/>
+          </svg>
+        </button>
+      )}
+    </div>
   )
 }

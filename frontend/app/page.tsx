@@ -129,6 +129,23 @@ export default function ImpactMatchPage() {
   const [aiMatching, setAiMatching] = useState(false)
   const [isAiResult, setIsAiResult] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
+
+  const requestGeolocation = useCallback(() => {
+    if (!navigator.geolocation) return
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+      },
+      () => {/* permission denied or error — keep null */},
+      { enableHighAccuracy: true, timeout: 8000 },
+    )
+  }, [])
+
+  // Request geolocation once on mount
+  useEffect(() => {
+    requestGeolocation()
+  }, [requestGeolocation])
 
   // Populate inputs from saved preferences when user logs in
   useEffect(() => {
@@ -168,9 +185,16 @@ export default function ImpactMatchPage() {
   }, [items])
 
   const filteredItems = useMemo(() => {
-    if (!remoteOnly) return items
-    return items.filter((item) => /remote|virtual|online/i.test(item.description))
-  }, [items, remoteOnly])
+    let result = remoteOnly ? items.filter((item) => /remote|virtual|online/i.test(item.description)) : items
+    if (userCoords) {
+      result = [...result].sort((a, b) => {
+        const dA = (a.latitude - userCoords.lat) ** 2 + (a.longitude - userCoords.lng) ** 2
+        const dB = (b.latitude - userCoords.lat) ** 2 + (b.longitude - userCoords.lng) ** 2
+        return dA - dB
+      })
+    }
+    return result
+  }, [items, remoteOnly, userCoords])
 
   async function discoverOpportunities() {
     setLoading(true)
@@ -496,6 +520,8 @@ export default function ImpactMatchPage() {
               <OpportunityMap
                 items={filteredItems.slice(0, 40)}
                 className="h-[380px] w-full"
+                userLocation={userCoords}
+                onLocateMe={requestGeolocation}
               />
             </div>
             <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs text-[#6C645F]">
