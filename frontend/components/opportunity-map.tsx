@@ -59,21 +59,34 @@ export type MapOpportunity = {
   latitude: number
   longitude: number
   match_pct?: number
+  volunteers_needed?: number
+  volunteers_signed?: number
+}
+
+export type HeatPoint = {
+  lat: number
+  lng: number
+  weight: number
 }
 
 type OpportunityMapProps = {
   items: MapOpportunity[]
+  heatPoints?: HeatPoint[]
   className?: string
   userLocation?: { lat: number; lng: number } | null
   onLocateMe?: () => void
   onMarkerClick?: (id: string) => void
 }
 
-export default function OpportunityMap({ items, className, userLocation, onLocateMe, onMarkerClick }: OpportunityMapProps) {
+type MapMode = "markers" | "heat"
+
+export default function OpportunityMap({ items, heatPoints, className, userLocation, onLocateMe, onMarkerClick }: OpportunityMapProps) {
   const mapRef = useRef<L.Map | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const markersRef = useRef<L.LayerGroup | null>(null)
+  const heatLayerRef = useRef<L.Layer | null>(null)
   const userMarkerRef = useRef<L.Marker | null>(null)
+  const [mode, setMode] = useState<MapMode>("markers")
 
   // Initialize map once
   useEffect(() => {
@@ -99,6 +112,7 @@ export default function OpportunityMap({ items, className, userLocation, onLocat
       map.remove()
       mapRef.current = null
       markersRef.current = null
+      heatLayerRef.current = null
     }
   }, [])
 
@@ -108,6 +122,20 @@ export default function OpportunityMap({ items, className, userLocation, onLocat
     [items],
   )
 
+  // Compute heat data from heatPoints prop or fall back to items with urgency weighting
+  const heatData = useMemo(() => {
+    if (heatPoints && heatPoints.length > 0) {
+      return heatPoints.map((p) => [p.lat, p.lng, p.weight] as [number, number, number])
+    }
+    return validItems.map((item) => {
+      const needed = item.volunteers_needed ?? 1
+      const signed = item.volunteers_signed ?? 0
+      const remaining = Math.max(0, needed - signed)
+      const weight = Math.min(1.0, 0.2 + (remaining / Math.max(needed, 1)) * 0.8)
+      return [item.latitude, item.longitude, weight] as [number, number, number]
+    })
+  }, [heatPoints, validItems])
+
   // Update markers when items change
   useEffect(() => {
     const map = mapRef.current
@@ -116,28 +144,30 @@ export default function OpportunityMap({ items, className, userLocation, onLocat
 
     group.clearLayers()
 
-    for (const item of validItems) {
-      const icon = createIcon(item.cause, item.urgency)
-      const matchBadge =
-        item.match_pct && item.match_pct > 0
-          ? `<span style="display:inline-block;background:#f3e8ff;color:#7c3aed;border-radius:9999px;padding:1px 7px;font-size:11px;font-weight:600;margin-left:6px">${item.match_pct}%</span>`
-          : ""
+    if (mode === "markers") {
+      for (const item of validItems) {
+        const icon = createIcon(item.cause, item.urgency)
+        const matchBadge =
+          item.match_pct && item.match_pct > 0
+            ? `<span style="display:inline-block;background:#f3e8ff;color:#7c3aed;border-radius:9999px;padding:1px 7px;font-size:11px;font-weight:600;margin-left:6px">${item.match_pct}%</span>`
+            : ""
 
-      const popup = `
-        <div style="min-width:180px;font-family:system-ui,sans-serif">
-          <div style="font-weight:600;font-size:13px;line-height:1.3">${item.title}${matchBadge}</div>
-          <div style="color:#6b7280;font-size:12px;margin-top:2px">${item.organization}</div>
-          <div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">
-            <span style="background:${markerColor(item.cause)}22;color:${markerColor(item.cause)};border-radius:9999px;padding:1px 8px;font-size:11px">${item.cause.replace(/-/g, " ")}</span>
-            <span style="background:#f3f4f6;color:#374151;border-radius:9999px;padding:1px 8px;font-size:11px">${item.location}</span>
-          </div>
-        </div>`
+        const popup = `
+          <div style="min-width:180px;font-family:system-ui,sans-serif">
+            <div style="font-weight:600;font-size:13px;line-height:1.3">${item.title}${matchBadge}</div>
+            <div style="color:#6b7280;font-size:12px;margin-top:2px">${item.organization}</div>
+            <div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">
+              <span style="background:${markerColor(item.cause)}22;color:${markerColor(item.cause)};border-radius:9999px;padding:1px 8px;font-size:11px">${item.cause.replace(/-/g, " ")}</span>
+              <span style="background:#f3f4f6;color:#374151;border-radius:9999px;padding:1px 8px;font-size:11px">${item.location}</span>
+            </div>
+          </div>`
 
-      const marker = L.marker([item.latitude, item.longitude], { icon }).bindPopup(popup)
-      if (onMarkerClick) {
-        marker.on("click", () => onMarkerClick(item.id))
+        const marker = L.marker([item.latitude, item.longitude], { icon }).bindPopup(popup)
+        if (onMarkerClick) {
+          marker.on("click", () => onMarkerClick(item.id))
+        }
+        group.addLayer(marker)
       }
-      group.addLayer(marker)
     }
 
     // Fit bounds to show all markers + user location
@@ -149,7 +179,35 @@ export default function OpportunityMap({ items, className, userLocation, onLocat
       const bounds = L.latLngBounds(allCoords)
       map.fitBounds(bounds, { padding: [40, 40], maxZoom: 13 })
     }
-  }, [validItems, onMarkerClick, userLocation])
+  }, [validItems, onMarkerClick, userLocation, mode])
+
+  // Manage heat layer
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+
+    // Remove existing heat layer
+    if (heatLayerRef.current) {
+      map.removeLayer(heatLayerRef.current)
+      heatLayerRef.current = null
+    }
+
+    if (mode === "heat" && heatData.length > 0) {
+      // Dynamically import leaflet.heat (it attaches L.heatLayer to L)
+      import("leaflet.heat").then(() => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const heatLayer = (L as any).heatLayer(heatData, {
+          radius: 25,
+          blur: 15,
+          maxZoom: 17,
+          max: 1.0,
+          gradient: { 0.2: "#eff6ff", 0.4: "#93c5fd", 0.6: "#3b82f6", 0.8: "#f97316", 1.0: "#dc2626" },
+        })
+        heatLayer.addTo(map)
+        heatLayerRef.current = heatLayer
+      })
+    }
+  }, [mode, heatData])
 
   // User location marker
   useEffect(() => {
@@ -172,6 +230,25 @@ export default function OpportunityMap({ items, className, userLocation, onLocat
   return (
     <div className="relative">
       <div ref={containerRef} className={className ?? "h-[380px] w-full rounded-xl"} />
+
+      {/* Mode toggle */}
+      <div className="absolute top-3 left-3 z-[1000] flex overflow-hidden rounded-lg border border-gray-200 bg-white shadow-md text-xs font-medium">
+        <button
+          type="button"
+          onClick={() => setMode("markers")}
+          className={`px-3 py-1.5 transition-colors ${mode === "markers" ? "bg-[#37322F] text-white" : "hover:bg-gray-50"}`}
+        >
+          Pins
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode("heat")}
+          className={`px-3 py-1.5 transition-colors ${mode === "heat" ? "bg-[#37322F] text-white" : "hover:bg-gray-50"}`}
+        >
+          Heatmap
+        </button>
+      </div>
+
       {onLocateMe && (
         <button
           type="button"

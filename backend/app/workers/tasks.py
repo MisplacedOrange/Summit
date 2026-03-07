@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from datetime import datetime, timezone
 
 from sqlalchemy import select
 
@@ -9,6 +10,7 @@ from app.models.opportunity import Opportunity
 from app.models.user import UserPreference
 from app.scraper.runner import run_pipeline
 from app.services.gemini import gemini_service
+from app.services.geocoding import geocode_address
 from app.services.recommendation import update_user_embedding
 from app.workers.celery_app import celery_app
 
@@ -42,6 +44,18 @@ def run_scraping_pipeline(self) -> int:
                     source_url=source_url,
                     is_scraped=True,
                 )
+
+                # Geocode from location_text
+                loc_text = opp.location_text
+                if loc_text:
+                    geo = await geocode_address(loc_text)
+                    if geo.lat is not None and geo.lng is not None:
+                        opp.location_lat = geo.lat
+                        opp.location_lng = geo.lng
+                        opp.geocode_source = geo.source
+                        opp.geocode_confidence = geo.confidence
+                        opp.geocoded_at = datetime.now(timezone.utc)
+
                 db.add(opp)
                 inserted += 1
 

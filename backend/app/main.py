@@ -120,10 +120,8 @@ def _geocode_location(location_text: str, seed: str) -> tuple[float, float]:
 
 
 def _build_legacy_item(opp: Opportunity, score: float = 0.0) -> LegacyOpportunity:
-    seed = opp.source_url or opp.id
-    fallback_lat, fallback_lon = _geocode_location(opp.location_text or "", seed)
-    location_lat = float(opp.location_lat) if opp.location_lat is not None else fallback_lat
-    location_lng = float(opp.location_lng) if opp.location_lng is not None else fallback_lon
+    location_lat = float(opp.location_lat) if opp.location_lat is not None else 0.0
+    location_lng = float(opp.location_lng) if opp.location_lng is not None else 0.0
     needed = int(opp.volunteers_needed or 1)
     signed = int(opp.volunteers_signed or 0)
     remaining = max(0, needed - signed)

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-import math
-from datetime import date
+from datetime import date, datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, status
 from sqlalchemy import and_, func, or_, select
@@ -13,18 +12,11 @@ from app.models.opportunity import Opportunity
 from app.models.organization import Organization
 from app.models.user import User
 from app.models.volunteer_record import SavedOpportunity, VolunteerRecord
-from app.schemas.opportunity import OpportunityCreate, OpportunityListResponse, OpportunityMapPin, OpportunityRead
+from app.schemas.opportunity import OpportunityCreate, OpportunityListResponse, OpportunityMapPin, OpportunityRead, HeatPoint
+from app.services.location import haversine_km, validate_coordinates
+from app.services.geocoding import geocode_address
 
 router = APIRouter()
-
-
-def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    earth_km = 6371.0
-    p1, p2 = math.radians(lat1), math.radians(lat2)
-    dlat = math.radians(lat2 - lat1)
-    dlon = math.radians(lon2 - lon1)
-    a = math.sin(dlat / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dlon / 2) ** 2
-    return earth_km * (2 * math.atan2(math.sqrt(a), math.sqrt(1 - a)))
 
 
 @router.get("", response_model=OpportunityListResponse)
@@ -66,7 +58,7 @@ async def list_opportunities(
             for row in rows
             if row.location_lat is not None
             and row.location_lng is not None
-            and _haversine_km(lat, lng, row.location_lat, row.location_lng) <= radius_km
+            and haversine_km(lat, lng, row.location_lat, row.location_lng) <= radius_km
         ]
 
     total = await db.scalar(count_stmt) or 0
@@ -74,9 +66,27 @@ async def list_opportunities(
 
 
 @router.get("/map", response_model=list[OpportunityMapPin])
-async def list_map_pins(db: AsyncSession = Depends(get_db)) -> list[OpportunityMapPin]:
-    result = await db.execute(select(Opportunity))
-    opportunities = result.scalars().all()
+async def list_map_pins(
+    lat: float | None = Query(default=None, description="Center latitude for viewport filter"),
+    lng: float | None = Query(default=None, description="Center longitude for viewport filter"),
+    radius_km: int = Query(default=50, ge=1, le=500, description="Radius in km from center"),
+    db: AsyncSession = Depends(get_db),
+) -> list[OpportunityMapPin]:
+    """Return map pins for opportunities that have real geocoded coordinates."""
+    stmt = select(Opportunity).where(
+        Opportunity.location_lat.is_not(None),
+        Opportunity.location_lng.is_not(None),
+    )
+    result = await db.execute(stmt)
+    opportunities = list(result.scalars().all())
+
+    # Optional viewport filter
+    if lat is not None and lng is not None:
+        opportunities = [
+            item for item in opportunities
+            if haversine_km(lat, lng, float(item.location_lat), float(item.location_lng)) <= radius_km
+        ]
+
     return [
         OpportunityMapPin(
             id=item.id,
@@ -87,6 +97,39 @@ async def list_map_pins(db: AsyncSession = Depends(get_db)) -> list[OpportunityM
         )
         for item in opportunities
     ]
+
+
+@router.get("/map/heat", response_model=list[HeatPoint])
+async def list_heat_points(
+    lat: float | None = Query(default=None),
+    lng: float | None = Query(default=None),
+    radius_km: int = Query(default=50, ge=1, le=500),
+    db: AsyncSession = Depends(get_db),
+) -> list[HeatPoint]:
+    """Return weighted heat-map points based on volunteer demand urgency."""
+    stmt = select(Opportunity).where(
+        Opportunity.location_lat.is_not(None),
+        Opportunity.location_lng.is_not(None),
+    )
+    result = await db.execute(stmt)
+    opportunities = list(result.scalars().all())
+
+    if lat is not None and lng is not None:
+        opportunities = [
+            item for item in opportunities
+            if haversine_km(lat, lng, float(item.location_lat), float(item.location_lng)) <= radius_km
+        ]
+
+    points: list[HeatPoint] = []
+    for opp in opportunities:
+        needed = opp.volunteers_needed or 1
+        signed = opp.volunteers_signed or 0
+        remaining = max(0, needed - signed)
+        # Weight: normalized urgency (0.2 baseline so every point is visible)
+        weight = min(1.0, 0.2 + (remaining / max(needed, 1)) * 0.8)
+        points.append(HeatPoint(lat=float(opp.location_lat), lng=float(opp.location_lng), weight=round(weight, 3)))
+
+    return points
 
 
 @router.get("/{opportunity_id}", response_model=OpportunityRead)
@@ -124,6 +167,21 @@ async def create_opportunity(
         skills_required=payload.skills_required,
         is_scraped=False,
     )
+
+    # If caller provided coords, mark them as manual; otherwise geocode from location_text.
+    if validate_coordinates(payload.location_lat, payload.location_lng):
+        opportunity.geocode_source = "manual"
+        opportunity.geocode_confidence = 1.0
+        opportunity.geocoded_at = datetime.now(timezone.utc)
+    elif payload.location_text:
+        result = await geocode_address(payload.location_text)
+        if result.lat is not None and result.lng is not None:
+            opportunity.location_lat = result.lat
+            opportunity.location_lng = result.lng
+            opportunity.geocode_source = result.source
+            opportunity.geocode_confidence = result.confidence
+            opportunity.geocoded_at = datetime.now(timezone.utc)
+
     db.add(opportunity)
     await db.commit()
     await db.refresh(opportunity)

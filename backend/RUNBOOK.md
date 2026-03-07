@@ -105,7 +105,32 @@ Services:
 - Postgres (pgvector): localhost:5432
 - Redis: localhost:6379
 
-## 9. Common Troubleshooting
+## 9. Geocoding & Location
+
+### How coordinates work
+
+- **Manual**: Organization users submit `location_lat` / `location_lng` explicitly via the create opportunity API. These are marked `geocode_source=manual`.
+- **Mapbox geocoding**: When only `location_text` is provided (API creation or scraper), the system calls Mapbox Geocoding v5 to resolve coordinates. Requires `MAPBOX_SECRET_TOKEN` in `.env`.
+- **Metadata columns**: `geocode_source` (manual/mapbox/none), `geocode_confidence` (0–1), `geocoded_at` (timestamp).
+
+### Backfill existing opportunities
+
+If you have existing opportunities with `location_text` but no coordinates, run:
+
+```bash
+# Preview (dry run)
+python -m app.scripts.backfill_geocode --dry-run --batch-size 50
+
+# Execute
+python -m app.scripts.backfill_geocode --batch-size 50
+```
+
+### Map endpoints
+
+- `GET /v1/opportunities/map` — Marker pins (only opportunities with real coordinates). Optional: `?lat=...&lng=...&radius_km=50` for viewport filtering.
+- `GET /v1/opportunities/map/heat` — Weighted heatmap points based on volunteer demand urgency. Same optional viewport params.
+
+## 10. Common Troubleshooting
 
 - `Import ... could not be resolved`: install `backend/requirements.txt` in the selected interpreter.
 - Playwright scrape failures: run `python -m playwright install chromium`.

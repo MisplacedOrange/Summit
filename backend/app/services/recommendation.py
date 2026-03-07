@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 from datetime import date
 
 from sqlalchemy import select, text
@@ -9,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.opportunity import Opportunity
 from app.models.user import UserPreference
 from app.services.gemini import gemini_service
+from app.services.location import haversine_km
 
 
 def build_profile_text(preferences: UserPreference) -> str:
@@ -31,16 +31,9 @@ def _coerce_embedding(value: object) -> list[float]:
     return []
 
 
+# Keep old name as alias for backwards compat
 def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    earth_km = 6371.0
-    p1 = math.radians(lat1)
-    p2 = math.radians(lat2)
-    dlat = math.radians(lat2 - lat1)
-    dlon = math.radians(lon2 - lon1)
-
-    a = math.sin(dlat / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dlon / 2) ** 2
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    return earth_km * c
+    return haversine_km(lat1, lon1, lat2, lon2)
 
 
 async def update_user_embedding(db: AsyncSession, preferences: UserPreference) -> None:
@@ -60,7 +53,7 @@ def _rerank(
     for opp, cosine_sim in candidates:
         proximity_boost = 0.0
         if user_lat is not None and user_lng is not None and opp.location_lat is not None and opp.location_lng is not None:
-            distance_km = haversine(user_lat, user_lng, opp.location_lat, opp.location_lng)
+            distance_km = haversine_km(user_lat, user_lng, opp.location_lat, opp.location_lng)
             proximity_boost = max(0.0, 1.0 - (distance_km / 50.0))
 
         needed = opp.volunteers_needed or 0

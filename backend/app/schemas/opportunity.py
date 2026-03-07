@@ -54,6 +54,12 @@ class OpportunityMapPin(BaseModel):
     location_lng: float | None
 
 
+class HeatPoint(BaseModel):
+    lat: float
+    lng: float
+    weight: float
+
+
 class OpportunityListResponse(BaseModel):
     total: int
     items: list[OpportunityRead]

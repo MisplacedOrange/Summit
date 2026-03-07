@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic"
 import Link from "next/link"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useAuth } from "../auth-context"
 
 const OpportunityMap = dynamic(() => import("@/components/opportunity-map"), { ssr: false, loading: () => <div className="flex h-[380px] items-center justify-center rounded-xl bg-[#F9F6F2]"><p className="text-sm text-[#999]">Loading map…</p></div> })
@@ -127,22 +127,40 @@ export default function ImpactMatchPage() {
   const [isAiResult, setIsAiResult] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const watchIdRef = useRef<number | null>(null)
+  const lastUpdateRef = useRef<number>(0)
 
-  const requestGeolocation = useCallback(() => {
+  const startWatchingLocation = useCallback(() => {
     if (!navigator.geolocation) return
-    navigator.geolocation.getCurrentPosition(
+
+    // Stop existing watcher if any
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current)
+    }
+
+    watchIdRef.current = navigator.geolocation.watchPosition(
       (pos) => {
+        const now = Date.now()
+        // Throttle updates to at most once every 5 seconds
+        if (now - lastUpdateRef.current < 5000) return
+        lastUpdateRef.current = now
         setUserCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
       },
       () => {/* permission denied or error — keep null */},
-      { enableHighAccuracy: true, timeout: 8000 },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 },
     )
   }, [])
 
-  // Request geolocation once on mount
+  // Start watching on mount, clean up on unmount
   useEffect(() => {
-    requestGeolocation()
-  }, [requestGeolocation])
+    startWatchingLocation()
+    return () => {
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current)
+        watchIdRef.current = null
+      }
+    }
+  }, [startWatchingLocation])
 
   // Populate inputs from saved preferences when user logs in
   useEffect(() => {
@@ -463,7 +481,7 @@ export default function ImpactMatchPage() {
                 items={filteredItems.slice(0, MAP_OPPORTUNITY_LIMIT)}
                 className="h-[380px] w-full"
                 userLocation={userCoords}
-                onLocateMe={requestGeolocation}
+                onLocateMe={startWatchingLocation}
               />
             </div>
             <p className="mt-3 text-xs text-[#6C645F]">

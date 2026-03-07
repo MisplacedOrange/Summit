@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useAuth } from "../auth-context"
 import type { UserPreferences } from "../auth-context"
 
@@ -14,6 +14,24 @@ export default function ProfilePage() {
   const [radiusKm, setRadiusKm] = useState(25)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [locationStatus, setLocationStatus] = useState<"idle" | "loading" | "granted" | "denied">("idle")
+
+  const requestLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      setLocationStatus("denied")
+      return
+    }
+    setLocationStatus("loading")
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+        setLocationStatus("granted")
+      },
+      () => setLocationStatus("denied"),
+      { enableHighAccuracy: true, timeout: 10000 },
+    )
+  }, [])
 
   useEffect(() => {
     if (!loading && !user) {
@@ -26,8 +44,18 @@ export default function ProfilePage() {
       setInterests(user.preferences.interests.join(", "))
       setSkills(user.preferences.skills.join(", "))
       setRadiusKm(user.preferences.radius_km)
+      // Restore saved coordinates if they exist
+      if (user.preferences.location_lat != null && user.preferences.location_lng != null) {
+        setUserCoords({ lat: user.preferences.location_lat, lng: user.preferences.location_lng })
+        setLocationStatus("granted")
+      }
     }
   }, [user])
+
+  // Request location on mount
+  useEffect(() => {
+    requestLocation()
+  }, [requestLocation])
 
   if (loading) {
     return (
@@ -45,8 +73,8 @@ export default function ProfilePage() {
     const prefs: UserPreferences = {
       interests: interests.split(",").map((s) => s.trim()).filter(Boolean),
       skills: skills.split(",").map((s) => s.trim()).filter(Boolean),
-      location_lat: null,
-      location_lng: null,
+      location_lat: userCoords?.lat ?? null,
+      location_lng: userCoords?.lng ?? null,
       radius_km: radiusKm,
     }
     try {
@@ -129,6 +157,29 @@ export default function ProfilePage() {
                 />
                 <span className="w-16 text-right text-sm font-medium">{radiusKm} km</span>
               </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium">Your location</label>
+              <div className="mt-1 flex items-center gap-3">
+                {locationStatus === "granted" && userCoords ? (
+                  <p className="text-sm text-emerald-600">
+                    Location detected ({userCoords.lat.toFixed(4)}, {userCoords.lng.toFixed(4)})
+                  </p>
+                ) : locationStatus === "loading" ? (
+                  <p className="text-sm text-[#605A57]">Detecting location…</p>
+                ) : locationStatus === "denied" ? (
+                  <p className="text-sm text-amber-600">Location access denied. Results won&apos;t be ranked by distance.</p>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={requestLocation}
+                  className="rounded-full border border-[#CFC7C1] px-3 py-1 text-xs font-medium hover:bg-[#F3ECE5] transition-colors"
+                >
+                  {locationStatus === "granted" ? "Refresh" : "Allow location"}
+                </button>
+              </div>
+              <p className="mt-1 text-xs text-[#7D756F]">Used for proximity ranking in AI Match</p>
             </div>
           </div>
 
