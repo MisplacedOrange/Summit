@@ -63,11 +63,11 @@ export default function ProfilePage() {
   return (
     <main className="min-h-screen bg-[#F7F5F3] text-[#37322F]">
       <nav className="mx-auto flex max-w-[1100px] items-center justify-between px-4 py-4 md:px-6">
-        <a href="/" className="text-sm font-semibold">
+        <a href="/discover" className="text-sm font-semibold">
           ← Back to discover
         </a>
         <button
-          onClick={() => { logout(); router.push("/") }}
+          onClick={() => { logout(); router.push("/discover") }}
           className="rounded-full border border-[#CFC7C1] bg-white px-4 py-1.5 text-sm font-medium hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-colors"
         >
           Sign out

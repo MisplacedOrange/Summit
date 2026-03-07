@@ -19,13 +19,14 @@ export type AuthUser = {
   full_name: string | null
   role: string
   preferences: UserPreferences | null
+  picture?: string | null
 }
 
 type AuthContextValue = {
   user: AuthUser | null
   token: string | null
   loading: boolean
-  login: (email: string, name: string) => Promise<void>
+  login: () => void
   logout: () => void
   refreshProfile: () => Promise<void>
   updatePreferences: (prefs: UserPreferences) => Promise<void>
@@ -35,7 +36,7 @@ const AuthContext = createContext<AuthContextValue>({
   user: null,
   token: null,
   loading: true,
-  login: async () => {},
+  login: () => {},
   logout: () => {},
   refreshProfile: async () => {},
   updatePreferences: async () => {},
@@ -50,66 +51,116 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const fetchProfile = useCallback(async (t: string): Promise<AuthUser | null> => {
-    try {
-      const res = await fetch(`${API_BASE}/v1/users/me`, {
-        headers: { Authorization: `Bearer ${t}` },
-      })
-      if (!res.ok) return null
-      return (await res.json()) as AuthUser
-    } catch {
-      return null
+  // Try Auth0 session first, fall back to dev test-token
+  useEffect(() => {
+    let cancelled = false
+
+    async function init() {
+      try {
+        // 1. Check for Auth0 session
+        const res = await fetch("/api/auth/me")
+        if (res.ok) {
+          const data = await res.json()
+          if (data.user) {
+            const accessToken = data.accessToken ?? "auth0-session"
+
+            // Sync the Auth0 user with the backend
+            const exchangeRes = await fetch(`${API_BASE}/v1/auth/exchange`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                auth0_id: data.user.sub,
+                email: data.user.email,
+                full_name: data.user.name ?? data.user.email.split("@")[0],
+                role: "student",
+              }),
+            })
+
+            if (exchangeRes.ok) {
+              // Get full profile from backend
+              const profileRes = await fetch(`${API_BASE}/v1/users/me`, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+              })
+              if (profileRes.ok && !cancelled) {
+                const profile = await profileRes.json()
+                setUser({ ...profile, picture: data.user.picture })
+                setToken(accessToken)
+                setLoading(false)
+                return
+              }
+            }
+
+            // Even if backend sync fails, show Auth0 user
+            if (!cancelled) {
+              setUser({
+                id: data.user.sub,
+                email: data.user.email,
+                full_name: data.user.name,
+                role: "student",
+                preferences: null,
+                picture: data.user.picture,
+              })
+              setToken(accessToken)
+              setLoading(false)
+              return
+            }
+          }
+        }
+      } catch {
+        // Auth0 route not available — fall through to dev check
+      }
+
+      // 2. Fall back to dev token (for local dev without Auth0)
+      const stored = localStorage.getItem("im_token")
+      if (stored) {
+        try {
+          const profileRes = await fetch(`${API_BASE}/v1/users/me`, {
+            headers: { Authorization: `Bearer ${stored}` },
+          })
+          if (profileRes.ok && !cancelled) {
+            const profile = await profileRes.json()
+            setUser(profile)
+            setToken(stored)
+          }
+        } catch {
+          // ignore
+        }
+      }
+
+      if (!cancelled) setLoading(false)
     }
+
+    void init()
+    return () => { cancelled = true }
   }, [])
 
-  // Restore session on mount
-  useEffect(() => {
-    const stored = localStorage.getItem("im_token")
-    if (stored) {
-      setToken(stored)
-      fetchProfile(stored).then((u) => {
-        if (u) setUser(u)
-        setLoading(false)
-      })
-    } else {
-      setLoading(false)
-    }
-  }, [fetchProfile])
-
-  const login = useCallback(
-    async (email: string, name: string) => {
-      // Use the backend auth exchange endpoint to create/get the user,
-      // then use "test-token" for subsequent requests (dev flow).
-      // In production, replace with real Auth0 token exchange.
-      const t = "test-token"
-
-      // Exchange creates user if not exists
-      const exchangeRes = await fetch(`${API_BASE}/v1/auth/exchange`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ auth0_id: "auth0|local", email, full_name: name, role: "student" }),
-      })
-      if (!exchangeRes.ok) throw new Error("Login failed")
-
-      localStorage.setItem("im_token", t)
-      setToken(t)
-      const profile = await fetchProfile(t)
-      if (profile) setUser(profile)
-    },
-    [fetchProfile],
-  )
+  const login = useCallback(() => {
+    // Redirect to Auth0 login
+    window.location.assign("/api/auth/login")
+  }, [])
 
   const logout = useCallback(() => {
     localStorage.removeItem("im_token")
     setToken(null)
     setUser(null)
+    // Redirect to Auth0 logout (returns to home)
+    window.location.assign("/api/auth/logout")
   }, [])
 
   const refreshProfile = useCallback(async () => {
     if (!token) return
-    const profile = await fetchProfile(token)
-    if (profile) setUser(profile)
-  }, [token, fetchProfile])
+    try {
+      const res = await fetch(`${API_BASE}/v1/users/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (res.ok) {
+        const profile = await res.json()
+        setUser((prev) => prev ? { ...profile, picture: prev.picture } : profile)
+      }
+    } catch {
+      // ignore
+    }
+  }, [token])
 
   const updatePreferences = useCallback(
     async (prefs: UserPreferences) => {
@@ -123,8 +174,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify(prefs),
       })
       if (!res.ok) throw new Error("Failed to save preferences")
-      const updated = (await res.json()) as AuthUser
-      setUser(updated)
+      const updated = await res.json() as AuthUser
+      setUser((prev) => prev ? { ...updated, picture: prev.picture } : updated)
     },
     [token],
   )
