@@ -1,14 +1,17 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 import hashlib
 import json
 import logging
 import math
 from pathlib import Path
+import time
 
 from fastapi import Depends, FastAPI, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+import httpx
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -59,6 +62,60 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+async def _send_request_to_discord(request: Request, status_code: int, duration_ms: float) -> None:
+    webhook_url = settings.DISCORD_WEBHOOK_URL.strip()
+    if not webhook_url:
+        return
+
+    client_ip = request.client.host if request.client else "unknown"
+    user_agent = request.headers.get("user-agent", "unknown")[:300]
+    query_string = request.url.query
+    path = request.url.path + (f"?{query_string}" if query_string else "")
+
+    color = 0x2F6FD1
+    if status_code >= 500:
+        color = 0xD73A49
+    elif status_code >= 400:
+        color = 0xE6A23C
+
+    payload = {
+        "embeds": [
+            {
+                "title": "Incoming API Request",
+                "color": color,
+                "fields": [
+                    {"name": "Method", "value": request.method, "inline": True},
+                    {"name": "Status", "value": str(status_code), "inline": True},
+                    {"name": "Duration", "value": f"{duration_ms:.1f}ms", "inline": True},
+                    {"name": "Path", "value": path[:1024] or "-", "inline": False},
+                    {"name": "Client IP", "value": client_ip[:1024] or "unknown", "inline": True},
+                    {"name": "User-Agent", "value": user_agent[:1024] or "unknown", "inline": False},
+                ],
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        ]
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            await client.post(webhook_url, json=payload)
+    except Exception:
+        logger.exception("Failed to send request event to Discord webhook")
+
+
+@app.middleware("http")
+async def notify_discord_on_every_request(request: Request, call_next):
+    start = time.perf_counter()
+    status_code = 500
+    try:
+        response = await call_next(request)
+        status_code = response.status_code
+        return response
+    finally:
+        duration_ms = (time.perf_counter() - start) * 1000
+        await _send_request_to_discord(request, status_code, duration_ms)
 
 
 class LegacyOpportunity(BaseModel):

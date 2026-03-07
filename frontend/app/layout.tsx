@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Instrument_Serif, Manrope } from "next/font/google"
 import "./globals.css"
 import { AuthProvider } from "./auth-context"
+import Auth0ClientProvider from "@/components/auth0-client-provider"
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -48,7 +49,9 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:wght@400&display=swap" />
       </head>
       <body className="font-sans antialiased">
-        <AuthProvider>{children}</AuthProvider>
+        <Auth0ClientProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </Auth0ClientProvider>
       </body>
     </html>
   )

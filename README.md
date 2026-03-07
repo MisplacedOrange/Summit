@@ -29,6 +29,17 @@ Required backend environment variables:
 - `APP_JWT_SECRET`
 - `APP_JWT_EXPIRE_HOURS`
 - `ALLOWED_ORIGINS` (JSON array string, for example `["https://your-frontend-domain.com"]`)
+- `DISCORD_WEBHOOK_URL` (optional, forwards each API request summary to Discord)
+
+Frontend Auth0 environment variables (`frontend/.env.local`):
+- `NEXT_PUBLIC_API_BASE`
+- `AUTH0_SECRET`
+- `AUTH0_CLIENT_ID`
+- `AUTH0_CLIENT_SECRET`
+- `AUTH0_ISSUER_BASE_URL`
+- `AUTH0_AUDIENCE`
+- `AUTH0_SCOPE` (recommended: `openid profile email`)
+- `APP_BASE_URL` (for example `http://localhost:3000`)
 
 # Contributors
 - Dinesh Sinnathamby
