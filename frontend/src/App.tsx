@@ -1,34 +1,80 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect, useState } from 'react'
 import './App.css'
 
+type VolunteerOrg = {
+  name: string
+  url: string
+  description: string
+}
+
+type ApiResponse = {
+  query: string
+  count: number
+  source: string
+  items: VolunteerOrg[]
+}
+
 function App() {
-  const [count, setCount] = useState(0)
+  const [apiStatus, setApiStatus] = useState('Checking backend...')
+  const [orgs, setOrgs] = useState<VolunteerOrg[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [healthResponse, orgsResponse] = await Promise.all([
+          fetch('/api/health'),
+          fetch('/api/volunteer-organizations?limit=12'),
+        ])
+
+        if (!healthResponse.ok || !orgsResponse.ok) {
+          throw new Error('Backend returned a non-200 response')
+        }
+
+        const healthData: { status: string } = await healthResponse.json()
+        const orgData: ApiResponse = await orgsResponse.json()
+
+        setApiStatus(`Backend status: ${healthData.status}`)
+        setOrgs(orgData.items)
+      } catch (err) {
+        setApiStatus('Backend not reachable. Start FastAPI server on port 8000.')
+        setError(err instanceof Error ? err.message : 'Unknown error')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    void loadData()
+  }, [])
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
+    <main>
+      <h1>Summit</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
+        <p>{apiStatus}</p>
         <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
+          Showing businesses and organizations discovered from public volunteer-related web results.
         </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+
+      {loading && <p>Loading volunteer-friendly organizations...</p>}
+      {error && !loading && <p className="error">Could not fetch data: {error}</p>}
+
+      {!loading && !error && (
+        <section className="results-grid">
+          {orgs.map((org) => (
+            <article key={org.url} className="result-card">
+              <h2>{org.name}</h2>
+              <p>{org.description}</p>
+              <a href={org.url} target="_blank" rel="noreferrer">
+                Visit website
+              </a>
+            </article>
+          ))}
+        </section>
+      )}
+    </main>
   )
 }
 
