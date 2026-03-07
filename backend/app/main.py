@@ -1,7 +1,9 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 import hashlib
+import json
 import math
+from pathlib import Path
 
 from fastapi import Depends, FastAPI, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -115,6 +117,63 @@ def _build_legacy_item(opp: Opportunity, score: float = 0.0) -> LegacyOpportunit
     )
 
 
+def _load_legacy_seed_items(limit: int) -> list[LegacyOpportunity]:
+    repo_root = Path(__file__).resolve().parents[2]
+    candidates = [repo_root / "opportunities.json", repo_root / "static_opportunities.json"]
+
+    rows: list[dict[str, object]] = []
+    for path in candidates:
+        if not path.exists():
+            continue
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if isinstance(data, list) and data:
+            rows = [item for item in data if isinstance(item, dict)]
+            break
+
+    items: list[LegacyOpportunity] = []
+    for index, row in enumerate(rows[:limit], start=1):
+        title = str(row.get("title", "Volunteer Opportunity")).strip() or "Volunteer Opportunity"
+        link = str(row.get("link", row.get("url", "#"))).strip() or "#"
+        lat = row.get("latitude")
+        lon = row.get("longitude")
+        if not isinstance(lat, (int, float)) or not isinstance(lon, (int, float)):
+            lat, lon = _stable_coord(link + title)
+
+        category = str(row.get("cause", row.get("category", "community"))).strip() or "community"
+        skills_raw = row.get("skills", [])
+        skills = [str(item).strip() for item in skills_raw if str(item).strip()] if isinstance(skills_raw, list) else []
+        volunteers_needed = row.get("volunteers_needed", 6)
+        try:
+            volunteers_needed_int = int(volunteers_needed)
+        except Exception:
+            volunteers_needed_int = 6
+        urgency = "high" if volunteers_needed_int >= 10 else "medium" if volunteers_needed_int >= 4 else "low"
+
+        items.append(
+            LegacyOpportunity(
+                id=str(row.get("id", f"seed-{index}")),
+                title=title,
+                organization=str(row.get("organization", "ImpactMatch Organization")).strip() or "ImpactMatch Organization",
+                description=str(row.get("description", "Volunteer opportunity")).strip() or "Volunteer opportunity",
+                url=link,
+                cause=category,
+                location=str(row.get("location", "Toronto")).strip() or "Toronto",
+                schedule=str(row.get("schedule", row.get("time_commitment", "Flexible / Posted online"))).strip() or "Flexible / Posted online",
+                volunteers_needed=max(1, volunteers_needed_int),
+                skills=skills,
+                urgency=urgency,
+                score=float(row.get("score", 0.0) or 0.0),
+                latitude=float(lat),
+                longitude=float(lon),
+            )
+        )
+
+    return items
+
+
 def _score_legacy(opp: Opportunity, q: str, interests: list[str], skills: list[str], location: str) -> float:
     haystack = f"{opp.title} {opp.description} {opp.cause_category or ''}".lower()
     score = 0.0
@@ -144,6 +203,15 @@ async def legacy_discover(
     db: AsyncSession = Depends(get_db),
 ) -> LegacyOpportunityResponse:
     rows = list((await db.execute(select(Opportunity))).scalars().all())
+    if not rows:
+        items = _load_legacy_seed_items(limit=limit)
+        return LegacyOpportunityResponse(
+            query=q,
+            count=len(items),
+            source="ImpactMatch file fallback (opportunities.json/static_opportunities.json)",
+            items=items,
+        )
+
     if cause:
         rows = [item for item in rows if (item.cause_category or "").lower() == cause.lower()]
 
@@ -168,6 +236,14 @@ async def legacy_recommendations(
     db: AsyncSession = Depends(get_db),
 ) -> LegacyOpportunityResponse:
     rows = list((await db.execute(select(Opportunity))).scalars().all())
+    if not rows:
+        items = _load_legacy_seed_items(limit=payload.limit)
+        return LegacyOpportunityResponse(
+            query=" ".join(payload.interests) if payload.interests else "recommendations",
+            count=len(items),
+            source="ImpactMatch file fallback (opportunities.json/static_opportunities.json)",
+            items=items,
+        )
 
     scored: list[tuple[float, Opportunity]] = []
     for row in rows:
