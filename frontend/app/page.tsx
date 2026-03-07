@@ -83,12 +83,20 @@ export default function LandingPage() {
               </Link>
             </>
           ) : (
-            <Link
-              href="/discover"
-              className="rounded-full bg-[#37322F] px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-[#4A4340]"
-            >
-              Get Started
-            </Link>
+            <>
+              <Link
+                href="/login"
+                className="rounded-full border border-[#CFC7C1] px-5 py-2 text-sm font-medium transition-colors hover:bg-[#F3ECE5]"
+              >
+                Log in
+              </Link>
+              <Link
+                href="/signup"
+                className="rounded-full bg-[#37322F] px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-[#4A4340]"
+              >
+                Sign up
+              </Link>
+            </>
           )}
         </div>
       </nav>
@@ -107,12 +115,21 @@ export default function LandingPage() {
           Let AI match you to the causes that matter most.
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-          <Link
-            href="/discover"
-            className="rounded-full bg-[#37322F] px-7 py-3 text-sm font-medium text-white shadow-lg transition-all hover:bg-[#4A4340] hover:shadow-xl"
-          >
-            Explore Opportunities
-          </Link>
+          {user ? (
+            <Link
+              href="/discover"
+              className="rounded-full bg-[#37322F] px-7 py-3 text-sm font-medium text-white shadow-lg transition-all hover:bg-[#4A4340] hover:shadow-xl"
+            >
+              Explore Opportunities
+            </Link>
+          ) : (
+            <Link
+              href="/signup"
+              className="rounded-full bg-[#37322F] px-7 py-3 text-sm font-medium text-white shadow-lg transition-all hover:bg-[#4A4340] hover:shadow-xl"
+            >
+              Create Free Account
+            </Link>
+          )}
           <a
             href="#features"
             className="rounded-full border border-[#CFC7C1] px-7 py-3 text-sm font-medium transition-colors hover:bg-[#F3ECE5]"

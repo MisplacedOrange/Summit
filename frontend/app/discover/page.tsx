@@ -1,7 +1,7 @@
 "use client"
 
 import dynamic from "next/dynamic"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useAuth } from "../auth-context"
 import { mapOpportunityRead, type V1OpportunityRead } from "@/lib/utils"
@@ -30,6 +30,8 @@ type V1ListResponse = { total: number; items: V1OpportunityRead[] }
 type V1RecommendationResponse = { items: Array<{ opportunity: V1OpportunityRead; score: number }> }
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000"
+const MAP_OPPORTUNITY_LIMIT = 100
+const LIST_OPPORTUNITY_LIMIT = 24
 
 const CAUSE_OPTIONS = ["", "environment", "education", "healthcare", "community", "animal-care", "arts-culture"]
 
@@ -104,8 +106,7 @@ function EmptyState({ isError, onRetry }: { isError?: boolean; onRetry: () => vo
 
 
 export default function ImpactMatchPage() {
-  const { user, token, loading: authLoading, login, logout } = useAuth()
-  const router = useRouter()
+  const { user, loading: authLoading, logout } = useAuth()
 
   const [query, setQuery] = useState("student volunteer opportunities Toronto")
   const [cause, setCause] = useState("")
@@ -187,12 +188,11 @@ export default function ImpactMatchPage() {
     try {
       const url = new URL(`${API_BASE}/v1/opportunities`)
       url.searchParams.set("q", query)
-      url.searchParams.set("limit", "16")
-      if (cause) url.searchParams.set("category", cause)
-      if (userCoords) {
-        url.searchParams.set("lat", String(userCoords.lat))
-        url.searchParams.set("lng", String(userCoords.lng))
-      }
+      url.searchParams.set("location", location)
+      url.searchParams.set("limit", String(MAP_OPPORTUNITY_LIMIT))
+      if (cause) url.searchParams.set("cause", cause)
+      if (interests) url.searchParams.set("interests", interests)
+      if (skills) url.searchParams.set("skills", skills)
 
       const response = await fetch(url.toString())
       if (!response.ok) throw new Error(`Backend returned ${response.status}`)
@@ -215,8 +215,27 @@ export default function ImpactMatchPage() {
     setAiMatching(true)
     setError(null)
     try {
-      const response = await fetch(`${API_BASE}/v1/recommendations`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const payload = {
+        interests: interestsInput
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean),
+        skills: skillsInput
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean),
+        availability,
+        location,
+        max_distance_km: 20,
+        limit: MAP_OPPORTUNITY_LIMIT,
+      }
+
+      const response = await fetch(`${API_BASE}/api/recommendations`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       })
       if (!response.ok) throw new Error(`Backend returned ${response.status}`)
       const data: V1RecommendationResponse = await response.json()
@@ -271,12 +290,12 @@ export default function ImpactMatchPage() {
                 </button>
               </div>
             ) : (
-              <button
-                onClick={login}
+              <Link
+                href="/login"
                 className="rounded-full bg-[#37322F] px-4 py-1.5 text-sm font-medium text-white"
               >
                 Sign in
-              </button>
+              </Link>
             )}
           </div>
           <h1 className="mt-4 text-2xl font-semibold leading-tight sm:text-3xl md:text-5xl">
@@ -451,12 +470,15 @@ export default function ImpactMatchPage() {
             <p className="mt-1 text-sm text-[#605A57]">Color-coded pins show nearby opportunities and urgent needs. Click a pin for details.</p>
             <div className="mt-4 overflow-hidden rounded-xl border border-[#ECE7E2]">
               <OpportunityMap
-                items={filteredItems.slice(0, 40)}
+                items={filteredItems.slice(0, MAP_OPPORTUNITY_LIMIT)}
                 className="h-[380px] w-full"
                 userLocation={userCoords}
                 onLocateMe={requestGeolocation}
               />
             </div>
+            <p className="mt-3 text-xs text-[#6C645F]">
+              Showing up to {Math.min(filteredItems.length, MAP_OPPORTUNITY_LIMIT)} mapped opportunities with saved coordinates.
+            </p>
             <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs text-[#6C645F]">
               {Object.entries(CAUSE_COLORS).map(([cause, colors]) => (
                 <span key={cause} className="inline-flex items-center gap-1.5">
@@ -477,13 +499,18 @@ export default function ImpactMatchPage() {
               ? "Ranked by AI based on your interests, skills, and location."
               : "High-need local work and discovered listings from the open web."}
           </p>
+          {filteredItems.length > LIST_OPPORTUNITY_LIMIT && (
+            <p className="mt-2 text-xs text-[#6C645F]">
+              Showing {LIST_OPPORTUNITY_LIMIT} cards below. The map still includes up to {Math.min(filteredItems.length, MAP_OPPORTUNITY_LIMIT)} opportunities.
+            </p>
+          )}
 
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {loading && items.length === 0 ? (
               <>{Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}</>
             ) : filteredItems.length === 0 ? (
               <EmptyState isError={!!error} onRetry={() => void discoverOpportunities()} />
-            ) : filteredItems.map((item) => {
+            ) : filteredItems.slice(0, LIST_OPPORTUNITY_LIMIT).map((item) => {
               const causeStyle = CAUSE_COLORS[item.cause] ?? { bg: "bg-gray-100", text: "text-gray-700", dot: "#6b7280" }
               return (
                 <article key={item.id} className="rounded-xl border border-[#E7E1DA] p-4 transition-shadow duration-200 hover:shadow-md">

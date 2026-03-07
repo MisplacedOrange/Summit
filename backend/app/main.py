@@ -25,8 +25,26 @@ import app.models  # noqa: F401
 logger = logging.getLogger(__name__)
 
 
+async def _run_sqlite_compat_migrations() -> None:
+    """Patch older local SQLite schemas to match current models without manual reset."""
+    if engine.dialect.name != "sqlite":
+        return
+
+    async with engine.begin() as conn:
+        exists_result = await conn.exec_driver_sql("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
+        if exists_result.first() is None:
+            return
+
+        columns_result = await conn.exec_driver_sql("PRAGMA table_info(users)")
+        columns = {row[1] for row in columns_result.fetchall()}
+
+        if "avatar_url" not in columns:
+            await conn.exec_driver_sql("ALTER TABLE users ADD COLUMN avatar_url TEXT")
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    await _run_sqlite_compat_migrations()
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
@@ -75,7 +93,7 @@ class LegacyRecommendationRequest(BaseModel):
     availability: str = "weekends"
     location: str = "Toronto"
     max_distance_km: int = 20
-    limit: int = Field(default=16, ge=1, le=50)
+    limit: int = Field(default=16, ge=1, le=100)
 
 
 def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -211,7 +229,7 @@ async def legacy_discover(
     location: str = Query(default="Toronto"),
     interests: str = Query(default=""),
     skills: str = Query(default=""),
-    limit: int = Query(default=16, ge=1, le=50),
+    limit: int = Query(default=16, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
 ) -> LegacyOpportunityResponse:
     rows = list((await db.execute(select(Opportunity))).scalars().all())

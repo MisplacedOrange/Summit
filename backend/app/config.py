@@ -11,6 +11,12 @@ class Settings(BaseSettings):
     AUTH0_DOMAIN: str = ""
     AUTH0_AUDIENCE: str = ""
 
+    SUPABASE_URL: str = ""
+    SUPABASE_ANON_KEY: str = ""
+
+    APP_JWT_SECRET: str = "change-me-in-production"
+    APP_JWT_EXPIRE_HOURS: int = 24
+
     GEMINI_API_KEY: str = ""
     MAPBOX_SECRET_TOKEN: str = ""
 
