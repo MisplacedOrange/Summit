@@ -15,6 +15,8 @@ type Opportunity = {
   skills: string[]
   urgency: "low" | "medium" | "high"
   score: number
+  match_pct: number
+  match_reason: string
   latitude: number
   longitude: number
 }
@@ -62,6 +64,8 @@ export default function ImpactMatchPage() {
   const [items, setItems] = useState<Opportunity[]>([])
   const [source, setSource] = useState("")
   const [loading, setLoading] = useState(false)
+  const [aiMatching, setAiMatching] = useState(false)
+  const [isAiResult, setIsAiResult] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const stats = useMemo(() => {
@@ -83,6 +87,7 @@ export default function ImpactMatchPage() {
 
   async function discoverOpportunities() {
     setLoading(true)
+    setIsAiResult(false)
     setError(null)
     try {
       const interests = interestsInput
@@ -109,6 +114,7 @@ export default function ImpactMatchPage() {
 
   async function runAiMatch() {
     setLoading(true)
+    setAiMatching(true)
     setError(null)
     try {
       const payload = {
@@ -137,10 +143,12 @@ export default function ImpactMatchPage() {
       const data: OpportunityResponse = await response.json()
       setItems(data.items)
       setSource(data.source)
+      setIsAiResult(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error")
     } finally {
       setLoading(false)
+      setAiMatching(false)
     }
   }
 
@@ -273,18 +281,51 @@ export default function ImpactMatchPage() {
                   className="rounded-full bg-[#37322F] px-5 py-2 text-sm font-medium text-white"
                   disabled={loading}
                 >
-                  {loading ? "Loading..." : "Discover opportunities"}
+                  {loading && !aiMatching ? "Loading..." : "Discover opportunities"}
                 </button>
                 <button
                   onClick={() => void runAiMatch()}
-                  className="rounded-full border border-[#CFC7C1] bg-white px-5 py-2 text-sm font-medium"
+                  className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
+                    aiMatching
+                      ? "border border-purple-400 bg-purple-50 text-purple-700"
+                      : isAiResult
+                        ? "border border-purple-300 bg-purple-50 text-purple-700"
+                        : "border border-[#CFC7C1] bg-white hover:border-purple-300 hover:bg-purple-50"
+                  }`}
                   disabled={loading}
                 >
-                  AI match me
+                  {aiMatching ? (
+                    <span className="inline-flex items-center gap-1.5">
+                      <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Matching...
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5">
+                      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 2l2.09 6.26L20.18 9l-5 4.27L16.82 20 12 16.9 7.18 20l1.64-6.73L3.82 9l6.09-.74Z" />
+                      </svg>
+                      AI match me
+                    </span>
+                  )}
                 </button>
               </div>
 
-              {source && <p className="text-xs text-[#7D756F]">Source: {source}</p>}
+              {source && (
+                <p className="text-xs text-[#7D756F]">
+                  {isAiResult && (
+                    <span className="mr-1.5 inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-semibold text-purple-700">
+                      <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 2l2.09 6.26L20.18 9l-5 4.27L16.82 20 12 16.9 7.18 20l1.64-6.73L3.82 9l6.09-.74Z" />
+                      </svg>
+                      AI Ranked
+                    </span>
+                  )}
+                  Source: {source}
+                </p>
+              )}
               {error && <p className="text-sm text-red-700">Could not fetch opportunities: {error}</p>}
             </div>
           </div>
@@ -319,8 +360,14 @@ export default function ImpactMatchPage() {
         </div>
 
         <div className="mt-4 rounded-2xl border border-[#E5E1DD] bg-white p-4">
-          <h2 className="text-lg font-semibold">Opportunities</h2>
-          <p className="mt-1 text-sm text-[#605A57]">High-need local work and discovered listings from the open web.</p>
+          <h2 className="text-lg font-semibold">
+            {isAiResult ? "AI-Matched opportunities" : "Opportunities"}
+          </h2>
+          <p className="mt-1 text-sm text-[#605A57]">
+            {isAiResult
+              ? "Ranked by AI based on your interests, skills, and location."
+              : "High-need local work and discovered listings from the open web."}
+          </p>
 
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             {filteredItems.map((item) => {
@@ -329,16 +376,33 @@ export default function ImpactMatchPage() {
                 <article key={item.id} className="rounded-xl border border-[#E7E1DA] p-4">
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="text-base font-semibold leading-tight">{item.title}</h3>
-                    <span className={`rounded-full px-2 py-1 text-[11px] font-medium ${colorClass}`}>{toLabel(item.cause)}</span>
+                    <div className="flex shrink-0 items-center gap-1.5">
+                      {isAiResult && item.match_pct > 0 && (
+                        <span className={`rounded-full px-2 py-1 text-[11px] font-bold ${
+                          item.match_pct >= 70 ? "bg-emerald-100 text-emerald-700" :
+                          item.match_pct >= 45 ? "bg-amber-100 text-amber-700" :
+                          "bg-gray-100 text-gray-600"
+                        }`}>
+                          {item.match_pct}% match
+                        </span>
+                      )}
+                      <span className={`rounded-full px-2 py-1 text-[11px] font-medium ${colorClass}`}>{toLabel(item.cause)}</span>
+                    </div>
                   </div>
                   <p className="mt-1 text-sm text-[#625B56]">{item.organization}</p>
-                  <p className="mt-3 line-clamp-3 text-sm text-[#625B56]">{item.description}</p>
+                  {isAiResult && item.match_reason && (
+                    <p className="mt-1.5 text-xs italic text-purple-600">{item.match_reason}</p>
+                  )}
+                  <p className="mt-2 line-clamp-3 text-sm text-[#625B56]">{item.description}</p>
 
                   <div className="mt-3 flex flex-wrap gap-2 text-xs text-[#6B645E]">
                     <span className="rounded-full bg-[#F3ECE5] px-2 py-1">{item.location}</span>
                     <span className="rounded-full bg-[#F3ECE5] px-2 py-1">{item.schedule}</span>
                     <span className="rounded-full bg-[#F3ECE5] px-2 py-1">Need: {item.volunteers_needed}</span>
-                    <span className="rounded-full bg-[#F3ECE5] px-2 py-1">Score: {item.score.toFixed(1)}</span>
+                    {isAiResult
+                      ? <span className="rounded-full bg-purple-50 px-2 py-1 text-purple-700">{item.match_pct}%</span>
+                      : <span className="rounded-full bg-[#F3ECE5] px-2 py-1">Score: {item.score.toFixed(1)}</span>
+                    }
                   </div>
 
                   <div className="mt-3 flex flex-wrap gap-2">

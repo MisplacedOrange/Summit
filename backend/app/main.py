@@ -2,6 +2,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 import hashlib
 import json
+import logging
 import math
 from pathlib import Path
 
@@ -18,7 +19,10 @@ from app.db.base import Base
 from app.db.session import get_db
 from app.db.session import engine
 from app.models.opportunity import Opportunity
+from app.services.gemini import gemini_service
 import app.models  # noqa: F401
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
@@ -52,6 +56,8 @@ class LegacyOpportunity(BaseModel):
     skills: list[str]
     urgency: str
     score: float = 0.0
+    match_pct: int = 0
+    match_reason: str = ""
     latitude: float
     longitude: float
 
@@ -119,7 +125,7 @@ def _build_legacy_item(opp: Opportunity, score: float = 0.0) -> LegacyOpportunit
 
 def _load_legacy_seed_items(limit: int) -> list[LegacyOpportunity]:
     repo_root = Path(__file__).resolve().parents[2]
-    candidates = [repo_root / "opportunities.json", repo_root / "static_opportunities.json"]
+    candidates = [repo_root / "static_opportunities.json", repo_root / "opportunities.json"]
 
     rows: list[dict[str, object]] = []
     for path in candidates:
@@ -230,39 +236,218 @@ async def legacy_discover(
     )
 
 
+# ---------------------------------------------------------------------------
+# Embedding helpers & in-memory cache for AI matching
+# ---------------------------------------------------------------------------
+
+_embedding_cache: dict[str, list[float]] = {}
+
+
+def _cosine_similarity(a: list[float], b: list[float]) -> float:
+    if not a or not b or len(a) != len(b):
+        return 0.0
+    dot = sum(x * y for x, y in zip(a, b))
+    na = math.sqrt(sum(x * x for x in a))
+    nb = math.sqrt(sum(y * y for y in b))
+    if na == 0 or nb == 0:
+        return 0.0
+    return dot / (na * nb)
+
+
+async def _get_embedding(text: str) -> list[float]:
+    """Return a cached embedding or compute one via Gemini / fallback."""
+    key = hashlib.sha256(text.encode()).hexdigest()
+    if key in _embedding_cache:
+        return _embedding_cache[key]
+    emb = await gemini_service.embed(text)
+    _embedding_cache[key] = emb
+    return emb
+
+
+def _build_match_reason(
+    sim: float,
+    skill_overlap: list[str],
+    location_match: bool,
+    urgency: str,
+) -> str:
+    """Build a human-readable explanation of why an opportunity matched."""
+    parts: list[str] = []
+    if sim >= 0.82:
+        parts.append("Strong alignment with your interests")
+    elif sim >= 0.65:
+        parts.append("Good alignment with your interests")
+    elif sim >= 0.45:
+        parts.append("Moderate alignment with your interests")
+    if skill_overlap:
+        parts.append(f"Matches your skills: {', '.join(skill_overlap[:3])}")
+    if location_match:
+        parts.append("Near your location")
+    if urgency == "high":
+        parts.append("High urgency – volunteers needed now")
+    return ". ".join(parts) + "." if parts else "Potential match based on overall profile."
+
+
+async def _ai_score_seed_item(
+    item: LegacyOpportunity,
+    profile_emb: list[float],
+    user_skills: list[str],
+    user_location: str,
+    max_distance_km: int,
+) -> tuple[float, int, str]:
+    """Score a seed LegacyOpportunity using embedding similarity + signals."""
+    opp_text = f"{item.title}. {item.description}. Category: {item.cause}. Skills: {', '.join(item.skills)}"
+    opp_emb = await _get_embedding(opp_text)
+
+    sim = _cosine_similarity(profile_emb, opp_emb)
+
+    # Skill overlap bonus
+    user_skills_lower = {s.lower() for s in user_skills}
+    opp_skills_lower = {s.lower() for s in item.skills}
+    overlap = sorted(user_skills_lower & opp_skills_lower)
+    skill_bonus = min(len(overlap) * 0.08, 0.24)
+
+    # Location proximity bonus
+    location_match = user_location.lower() in item.location.lower()
+    loc_bonus = 0.10 if location_match else 0.0
+
+    # Urgency bonus
+    urgency_bonus = 0.06 if item.urgency == "high" else 0.02 if item.urgency == "medium" else 0.0
+
+    raw_score = sim + skill_bonus + loc_bonus + urgency_bonus
+    match_pct = max(1, min(99, int(raw_score * 70)))
+    reason = _build_match_reason(sim, overlap, location_match, item.urgency)
+    return raw_score, match_pct, reason
+
+
+async def _ai_score_db_row(
+    row: Opportunity,
+    profile_emb: list[float],
+    user_skills: list[str],
+    user_location: str,
+    max_distance_km: int,
+) -> tuple[float, int, str]:
+    """Score a DB Opportunity row using embedding similarity + signals."""
+    opp_text = f"{row.title}. {row.description}. Category: {row.cause_category or 'general'}. Skills: {', '.join(row.skills_required or [])}"
+    opp_emb = await _get_embedding(opp_text)
+
+    sim = _cosine_similarity(profile_emb, opp_emb)
+
+    user_skills_lower = {s.lower() for s in user_skills}
+    opp_skills_lower = {s.lower() for s in (row.skills_required or [])}
+    overlap = sorted(user_skills_lower & opp_skills_lower)
+    skill_bonus = min(len(overlap) * 0.08, 0.24)
+
+    location_match = user_location.lower() in (row.location_text or "").lower()
+    loc_bonus = 0.10 if location_match else 0.0
+
+    needed = int(row.volunteers_needed or 1)
+    signed = int(row.volunteers_signed or 0)
+    remaining = max(0, needed - signed)
+    urgency = "high" if remaining >= 10 else "medium" if remaining >= 4 else "low"
+    urgency_bonus = 0.06 if urgency == "high" else 0.02 if urgency == "medium" else 0.0
+
+    # Proximity bonus (haversine)
+    prox_bonus = 0.0
+    if row.location_lat is not None and row.location_lng is not None:
+        ref_coords = _city_coords(user_location)
+        if ref_coords:
+            dist = _haversine_km(ref_coords[0], ref_coords[1], float(row.location_lat), float(row.location_lng))
+            if dist <= max_distance_km:
+                prox_bonus = max(0.0, 0.12 * (1 - dist / max_distance_km))
+                location_match = True
+
+    raw_score = sim + skill_bonus + loc_bonus + prox_bonus + urgency_bonus
+    match_pct = max(1, min(99, int(raw_score * 70)))
+    reason = _build_match_reason(sim, overlap, location_match, urgency)
+    return raw_score, match_pct, reason
+
+
+def _city_coords(location: str) -> tuple[float, float] | None:
+    """Return (lat, lng) for well-known city names."""
+    cities: dict[str, tuple[float, float]] = {
+        "toronto": (43.6532, -79.3832),
+        "mississauga": (43.5890, -79.6441),
+        "vancouver": (49.2827, -123.1207),
+        "montreal": (45.5017, -73.5673),
+        "ottawa": (45.4215, -75.6972),
+        "calgary": (51.0447, -114.0719),
+        "edmonton": (53.5461, -113.4938),
+    }
+    return cities.get(location.strip().lower())
+
+
 @app.post("/api/recommendations", response_model=LegacyOpportunityResponse)
 async def legacy_recommendations(
     payload: LegacyRecommendationRequest,
     db: AsyncSession = Depends(get_db),
 ) -> LegacyOpportunityResponse:
+    # Build user profile text and embed it
+    profile_parts = []
+    if payload.interests:
+        profile_parts.append(f"Interests: {', '.join(payload.interests)}")
+    if payload.skills:
+        profile_parts.append(f"Skills: {', '.join(payload.skills)}")
+    if payload.availability:
+        profile_parts.append(f"Availability: {payload.availability}")
+    if payload.location:
+        profile_parts.append(f"Location: {payload.location}")
+    profile_text = ". ".join(profile_parts) or "volunteer opportunities"
+
+    try:
+        profile_emb = await _get_embedding(profile_text)
+    except Exception:
+        logger.warning("Embedding generation failed; falling back to keyword scoring")
+        profile_emb = []
+
+    query_label = " ".join(payload.interests) if payload.interests else "AI recommendations"
+
+    # --- DB path ---------------------------------------------------------
     rows = list((await db.execute(select(Opportunity))).scalars().all())
-    if not rows:
-        items = _load_legacy_seed_items(limit=payload.limit)
+    if rows:
+        scored: list[tuple[float, int, str, Opportunity]] = []
+        for row in rows:
+            raw, pct, reason = await _ai_score_db_row(
+                row, profile_emb, payload.skills, payload.location, payload.max_distance_km,
+            )
+            scored.append((raw, pct, reason, row))
+        scored.sort(key=lambda t: t[0], reverse=True)
+
+        items: list[LegacyOpportunity] = []
+        for raw, pct, reason, row in scored[: payload.limit]:
+            item = _build_legacy_item(row, score=raw)
+            item.match_pct = pct
+            item.match_reason = reason
+            items.append(item)
+
         return LegacyOpportunityResponse(
-            query=" ".join(payload.interests) if payload.interests else "recommendations",
+            query=query_label,
             count=len(items),
-            source="ImpactMatch file fallback (opportunities.json/static_opportunities.json)",
+            source="ImpactMatch AI matching",
             items=items,
         )
 
-    scored: list[tuple[float, Opportunity]] = []
-    for row in rows:
-        score = _score_legacy(row, " ".join(payload.interests), payload.interests, payload.skills, payload.location)
-        if row.location_lat is not None and row.location_lng is not None and payload.location.lower() == "toronto":
-            toronto_lat, toronto_lng = 43.6532, -79.3832
-            distance = _haversine_km(toronto_lat, toronto_lng, float(row.location_lat), float(row.location_lng))
-            if distance <= payload.max_distance_km:
-                score += 1.0
-        scored.append((score, row))
+    # --- Seed-file fallback path -----------------------------------------
+    seed_items = _load_legacy_seed_items(limit=50)
+    scored_seed: list[tuple[float, int, str, LegacyOpportunity]] = []
+    for item in seed_items:
+        raw, pct, reason = await _ai_score_seed_item(
+            item, profile_emb, payload.skills, payload.location, payload.max_distance_km,
+        )
+        scored_seed.append((raw, pct, reason, item))
+    scored_seed.sort(key=lambda t: t[0], reverse=True)
 
-    scored.sort(key=lambda pair: pair[0], reverse=True)
-    items = [_build_legacy_item(item, score=score) for score, item in scored[: payload.limit]]
+    result_items: list[LegacyOpportunity] = []
+    for raw, pct, reason, item in scored_seed[: payload.limit]:
+        item.score = round(raw, 2)
+        item.match_pct = pct
+        item.match_reason = reason
+        result_items.append(item)
 
     return LegacyOpportunityResponse(
-        query=" ".join(payload.interests) if payload.interests else "recommendations",
-        count=len(items),
-        source="ImpactMatch recommendation compatibility layer",
-        items=items,
+        query=query_label,
+        count=len(result_items),
+        source="ImpactMatch AI matching (seed data)",
+        items=result_items,
     )
 @app.get("/")
 async def read_root() -> dict[str, str]:

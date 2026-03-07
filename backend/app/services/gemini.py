@@ -9,9 +9,11 @@ from app.config import settings
 
 
 class GeminiService:
+    EMBED_DIM = 3072
+
     def __init__(self) -> None:
-        self.embed_model = "models/text-embedding-004"
-        self.generate_model = "gemini-1.5-flash"
+        self.embed_model = "models/gemini-embedding-001"
+        self.generate_model = "gemini-2.0-flash"
 
     async def generate(self, prompt: str) -> str:
         if not settings.GEMINI_API_KEY:
@@ -33,7 +35,7 @@ class GeminiService:
 
     async def embed(self, text: str) -> list[float]:
         if settings.GEMINI_API_KEY:
-            endpoint = "https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent"
+            endpoint = f"https://generativelanguage.googleapis.com/v1beta/{self.embed_model}:embedContent"
             payload: dict[str, Any] = {
                 "model": self.embed_model,
                 "content": {"parts": [{"text": text}]},
@@ -45,13 +47,13 @@ class GeminiService:
                 response.raise_for_status()
                 data = response.json()
             embedding = data.get("embedding", {}).get("values", [])
-            if isinstance(embedding, list) and len(embedding) == 768:
+            if isinstance(embedding, list) and len(embedding) == self.EMBED_DIM:
                 return [float(v) for v in embedding]
 
         # Deterministic fallback embedding for local/test environments.
         digest = hashlib.sha256(text.encode("utf-8")).digest()
-        seed_values = list(digest) * 24
-        return [float(v) / 255.0 for v in seed_values[:768]]
+        seed_values = list(digest) * (self.EMBED_DIM // len(hashlib.sha256(b"").digest()) + 1)
+        return [float(v) / 255.0 for v in seed_values[: self.EMBED_DIM]]
 
 
 gemini_service = GeminiService()
