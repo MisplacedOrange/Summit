@@ -1,6 +1,21 @@
 [
   {
-    "organization": "foodbankscanada.ca",
+    "organization": "https://www.redcross.ca/volunteer",
+    "title": "www.redcross.ca",
+    "category": "community services",
+    "skills": [
+      "communication",
+      "teamwork"
+    ],
+    "location": "Toronto",
+    "time_commitment": "Flexible",
+    "description": "This website uses a security service to protect against malicious bots. This page is displayed while the website verifies you are not a bot.",
+    "impact_level": 5,
+    "link": "https://www.redcross.ca/volunteer",
+    "source": "https://www.redcross.ca/volunteer"
+  },
+  {
+    "organization": "https://www.foodbankscanada.ca/get-involved/volunteer/",
     "title": "HUMAN POTENTIAL IS TOO VALUABLE TO GO UNFED",
     "category": "food security",
     "skills": [
@@ -14,7 +29,7 @@
     "source": "https://www.foodbankscanada.ca/get-involved/volunteer/"
   },
   {
-    "organization": "foodbankscanada.ca",
+    "organization": "https://www.foodbankscanada.ca/get-involved/volunteer/",
     "title": "Let\u2019s Make a Difference Together",
     "category": "food security",
     "skills": [
@@ -28,7 +43,7 @@
     "source": "https://www.foodbankscanada.ca/get-involved/volunteer/"
   },
   {
-    "organization": "foodbankscanada.ca",
+    "organization": "https://www.foodbankscanada.ca/get-involved/volunteer/",
     "title": "Corporate partnerships",
     "category": "food security",
     "skills": [
@@ -43,7 +58,7 @@
     "source": "https://www.foodbankscanada.ca/get-involved/volunteer/"
   },
   {
-    "organization": "foodbankscanada.ca",
+    "organization": "https://www.foodbankscanada.ca/get-involved/volunteer/",
     "title": "Our Partners",
     "category": "food security",
     "skills": [
@@ -55,5 +70,20 @@
     "impact_level": 6,
     "link": "https://foodbankscanada.ca/how-to-help/partner-recognition/",
     "source": "https://www.foodbankscanada.ca/get-involved/volunteer/"
+  },
+  {
+    "organization": "https://www.volunteertoronto.ca/networking/opening_search.asp",
+    "title": "www.volunteertoronto.ca",
+    "category": "community services",
+    "skills": [
+      "communication",
+      "teamwork"
+    ],
+    "location": "Toronto",
+    "time_commitment": "Flexible",
+    "description": "This website uses a security service to protect against malicious bots. This page is displayed while the website verifies you are not a bot.",
+    "impact_level": 5,
+    "link": "https://www.volunteertoronto.ca/networking/opening_search.asp",
+    "source": "https://www.volunteertoronto.ca/networking/opening_search.asp"
   }
 ]

@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 try:
     from pgvector.sqlalchemy import Vector
 
-    EMBEDDING_TYPE = Vector(768)
+    EMBEDDING_TYPE = Vector(3072)
 except Exception:  # pragma: no cover - fallback for local sqlite without pgvector
     from sqlalchemy import JSON
 

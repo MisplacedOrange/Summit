@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import { useAuth } from "./auth-context"
 
 type Opportunity = {
   id: string
@@ -52,6 +53,13 @@ function normalizeToPercent(value: number, min: number, max: number): number {
 }
 
 export default function ImpactMatchPage() {
+  const { user, loading: authLoading, login, logout } = useAuth()
+  const [showLogin, setShowLogin] = useState(false)
+  const [loginEmail, setLoginEmail] = useState("")
+  const [loginName, setLoginName] = useState("")
+  const [loginError, setLoginError] = useState("")
+  const [loggingIn, setLoggingIn] = useState(false)
+
   const [query, setQuery] = useState("student volunteer opportunities Toronto")
   const [cause, setCause] = useState("")
   const [location, setLocation] = useState("Toronto")
@@ -67,6 +75,31 @@ export default function ImpactMatchPage() {
   const [aiMatching, setAiMatching] = useState(false)
   const [isAiResult, setIsAiResult] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Populate inputs from saved preferences when user logs in
+  useEffect(() => {
+    if (user?.preferences) {
+      const p = user.preferences
+      if (p.interests.length > 0) setInterestsInput(p.interests.join(", "))
+      if (p.skills.length > 0) setSkillsInput(p.skills.join(", "))
+    }
+  }, [user])
+
+  async function handleLogin() {
+    if (!loginEmail.trim()) { setLoginError("Email is required"); return }
+    setLoggingIn(true)
+    setLoginError("")
+    try {
+      await login(loginEmail.trim(), loginName.trim() || loginEmail.trim().split("@")[0])
+      setShowLogin(false)
+      setLoginEmail("")
+      setLoginName("")
+    } catch {
+      setLoginError("Login failed. Please try again.")
+    } finally {
+      setLoggingIn(false)
+    }
+  }
 
   const stats = useMemo(() => {
     const totalNeeds = items.reduce((acc, item) => acc + item.volunteers_needed, 0)
@@ -175,11 +208,82 @@ export default function ImpactMatchPage() {
 
   return (
     <main className="min-h-screen bg-[#F7F5F3] text-[#37322F]">
+      {/* Login modal */}
+      {showLogin && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-2xl border border-[#E5E1DD] bg-white p-6 shadow-xl">
+            <h2 className="text-lg font-semibold">Sign in to ImpactMatch</h2>
+            <p className="mt-1 text-sm text-[#605A57]">Save your preferences and get personalized AI matches.</p>
+            <div className="mt-4 grid gap-3">
+              <input
+                className="w-full rounded-md border border-[#D9D2CC] px-3 py-2 text-sm"
+                type="email"
+                value={loginEmail}
+                onChange={(e) => setLoginEmail(e.target.value)}
+                placeholder="Email address"
+                onKeyDown={(e) => e.key === "Enter" && void handleLogin()}
+              />
+              <input
+                className="w-full rounded-md border border-[#D9D2CC] px-3 py-2 text-sm"
+                value={loginName}
+                onChange={(e) => setLoginName(e.target.value)}
+                placeholder="Full name (optional)"
+                onKeyDown={(e) => e.key === "Enter" && void handleLogin()}
+              />
+              {loginError && <p className="text-sm text-red-600">{loginError}</p>}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => void handleLogin()}
+                  disabled={loggingIn}
+                  className="flex-1 rounded-full bg-[#37322F] px-5 py-2 text-sm font-medium text-white disabled:opacity-50"
+                >
+                  {loggingIn ? "Signing in…" : "Sign in"}
+                </button>
+                <button
+                  onClick={() => setShowLogin(false)}
+                  className="rounded-full border border-[#CFC7C1] px-5 py-2 text-sm font-medium"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <section className="mx-auto max-w-[1100px] px-4 py-10 md:px-6">
         <div className="rounded-3xl border border-[#E5E1DD] bg-white/80 p-6 shadow-sm backdrop-blur">
-          <p className="inline-flex rounded-full border border-[#E5E1DD] bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide">
-            Summit ImpactMatch
-          </p>
+          <div className="flex items-start justify-between">
+            <p className="inline-flex rounded-full border border-[#E5E1DD] bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+              Summit ImpactMatch
+            </p>
+            {user ? (
+              <div className="flex items-center gap-2">
+                <a
+                  href="/profile"
+                  className="inline-flex items-center gap-2 rounded-full border border-[#E5E1DD] bg-white px-3 py-1.5 text-sm font-medium hover:bg-[#F3ECE5] transition-colors"
+                >
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#37322F] text-[10px] font-bold text-white">
+                    {user.full_name?.[0]?.toUpperCase() ?? user.email[0].toUpperCase()}
+                  </span>
+                  {user.full_name ?? user.email.split("@")[0]}
+                </a>
+                <button
+                  onClick={logout}
+                  className="rounded-full border border-[#CFC7C1] bg-white px-3 py-1.5 text-xs font-medium hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-colors"
+                >
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowLogin(true)}
+                className="rounded-full bg-[#37322F] px-4 py-1.5 text-sm font-medium text-white"
+              >
+                Sign in
+              </button>
+            )}
+          </div>
           <h1 className="mt-4 text-3xl font-semibold leading-tight md:text-5xl">
             Find meaningful volunteer hours with real local impact.
           </h1>
@@ -312,6 +416,16 @@ export default function ImpactMatchPage() {
                   )}
                 </button>
               </div>
+
+              {user?.preferences && user.preferences.interests.length > 0 && (
+                <p className="flex items-center gap-1.5 text-xs text-emerald-600">
+                  <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20 6L9 17l-5-5" />
+                  </svg>
+                  Using your saved preferences.{" "}
+                  <a href="/profile" className="underline hover:text-emerald-700">Edit</a>
+                </p>
+              )}
 
               {source && (
                 <p className="text-xs text-[#7D756F]">
