@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useAuth } from "../auth-context"
 import { mapOpportunityRead, type V1OpportunityRead } from "@/lib/utils"
@@ -106,7 +107,8 @@ function EmptyState({ isError, onRetry }: { isError?: boolean; onRetry: () => vo
 
 
 export default function ImpactMatchPage() {
-  const { user, loading: authLoading, logout } = useAuth()
+  const { user, token, loading: authLoading, login, logout } = useAuth()
+  const router = useRouter()
 
   const [query, setQuery] = useState("student volunteer opportunities Toronto")
   const [cause, setCause] = useState("")
@@ -188,11 +190,12 @@ export default function ImpactMatchPage() {
     try {
       const url = new URL(`${API_BASE}/v1/opportunities`)
       url.searchParams.set("q", query)
-      url.searchParams.set("location", location)
-      url.searchParams.set("limit", String(MAP_OPPORTUNITY_LIMIT))
-      if (cause) url.searchParams.set("cause", cause)
-      if (interests) url.searchParams.set("interests", interests)
-      if (skills) url.searchParams.set("skills", skills)
+      url.searchParams.set("limit", "16")
+      if (cause) url.searchParams.set("category", cause)
+      if (userCoords) {
+        url.searchParams.set("lat", String(userCoords.lat))
+        url.searchParams.set("lng", String(userCoords.lng))
+      }
 
       const response = await fetch(url.toString())
       if (!response.ok) throw new Error(`Backend returned ${response.status}`)
@@ -215,27 +218,8 @@ export default function ImpactMatchPage() {
     setAiMatching(true)
     setError(null)
     try {
-      const payload = {
-        interests: interestsInput
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean),
-        skills: skillsInput
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean),
-        availability,
-        location,
-        max_distance_km: 20,
-        limit: MAP_OPPORTUNITY_LIMIT,
-      }
-
-      const response = await fetch(`${API_BASE}/api/recommendations`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+      const response = await fetch(`${API_BASE}/v1/recommendations`, {
+        headers: { Authorization: `Bearer ${token}` },
       })
       if (!response.ok) throw new Error(`Backend returned ${response.status}`)
       const data: V1RecommendationResponse = await response.json()
