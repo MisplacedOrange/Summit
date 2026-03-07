@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { useAuth } from "./auth-context"
 
@@ -65,19 +66,19 @@ export default function LandingPage() {
   const { user } = useAuth()
 
   return (
-    <main className="min-h-screen bg-[#F7F5F3] text-[#37322F]">
+    <main className="min-h-screen bg-[#eef6ff] text-[#143d73]">
       {/* Nav */}
       <nav className="mx-auto flex max-w-[1100px] items-center justify-between px-4 py-5 md:px-6">
-        <span className="text-lg font-semibold">Summit ImpactMatch</span>
+        <span className="text-lg font-semibold text-[#124383]">Summit ImpactMatch</span>
         <div className="flex items-center gap-3">
           {user ? (
             <>
-              <Link href="/profile" className="text-sm font-medium hover:underline">
+              <Link href="/profile" className="text-sm font-medium text-[#1b4f90] hover:underline">
                 Profile
               </Link>
               <Link
                 href="/discover"
-                className="rounded-full bg-[#37322F] px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-[#4A4340]"
+                className="rounded-full bg-[#2f6fd1] px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-[#245cb0]"
               >
                 Go to Dashboard
               </Link>
@@ -86,13 +87,13 @@ export default function LandingPage() {
             <>
               <Link
                 href="/login"
-                className="rounded-full border border-[#CFC7C1] px-5 py-2 text-sm font-medium transition-colors hover:bg-[#F3ECE5]"
+                className="rounded-full border border-[#9fc4ef] bg-white px-5 py-2 text-sm font-medium text-[#1d4f8a] transition-colors hover:bg-[#e8f3ff]"
               >
                 Log in
               </Link>
               <Link
                 href="/signup"
-                className="rounded-full bg-[#37322F] px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-[#4A4340]"
+                className="rounded-full bg-[#2f6fd1] px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-[#245cb0]"
               >
                 Sign up
               </Link>
@@ -103,14 +104,14 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="mx-auto max-w-[1100px] px-4 pt-12 pb-16 text-center md:px-6 md:pt-20 md:pb-24">
-        <span className="inline-flex rounded-full border border-[#E5E1DD] bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wide">
+        <span className="inline-flex rounded-full border border-[#a9caf1] bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-[#2f67ac]">
           AI-Powered Volunteer Matching
         </span>
         <h1 className="mx-auto mt-6 max-w-3xl text-3xl font-semibold leading-tight sm:text-4xl md:text-6xl">
           Find meaningful volunteer hours with{" "}
-          <span className="font-[family-name:var(--font-instrument-serif)] italic">real local impact.</span>
+          <span className="font-[family-name:var(--font-instrument-serif)] italic text-[#2f73c9]">real local impact.</span>
         </h1>
-        <p className="mx-auto mt-5 max-w-2xl text-base text-[#605A57] md:text-lg">
+        <p className="mx-auto mt-5 max-w-2xl text-base text-[#456f9f] md:text-lg">
           Discover opportunities from nonprofits, local businesses, and volunteer events in one place.
           Let AI match you to the causes that matter most.
         </p>
@@ -118,34 +119,45 @@ export default function LandingPage() {
           {user ? (
             <Link
               href="/discover"
-              className="rounded-full bg-[#37322F] px-7 py-3 text-sm font-medium text-white shadow-lg transition-all hover:bg-[#4A4340] hover:shadow-xl"
+              className="rounded-full bg-[#2f6fd1] px-7 py-3 text-sm font-medium text-white shadow-lg transition-all hover:bg-[#245cb0] hover:shadow-xl"
             >
               Explore Opportunities
             </Link>
           ) : (
             <Link
               href="/signup"
-              className="rounded-full bg-[#37322F] px-7 py-3 text-sm font-medium text-white shadow-lg transition-all hover:bg-[#4A4340] hover:shadow-xl"
+              className="rounded-full bg-[#2f6fd1] px-7 py-3 text-sm font-medium text-white shadow-lg transition-all hover:bg-[#245cb0] hover:shadow-xl"
             >
               Create Free Account
             </Link>
           )}
           <a
             href="#features"
-            className="rounded-full border border-[#CFC7C1] px-7 py-3 text-sm font-medium transition-colors hover:bg-[#F3ECE5]"
+            className="rounded-full border border-[#9fc4ef] bg-white px-7 py-3 text-sm font-medium text-[#1d4f8a] transition-colors hover:bg-[#e8f3ff]"
           >
             See how it works
           </a>
         </div>
+
+        <div className="relative mx-auto mt-10 max-w-5xl overflow-hidden rounded-3xl border border-[#87b5ec] bg-white/80 p-3 shadow-[0_18px_60px_rgba(49,116,204,0.28)]">
+          <Image
+            src="/assets/images/hero-vibrant-orb.svg"
+            alt="Vibrant Summit platform preview"
+            width={960}
+            height={640}
+            className="h-auto w-full rounded-2xl"
+            priority
+          />
+        </div>
       </section>
 
       {/* Stats strip */}
-      <section className="border-y border-[#E5E1DD] bg-white/60 backdrop-blur">
+      <section className="border-y border-[#9fc4ef] bg-gradient-to-r from-[#eff8ff] via-[#ffffff] to-[#ecfcff] backdrop-blur">
         <div className="mx-auto grid max-w-[1100px] grid-cols-2 gap-6 px-4 py-8 md:grid-cols-4 md:px-6">
           {STATS.map((s) => (
             <div key={s.label} className="text-center">
               <p className="text-2xl font-semibold md:text-3xl">{s.value}</p>
-              <p className="mt-1 text-sm text-[#605A57]">{s.label}</p>
+              <p className="mt-1 text-sm text-[#4876aa]">{s.label}</p>
             </div>
           ))}
         </div>
@@ -156,32 +168,32 @@ export default function LandingPage() {
         <h2 className="text-center text-2xl font-semibold sm:text-3xl">
           Everything you need to make an impact
         </h2>
-        <p className="mx-auto mt-3 max-w-xl text-center text-sm text-[#605A57] md:text-base">
+        <p className="mx-auto mt-3 max-w-xl text-center text-sm text-[#4876aa] md:text-base">
           From intelligent matching to interactive maps, ImpactMatch makes it effortless to find and track volunteer work.
         </p>
         <div className="mt-12 grid gap-6 sm:grid-cols-2">
           {FEATURES.map((f) => (
             <div
               key={f.title}
-              className="rounded-2xl border border-[#E5E1DD] bg-white p-6 transition-shadow duration-200 hover:shadow-md"
+              className="rounded-2xl border border-[#c2daf8] bg-white p-6 transition-shadow duration-200 hover:shadow-md"
             >
-              <div className="inline-flex rounded-xl bg-[#F3ECE5] p-3 text-[#37322F]">{f.icon}</div>
+              <div className="inline-flex rounded-xl bg-[#deecff] p-3 text-[#235b9f]">{f.icon}</div>
               <h3 className="mt-4 text-lg font-semibold">{f.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-[#605A57]">{f.desc}</p>
+              <p className="mt-2 text-sm leading-relaxed text-[#4876aa]">{f.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Cause tags */}
-      <section className="border-y border-[#E5E1DD] bg-white/60 backdrop-blur">
+      <section className="border-y border-[#c2daf8] bg-white/70 backdrop-blur">
         <div className="mx-auto max-w-[1100px] px-4 py-12 text-center md:px-6">
           <h2 className="text-xl font-semibold sm:text-2xl">Causes you can support</h2>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             {CAUSES.map((c) => (
               <span
                 key={c.name}
-                className="inline-flex items-center gap-2 rounded-full border border-[#E5E1DD] bg-white px-4 py-2 text-sm font-medium"
+                className="inline-flex items-center gap-2 rounded-full border border-[#c2daf8] bg-white px-4 py-2 text-sm font-medium"
               >
                 <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: c.color }} />
                 {c.name}
@@ -193,16 +205,16 @@ export default function LandingPage() {
 
       {/* CTA */}
       <section className="mx-auto max-w-[1100px] px-4 py-16 text-center md:px-6 md:py-24">
-        <div className="rounded-3xl border border-[#E5E1DD] bg-white p-8 shadow-sm md:p-12">
+        <div className="rounded-3xl border border-[#c2daf8] bg-white p-8 shadow-sm md:p-12">
           <h2 className="text-2xl font-semibold sm:text-3xl">
             Ready to find your perfect volunteer match?
           </h2>
-          <p className="mx-auto mt-3 max-w-lg text-sm text-[#605A57] md:text-base">
+          <p className="mx-auto mt-3 max-w-lg text-sm text-[#4876aa] md:text-base">
             Join students and nonprofits already using ImpactMatch to connect, track, and grow real local impact.
           </p>
           <Link
             href="/discover"
-            className="mt-6 inline-flex rounded-full bg-[#37322F] px-8 py-3 text-sm font-medium text-white shadow-lg transition-all hover:bg-[#4A4340] hover:shadow-xl"
+            className="mt-6 inline-flex rounded-full bg-[#2f6fd1] px-8 py-3 text-sm font-medium text-white shadow-lg transition-all hover:bg-[#245cb0] hover:shadow-xl"
           >
             Get Started — It&apos;s Free
           </Link>
@@ -210,10 +222,10 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-[#E5E1DD] bg-white/60 backdrop-blur">
+      <footer className="border-t border-[#c2daf8] bg-white/70 backdrop-blur">
         <div className="mx-auto flex max-w-[1100px] items-center justify-between px-4 py-6 md:px-6">
-          <span className="text-sm font-medium text-[#605A57]">&copy; 2026 Summit ImpactMatch</span>
-          <div className="flex gap-4 text-sm text-[#605A57]">
+          <span className="text-sm font-medium text-[#4876aa]">&copy; 2026 Summit ImpactMatch</span>
+          <div className="flex gap-4 text-sm text-[#4876aa]">
             <Link href="/discover" className="hover:underline">Discover</Link>
             <Link href="/profile" className="hover:underline">Profile</Link>
           </div>

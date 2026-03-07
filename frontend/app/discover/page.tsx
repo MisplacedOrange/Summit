@@ -1,8 +1,10 @@
 "use client"
 
 import dynamic from "next/dynamic"
+import Image from "next/image"
 import Link from "next/link"
 import { useCallback, useEffect, useMemo, useState } from "react"
+import { Header } from "@/components/header"
 import { useAuth } from "../auth-context"
 
 const OpportunityMap = dynamic(() => import("@/components/opportunity-map"), { ssr: false, loading: () => <div className="flex h-[380px] items-center justify-center rounded-xl bg-[#F9F6F2]"><p className="text-sm text-[#999]">Loading map…</p></div> })
@@ -52,10 +54,10 @@ function toLabel(value: string): string {
 
 function SkeletonCard() {
   return (
-    <div className="animate-pulse rounded-xl border border-[#E7E1DA] p-4">
+    <div className="animate-pulse rounded-xl border border-[#b9d5f7] p-4">
       <div className="flex items-start justify-between gap-2">
-        <div className="h-5 w-3/5 rounded bg-[#E5E1DD]" />
-        <div className="h-5 w-16 rounded-full bg-[#E5E1DD]" />
+        <div className="h-5 w-3/5 rounded bg-[#b9d5f7]" />
+        <div className="h-5 w-16 rounded-full bg-[#b9d5f7]" />
       </div>
       <div className="mt-2 h-4 w-2/5 rounded bg-[#EDE9E4]" />
       <div className="mt-3 space-y-2">
@@ -67,16 +69,16 @@ function SkeletonCard() {
         <div className="h-6 w-16 rounded-full bg-[#EDE9E4]" />
         <div className="h-6 w-14 rounded-full bg-[#EDE9E4]" />
       </div>
-      <div className="mt-4 h-8 w-32 rounded-full bg-[#E5E1DD]" />
+      <div className="mt-4 h-8 w-32 rounded-full bg-[#b9d5f7]" />
     </div>
   )
 }
 
 function SkeletonStat() {
   return (
-    <div className="animate-pulse rounded-xl border border-[#E5E1DD] bg-white p-4">
+    <div className="animate-pulse rounded-xl border border-[#b9d5f7] bg-white p-4">
       <div className="h-3 w-20 rounded bg-[#EDE9E4]" />
-      <div className="mt-2 h-7 w-10 rounded bg-[#E5E1DD]" />
+      <div className="mt-2 h-7 w-10 rounded bg-[#b9d5f7]" />
     </div>
   )
 }
@@ -84,20 +86,20 @@ function SkeletonStat() {
 function EmptyState({ isError, onRetry }: { isError?: boolean; onRetry: () => void }) {
   return (
     <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
-      <svg className="h-16 w-16 text-[#D9D2CC]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
+      <svg className="h-16 w-16 text-[#9ec4ef]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
         <path d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
       </svg>
       <h3 className="mt-4 text-lg font-semibold text-[#49423D]">
         {isError ? "Something went wrong" : "No opportunities found"}
       </h3>
-      <p className="mt-1 max-w-sm text-sm text-[#7D756F]">
+      <p className="mt-1 max-w-sm text-sm text-[#4676aa]">
         {isError
           ? "We couldn\u2019t reach the server. Check your connection and try again."
           : "Try broadening your search, changing the cause filter, or adjusting your location."}
       </p>
       <button
         onClick={onRetry}
-        className="mt-4 rounded-full border border-[#CFC7C1] px-5 py-2 text-sm font-medium hover:bg-[#F3ECE5] transition-colors"
+        className="mt-4 rounded-full border border-[#9ec4ef] bg-white px-5 py-2 text-sm font-medium hover:bg-[#eaf4ff] transition-colors"
       >
         {isError ? "Retry" : "Reset & search"}
       </button>
@@ -249,23 +251,25 @@ export default function ImpactMatchPage() {
 
 
   return (
-    <main className="min-h-screen bg-[#F7F5F3] text-[#37322F]">
-      <section className="mx-auto max-w-[1100px] px-4 py-10 md:px-6">
-        <div className="rounded-3xl border border-[#E5E1DD] bg-white/80 p-6 shadow-sm backdrop-blur">
+    <main className="min-h-screen bg-[#eef6ff] text-[#143d73]">
+      <Header />
+
+      <section className="mx-auto max-w-[1100px] px-4 pb-10 pt-24 md:px-6">
+        <div className="rounded-3xl border border-[#b6d4f7] bg-white/85 p-6 shadow-[0_14px_40px_rgba(52,122,212,0.2)] backdrop-blur">
           <div className="flex items-start justify-between">
-            <p className="inline-flex rounded-full border border-[#E5E1DD] bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+            <p className="inline-flex rounded-full border border-[#9fc4ef] bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#2e6dae]">
               Summit ImpactMatch
             </p>
             {user ? (
               <div className="flex items-center gap-2">
                 <a
                   href="/profile"
-                  className="inline-flex items-center gap-2 rounded-full border border-[#E5E1DD] bg-white px-3 py-1.5 text-sm font-medium hover:bg-[#F3ECE5] transition-colors"
+                  className="inline-flex items-center gap-2 rounded-full border border-[#9fc4ef] bg-white px-3 py-1.5 text-sm font-medium text-[#1f5a9b] hover:bg-[#eaf4ff] transition-colors"
                 >
                   {user.picture ? (
                     <img src={user.picture} alt="" className="h-6 w-6 rounded-full" referrerPolicy="no-referrer" />
                   ) : (
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#37322F] text-[10px] font-bold text-white">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#2f6fd1] text-[10px] font-bold text-white">
                       {user.full_name?.[0]?.toUpperCase() ?? user.email[0].toUpperCase()}
                     </span>
                   )}
@@ -273,7 +277,7 @@ export default function ImpactMatchPage() {
                 </a>
                 <button
                   onClick={logout}
-                  className="rounded-full border border-[#CFC7C1] bg-white px-3 py-1.5 text-xs font-medium hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-colors"
+                  className="rounded-full border border-[#9fc4ef] bg-white px-3 py-1.5 text-xs font-medium hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-colors"
                 >
                   Sign out
                 </button>
@@ -281,7 +285,7 @@ export default function ImpactMatchPage() {
             ) : (
               <Link
                 href="/login"
-                className="rounded-full bg-[#37322F] px-4 py-1.5 text-sm font-medium text-white"
+                className="rounded-full bg-[#2f6fd1] px-4 py-1.5 text-sm font-medium text-white"
               >
                 Sign in
               </Link>
@@ -290,10 +294,20 @@ export default function ImpactMatchPage() {
           <h1 className="mt-4 text-2xl font-semibold leading-tight sm:text-3xl md:text-5xl">
             Find meaningful volunteer hours with real local impact.
           </h1>
-          <p className="mt-3 max-w-3xl text-sm text-[#605A57] md:text-base">
+          <p className="mt-3 max-w-3xl text-sm text-[#4676aa] md:text-base">
             Discover opportunities from nonprofits, local businesses, and volunteer events in one place. Use AI matching
             to rank options by your interests, skills, availability, and location.
           </p>
+
+          <div className="mt-5 overflow-hidden rounded-2xl border border-[#9fc4ef] bg-white p-2">
+            <Image
+              src="/assets/images/discover-gradient-grid.svg"
+              alt="Colorful discovery dashboard illustration"
+              width={960}
+              height={560}
+              className="h-auto w-full rounded-xl"
+            />
+          </div>
         </div>
       </section>
 
@@ -302,20 +316,20 @@ export default function ImpactMatchPage() {
           <>{Array.from({ length: 4 }).map((_, i) => <SkeletonStat key={i} />)}</>
         ) : (
           <>
-            <div className="rounded-xl border border-[#E5E1DD] bg-white p-4 transition-all duration-300">
-              <p className="text-xs text-[#605A57]">Opportunities</p>
+            <div className="rounded-xl border border-[#b6d4f7] bg-white p-4 transition-all duration-300">
+              <p className="text-xs text-[#4676aa]">Opportunities</p>
               <p className="text-2xl font-semibold">{stats.opportunities}</p>
             </div>
-            <div className="rounded-xl border border-[#E5E1DD] bg-white p-4 transition-all duration-300">
-              <p className="text-xs text-[#605A57]">Spots needed</p>
+            <div className="rounded-xl border border-[#b6d4f7] bg-white p-4 transition-all duration-300">
+              <p className="text-xs text-[#4676aa]">Spots needed</p>
               <p className="text-2xl font-semibold">{stats.totalNeeds}</p>
             </div>
-            <div className="rounded-xl border border-[#E5E1DD] bg-white p-4 transition-all duration-300">
-              <p className="text-xs text-[#605A57]">High urgency</p>
+            <div className="rounded-xl border border-[#b6d4f7] bg-white p-4 transition-all duration-300">
+              <p className="text-xs text-[#4676aa]">High urgency</p>
               <p className="text-2xl font-semibold">{stats.highUrgency}</p>
             </div>
-            <div className="rounded-xl border border-[#E5E1DD] bg-white p-4 transition-all duration-300">
-              <p className="text-xs text-[#605A57]">Categories</p>
+            <div className="rounded-xl border border-[#b6d4f7] bg-white p-4 transition-all duration-300">
+              <p className="text-xs text-[#4676aa]">Categories</p>
               <p className="text-2xl font-semibold">{stats.causes}</p>
             </div>
           </>
@@ -324,13 +338,13 @@ export default function ImpactMatchPage() {
 
       <section className="mx-auto mt-4 max-w-[1100px] px-4 pb-16 md:px-6">
         <div className="grid gap-4 lg:grid-cols-[1.1fr_1fr]">
-          <div className="rounded-2xl border border-[#E5E1DD] bg-white p-4">
+          <div className="rounded-2xl border border-[#b9d5f7] bg-white p-4">
             <h2 className="text-lg font-semibold">Smart discovery</h2>
-            <p className="mt-1 text-sm text-[#605A57]">Search and filter opportunities, then run AI matching for ranked results.</p>
+            <p className="mt-1 text-sm text-[#4676aa]">Search and filter opportunities, then run AI matching for ranked results.</p>
 
             <div className="mt-4 grid gap-3">
               <input
-                className="w-full rounded-md border border-[#D9D2CC] px-3 py-2 text-sm"
+                className="w-full rounded-md border border-[#b9d5f7] px-3 py-2 text-sm"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search causes or opportunities"
@@ -338,7 +352,7 @@ export default function ImpactMatchPage() {
 
               <div className="grid gap-3 md:grid-cols-2">
                 <select
-                  className="rounded-md border border-[#D9D2CC] px-3 py-2 text-sm"
+                  className="rounded-md border border-[#b9d5f7] px-3 py-2 text-sm"
                   value={cause}
                   onChange={(e) => setCause(e.target.value)}
                 >
@@ -349,7 +363,7 @@ export default function ImpactMatchPage() {
                   ))}
                 </select>
                 <input
-                  className="rounded-md border border-[#D9D2CC] px-3 py-2 text-sm"
+                  className="rounded-md border border-[#b9d5f7] px-3 py-2 text-sm"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   placeholder="Location"
@@ -358,13 +372,13 @@ export default function ImpactMatchPage() {
 
               <div className="grid gap-3 md:grid-cols-2">
                 <input
-                  className="rounded-md border border-[#D9D2CC] px-3 py-2 text-sm"
+                  className="rounded-md border border-[#b9d5f7] px-3 py-2 text-sm"
                   value={interestsInput}
                   onChange={(e) => setInterestsInput(e.target.value)}
                   placeholder="Interests: environment, education"
                 />
                 <input
-                  className="rounded-md border border-[#D9D2CC] px-3 py-2 text-sm"
+                  className="rounded-md border border-[#b9d5f7] px-3 py-2 text-sm"
                   value={skillsInput}
                   onChange={(e) => setSkillsInput(e.target.value)}
                   placeholder="Skills: social media, design"
@@ -373,7 +387,7 @@ export default function ImpactMatchPage() {
 
               <div className="flex flex-wrap items-center gap-3">
                 <select
-                  className="rounded-md border border-[#D9D2CC] px-3 py-2 text-sm"
+                  className="rounded-md border border-[#b9d5f7] px-3 py-2 text-sm"
                   value={availability}
                   onChange={(e) => setAvailability(e.target.value)}
                 >
@@ -391,7 +405,7 @@ export default function ImpactMatchPage() {
               <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() => void discoverOpportunities()}
-                  className="rounded-full bg-[#37322F] px-5 py-2 text-sm font-medium text-white"
+                  className="rounded-full bg-[#2f6fd1] px-5 py-2 text-sm font-medium text-white"
                   disabled={loading}
                 >
                   {loading && !aiMatching ? "Loading..." : "Discover opportunities"}
@@ -403,7 +417,7 @@ export default function ImpactMatchPage() {
                       ? "border border-purple-400 bg-purple-50 text-purple-700"
                       : isAiResult
                         ? "border border-purple-300 bg-purple-50 text-purple-700"
-                        : "border border-[#CFC7C1] bg-white hover:border-purple-300 hover:bg-purple-50"
+                        : "border border-[#9ec4ef] bg-white hover:border-[#7ab3f2] hover:bg-[#edf7ff]"
                   }`}
                   disabled={loading}
                 >
@@ -437,7 +451,7 @@ export default function ImpactMatchPage() {
               )}
 
               {source && (
-                <p className="text-xs text-[#7D756F]">
+                <p className="text-xs text-[#4676aa]">
                   {isAiResult && (
                     <span className="mr-1.5 inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-semibold text-purple-700">
                       <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -453,10 +467,10 @@ export default function ImpactMatchPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-[#E5E1DD] bg-white p-4">
+          <div className="rounded-2xl border border-[#b9d5f7] bg-white p-4">
             <h2 className="text-lg font-semibold">Local impact map</h2>
-            <p className="mt-1 text-sm text-[#605A57]">Color-coded pins show nearby opportunities and urgent needs. Click a pin for details.</p>
-            <div className="mt-4 overflow-hidden rounded-xl border border-[#ECE7E2]">
+            <p className="mt-1 text-sm text-[#4676aa]">Color-coded pins show nearby opportunities and urgent needs. Click a pin for details.</p>
+            <div className="mt-4 overflow-hidden rounded-xl border border-[#b9d5f7]">
               <OpportunityMap
                 items={filteredItems.slice(0, 40)}
                 className="h-[380px] w-full"
@@ -464,7 +478,7 @@ export default function ImpactMatchPage() {
                 onLocateMe={requestGeolocation}
               />
             </div>
-            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs text-[#6C645F]">
+            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs text-[#4676aa]">
               {Object.entries(CAUSE_COLORS).map(([cause, colors]) => (
                 <span key={cause} className="inline-flex items-center gap-1.5">
                   <span className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-black/5" style={{ backgroundColor: colors.dot }} />
@@ -475,11 +489,11 @@ export default function ImpactMatchPage() {
           </div>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-[#E5E1DD] bg-white p-4">
+        <div className="mt-4 rounded-2xl border border-[#b9d5f7] bg-white p-4">
           <h2 className="text-lg font-semibold">
             {isAiResult ? "AI-Matched opportunities" : "Opportunities"}
           </h2>
-          <p className="mt-1 text-sm text-[#605A57]">
+          <p className="mt-1 text-sm text-[#4676aa]">
             {isAiResult
               ? "Ranked by AI based on your interests, skills, and location."
               : "High-need local work and discovered listings from the open web."}
@@ -493,7 +507,7 @@ export default function ImpactMatchPage() {
             ) : filteredItems.map((item) => {
               const causeStyle = CAUSE_COLORS[item.cause] ?? { bg: "bg-gray-100", text: "text-gray-700", dot: "#6b7280" }
               return (
-                <article key={item.id} className="rounded-xl border border-[#E7E1DA] p-4 transition-shadow duration-200 hover:shadow-md">
+                <article key={item.id} className="rounded-xl border border-[#b9d5f7] p-4 transition-shadow duration-200 hover:shadow-md">
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="text-base font-semibold leading-tight">{item.title}</h3>
                     <div className="flex shrink-0 items-center gap-1.5">
@@ -509,11 +523,11 @@ export default function ImpactMatchPage() {
                       <span className={`rounded-full px-2 py-1 text-[11px] font-medium ${causeStyle.bg} ${causeStyle.text}`}>{toLabel(item.cause)}</span>
                     </div>
                   </div>
-                  <p className="mt-1 text-sm text-[#625B56]">{item.organization}</p>
+                  <p className="mt-1 text-sm text-[#4676aa]">{item.organization}</p>
                   {isAiResult && item.match_reason && (
                     <p className="mt-1.5 text-xs italic text-purple-600">{item.match_reason}</p>
                   )}
-                  <p className="mt-2 line-clamp-3 text-sm text-[#625B56]">{item.description}</p>
+                  <p className="mt-2 line-clamp-3 text-sm text-[#4676aa]">{item.description}</p>
 
                   <div className="mt-3 flex flex-wrap gap-2 text-xs text-[#6B645E]">
                     <span className="rounded-full bg-[#F3ECE5] px-2 py-1">{item.location}</span>
@@ -536,7 +550,7 @@ export default function ImpactMatchPage() {
                     href={item.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="mt-4 inline-flex rounded-full bg-[#37322F] px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-[#4A4340]"
+                    className="mt-4 inline-flex rounded-full bg-[#2f6fd1] px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-[#245cb0]"
                   >
                     View opportunity
                   </a>
