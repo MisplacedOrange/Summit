@@ -24,9 +24,9 @@ export const metadata: Metadata = {
     "AI-powered volunteer matching, automated opportunity discovery, and local impact mapping for students and nonprofits.",
   generator: "v0.app",
   icons: {
-    icon: "/assets/images/Summit%20Logo.png",
-    shortcut: "/assets/images/Summit%20Logo.png",
-    apple: "/assets/images/Summit%20Logo.png",
+    icon: [{ url: "/assets/images/summit.svg", type: "image/svg+xml" }],
+    shortcut: ["/assets/images/summit.svg"],
+    apple: [{ url: "/assets/images/summit.svg" }],
   },
 }
 
