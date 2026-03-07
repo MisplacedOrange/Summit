@@ -15,9 +15,42 @@ from app.workers.celery_app import celery_app
 
 @celery_app.task(bind=True, max_retries=3, default_retry_delay=300)
 def run_scraping_pipeline(self) -> int:
+    async def _run_and_store() -> int:
+        records = await run_pipeline()
+        inserted = 0
+        async with SessionLocal() as db:
+            for row in records:
+                source_url = str(row.get("link", "")).strip() or None
+                title = str(row.get("title", "")).strip()
+                if not title:
+                    continue
+
+                if source_url:
+                    existing = await db.execute(select(Opportunity.id).where(Opportunity.source_url == source_url).limit(1))
+                    if existing.first() is not None:
+                        continue
+
+                skills_raw = row.get("skills", [])
+                skills = [str(item).strip().lower() for item in skills_raw if str(item).strip()] if isinstance(skills_raw, list) else []
+
+                opp = Opportunity(
+                    title=title,
+                    description=str(row.get("description", "")).strip() or "Volunteer opportunity",
+                    cause_category=str(row.get("category", "")).strip() or None,
+                    location_text=str(row.get("location", "")).strip() or None,
+                    skills_required=skills,
+                    source_url=source_url,
+                    is_scraped=True,
+                )
+                db.add(opp)
+                inserted += 1
+
+            await db.commit()
+
+        return inserted
+
     try:
-        records = asyncio.run(run_pipeline())
-        return len(records)
+        return asyncio.run(_run_and_store())
     except Exception as exc:  # pragma: no cover
         raise self.retry(exc=exc)
 

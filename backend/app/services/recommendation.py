@@ -28,6 +28,20 @@ def cosine_similarity(vec_a: list[float], vec_b: list[float]) -> float:
     return dot / (norm_a * norm_b)
 
 
+def _coerce_embedding(value: object) -> list[float]:
+    if value is None:
+        return []
+    if isinstance(value, list):
+        return [float(v) for v in value]
+    if hasattr(value, "tolist"):
+        converted = value.tolist()
+        if isinstance(converted, list):
+            return [float(v) for v in converted]
+    if hasattr(value, "__iter__"):
+        return [float(v) for v in value]  # type: ignore[arg-type]
+    return []
+
+
 def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     earth_km = 6371.0
     p1 = math.radians(lat1)
@@ -58,7 +72,7 @@ def score_opportunity(
     user_lat: float | None,
     user_lng: float | None,
 ) -> float:
-    similarity_score = cosine_similarity(user_embedding, opp.embedding or [])
+    similarity_score = cosine_similarity(user_embedding, _coerce_embedding(opp.embedding))
 
     proximity_boost = 0.0
     if user_lat is not None and user_lng is not None and opp.location_lat is not None and opp.location_lng is not None:
@@ -83,14 +97,16 @@ async def get_recommendations(
     preferences: UserPreference,
     limit: int = 20,
 ) -> list[tuple[Opportunity, float]]:
-    if not preferences.embedding:
+    embedding = _coerce_embedding(preferences.embedding)
+    if len(embedding) == 0:
         await update_user_embedding(db, preferences)
+        embedding = _coerce_embedding(preferences.embedding)
 
     candidates = await get_candidate_opportunities(db)
     scored = [
         (
             opp,
-            score_opportunity(opp, preferences.embedding or [], preferences.location_lat, preferences.location_lng),
+                score_opportunity(opp, embedding, preferences.location_lat, preferences.location_lng),
         )
         for opp in candidates
     ]

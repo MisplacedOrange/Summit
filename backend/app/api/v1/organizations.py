@@ -15,14 +15,6 @@ from app.schemas.organization import OrganizationRead, OrganizationUpdate
 router = APIRouter()
 
 
-@router.get("/{organization_id}", response_model=OrganizationRead)
-async def get_organization(organization_id: str, db: AsyncSession = Depends(get_db)) -> Organization:
-    organization = await db.get(Organization, organization_id)
-    if organization is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
-    return organization
-
-
 @router.put("/me", response_model=OrganizationRead)
 async def update_my_organization(
     payload: OrganizationUpdate,
@@ -57,3 +49,11 @@ async def my_posted_opportunities(
 
     opps = await db.execute(select(Opportunity).where(Opportunity.organization_id == organization.id))
     return list(opps.scalars().all())
+
+
+@router.get("/{organization_id}", response_model=OrganizationRead)
+async def get_organization(organization_id: str, db: AsyncSession = Depends(get_db)) -> Organization:
+    organization = await db.get(Organization, organization_id)
+    if organization is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
+    return organization
