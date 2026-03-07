@@ -1,0 +1,1803 @@
+﻿[
+    {
+        "organization":  "Canadian Red Cross",
+        "title":  "Disaster Response Volunteer",
+        "cause":  "community",
+        "skills":  [
+                       "communication",
+                       "teamwork",
+                       "leadership"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "4 hours per week",
+        "volunteers_needed":  12,
+        "description":  "Support disaster relief efforts by assisting families affected by emergencies and coordinating relief resources across the GTA.",
+        "link":  "https://www.redcross.ca/volunteer",
+        "source":  "https://www.redcross.ca/volunteer",
+        "latitude":  43.6511,
+        "longitude":  -79.3470
+    },
+    {
+        "organization":  "Daily Bread Food Bank",
+        "title":  "Warehouse Volunteer",
+        "cause":  "community",
+        "skills":  [
+                       "organization",
+                       "teamwork",
+                       "physical fitness"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours",
+        "volunteers_needed":  15,
+        "description":  "Sort donations and prepare food packages for community distribution centres serving over 200 programs across Toronto.",
+        "link":  "https://www.dailybread.ca/volunteer/",
+        "source":  "https://www.dailybread.ca",
+        "latitude":  43.6590,
+        "longitude":  -79.3519
+    },
+    {
+        "organization":  "Toronto Public Library",
+        "title":  "Homework Help Tutor",
+        "cause":  "education",
+        "skills":  [
+                       "teaching",
+                       "mentoring",
+                       "communication",
+                       "math"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "2 hours per week",
+        "volunteers_needed":  8,
+        "description":  "Assist students in grades 1â€“8 with homework and provide mentorship in math, reading, and science at local library branches.",
+        "link":  "https://www.torontopubliclibrary.ca/support-us/volunteer/",
+        "source":  "https://www.torontopubliclibrary.ca",
+        "latitude":  43.6723,
+        "longitude":  -79.3868
+    },
+    {
+        "organization":  "Habitat for Humanity GTA",
+        "title":  "Construction Site Volunteer",
+        "cause":  "community",
+        "skills":  [
+                       "carpentry",
+                       "teamwork",
+                       "physical fitness"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "1 full day (8 AM â€“ 4 PM)",
+        "volunteers_needed":  20,
+        "description":  "Join construction teams building affordable housing for families in need. No experience required â€” training provided on-site.",
+        "link":  "https://habitatgta.ca/volunteer",
+        "source":  "https://habitatgta.ca",
+        "latitude":  43.6426,
+        "longitude":  -79.4291
+    },
+    {
+        "organization":  "Toronto Humane Society",
+        "title":  "Animal Care Volunteer",
+        "cause":  "animal-care",
+        "skills":  [
+                       "animal handling",
+                       "teamwork",
+                       "patience"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "4 hours weekly",
+        "volunteers_needed":  10,
+        "description":  "Assist staff with feeding, walking, cleaning, and socializing animals awaiting adoption at one of Canada\u0027s oldest animal shelters.",
+        "link":  "https://www.torontohumanesociety.com/volunteer",
+        "source":  "https://www.torontohumanesociety.com",
+        "latitude":  43.6689,
+        "longitude":  -79.3637
+    },
+    {
+        "organization":  "EcoSpark",
+        "title":  "Watershed Monitoring Volunteer",
+        "cause":  "environment",
+        "skills":  [
+                       "data collection",
+                       "teamwork",
+                       "hiking"
+                   ],
+        "location":  "GTA",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  6,
+        "description":  "Help collect water quality and biodiversity data along GTA rivers and creeks to support conservation and urban ecology research.",
+        "link":  "https://ecospark.ca/volunteer",
+        "source":  "https://ecospark.ca",
+        "latitude":  43.7764,
+        "longitude":  -79.3459
+    },
+    {
+        "organization":  "Kids Help Phone",
+        "title":  "Crisis Text Line Responder",
+        "cause":  "healthcare",
+        "skills":  [
+                       "active listening",
+                       "communication",
+                       "empathy"
+                   ],
+        "location":  "Remote",
+        "time_commitment":  "5 hours weekly",
+        "volunteers_needed":  25,
+        "description":  "Provide real-time emotional support and crisis intervention to young people across Canada via text-based chat services.",
+        "link":  "https://kidshelpphone.ca/get-involved",
+        "source":  "https://kidshelpphone.ca",
+        "latitude":  43.6532,
+        "longitude":  -79.3832
+    },
+    {
+        "organization":  "Second Harvest",
+        "title":  "Food Rescue Driver",
+        "cause":  "community",
+        "skills":  [
+                       "driving",
+                       "time management",
+                       "navigation"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "4 hours",
+        "volunteers_needed":  8,
+        "description":  "Pick up surplus food from restaurants, grocery stores, and caterers and deliver it to shelters and community centres across the city.",
+        "link":  "https://secondharvest.ca/volunteer",
+        "source":  "https://secondharvest.ca",
+        "latitude":  43.7182,
+        "longitude":  -79.3413
+    },
+    {
+        "organization":  "Big Brothers Big Sisters of Peel",
+        "title":  "Youth Mentor",
+        "cause":  "education",
+        "skills":  [
+                       "mentoring",
+                       "communication",
+                       "patience"
+                   ],
+        "location":  "Mississauga",
+        "time_commitment":  "2 hours weekly",
+        "volunteers_needed":  14,
+        "description":  "Be a consistent, positive role model for a young person aged 7â€“14 through one-on-one outings and activities in Peel Region.",
+        "link":  "https://bigbrothersbigsisters.ca/volunteer",
+        "source":  "https://bigbrothersbigsisters.ca",
+        "latitude":  43.5953,
+        "longitude":  -79.5879
+    },
+    {
+        "organization":  "Toronto Community Housing",
+        "title":  "Community Garden Coordinator",
+        "cause":  "environment",
+        "skills":  [
+                       "gardening",
+                       "teamwork",
+                       "community engagement"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "2 hours weekly",
+        "volunteers_needed":  5,
+        "description":  "Help maintain community gardens and run sustainable food programs at Toronto Community Housing neighborhoods across the city.",
+        "link":  "https://www.torontohousing.ca/residents/get-involved",
+        "source":  "https://www.torontohousing.ca",
+        "latitude":  43.6571,
+        "longitude":  -79.4515
+    },
+    {
+        "organization":  "Canadian Cancer Society",
+        "title":  "Relay for Life Event Volunteer",
+        "cause":  "healthcare",
+        "skills":  [
+                       "event planning",
+                       "fundraising",
+                       "communication"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "Event-based",
+        "volunteers_needed":  18,
+        "description":  "Help organize and run Relay for Life fundraising events, including setup, registration, and supporting participants through the night.",
+        "link":  "https://cancer.ca/en/get-involved/volunteer",
+        "source":  "https://cancer.ca",
+        "latitude":  43.6489,
+        "longitude":  -79.3925
+    },
+    {
+        "organization":  "Ontario Science Centre",
+        "title":  "Science Outreach Volunteer",
+        "cause":  "education",
+        "skills":  [
+                       "teaching",
+                       "science",
+                       "public speaking"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "4 hours per shift",
+        "volunteers_needed":  6,
+        "description":  "Lead hands-on science demonstrations and workshops for school groups and families visiting one of Canada\u0027s premier science museums.",
+        "link":  "https://www.ontariosciencecentre.ca/volunteer",
+        "source":  "https://www.ontariosciencecentre.ca",
+        "latitude":  43.7166,
+        "longitude":  -79.3388
+    },
+    {
+        "organization":  "Toronto Cat Rescue",
+        "title":  "Foster Home Volunteer",
+        "cause":  "animal-care",
+        "skills":  [
+                       "animal care",
+                       "patience",
+                       "responsibility"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "Ongoing (in-home)",
+        "volunteers_needed":  12,
+        "description":  "Provide temporary foster care for cats and kittens awaiting adoption, including feeding, socialization, and medication administration.",
+        "link":  "https://torontocatrescue.ca/volunteer",
+        "source":  "https://torontocatrescue.ca",
+        "latitude":  43.6845,
+        "longitude":  -79.3498
+    },
+    {
+        "organization":  "ArtHeart Community Art Centre",
+        "title":  "Arts Workshop Facilitator",
+        "cause":  "arts-culture",
+        "skills":  [
+                       "art",
+                       "teaching",
+                       "creativity"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  4,
+        "description":  "Lead free drop-in art workshops for community members of all ages in Regent Park, including painting, drawing, and mixed media.",
+        "link":  "https://www.artheart.ca/volunteer",
+        "source":  "https://www.artheart.ca",
+        "latitude":  43.6596,
+        "longitude":  -79.3605
+    },
+    {
+        "organization":  "Evergreen Brick Works",
+        "title":  "Ravine Trail Restoration Volunteer",
+        "cause":  "environment",
+        "skills":  [
+                       "physical fitness",
+                       "teamwork",
+                       "ecology"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours per event",
+        "volunteers_needed":  15,
+        "description":  "Help restore native plant habitats, remove invasive species, and maintain trails in the Don Valley ravine system at Evergreen Brick Works.",
+        "link":  "https://www.evergreen.ca/get-involved/volunteer/",
+        "source":  "https://www.evergreen.ca",
+        "latitude":  43.6847,
+        "longitude":  -79.3651
+    },
+    {
+        "organization":  "Scarborough Health Network",
+        "title":  "Hospital Wayfinding Volunteer",
+        "cause":  "healthcare",
+        "skills":  [
+                       "communication",
+                       "empathy",
+                       "customer service"
+                   ],
+        "location":  "Scarborough",
+        "time_commitment":  "4 hours weekly",
+        "volunteers_needed":  10,
+        "description":  "Welcome and guide patients and visitors through the hospital, providing directions, companionship, and emotional support.",
+        "link":  "https://www.shn.ca/volunteering/",
+        "source":  "https://www.shn.ca",
+        "latitude":  43.7731,
+        "longitude":  -79.2578
+    },
+    {
+        "organization":  "TIFF (Toronto International Film Festival)",
+        "title":  "Festival Usher \u0026 Events Volunteer",
+        "cause":  "arts-culture",
+        "skills":  [
+                       "customer service",
+                       "communication",
+                       "film knowledge"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "Event-based (September)",
+        "volunteers_needed":  30,
+        "description":  "Support one of the world\u0027s top film festivals by ushering screenings, managing queues, and assisting at industry events and galas.",
+        "link":  "https://www.tiff.net/volunteer",
+        "source":  "https://www.tiff.net",
+        "latitude":  43.6465,
+        "longitude":  -79.3882
+    },
+    {
+        "organization":  "Toronto Wildlife Centre",
+        "title":  "Wildlife Rehabilitation Volunteer",
+        "cause":  "animal-care",
+        "skills":  [
+                       "animal handling",
+                       "attention to detail",
+                       "biology"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "4 hours weekly",
+        "volunteers_needed":  8,
+        "description":  "Assist with the care and rehabilitation of injured, sick, and orphaned wild animals including feeding, cleaning, and medical support.",
+        "link":  "https://www.torontowildlifecentre.com/volunteer/",
+        "source":  "https://www.torontowildlifecentre.com",
+        "latitude":  43.7110,
+        "longitude":  -79.3375
+    },
+    {
+        "organization":  "Sketch Working Arts",
+        "title":  "Youth Arts Mentor",
+        "cause":  "arts-culture",
+        "skills":  [
+                       "art",
+                       "mentoring",
+                       "youth engagement"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  5,
+        "description":  "Mentor youth aged 16â€“29 experiencing homelessness through creative arts programs including visual arts, music, and digital media.",
+        "link":  "https://www.sketch.ca/get-involved/",
+        "source":  "https://www.sketch.ca",
+        "latitude":  43.6622,
+        "longitude":  -79.3460
+    },
+    {
+        "organization":  "Friends of the Rouge Watershed",
+        "title":  "River Clean-Up Volunteer",
+        "cause":  "environment",
+        "skills":  [
+                       "physical fitness",
+                       "teamwork",
+                       "environmental awareness"
+                   ],
+        "location":  "Scarborough",
+        "time_commitment":  "3 hours per event",
+        "volunteers_needed":  20,
+        "description":  "Participate in seasonal clean-up events along the Rouge River, removing litter and debris to protect Toronto\u0027s only national urban park.",
+        "link":  "https://www.frw.ca/volunteer",
+        "source":  "https://www.frw.ca",
+        "latitude":  43.8041,
+        "longitude":  -79.1783
+    },
+    {
+        "organization":  "SickKids Foundation",
+        "title":  "Patient \u0026 Family Volunteer",
+        "cause":  "healthcare",
+        "skills":  [
+                       "empathy",
+                       "communication",
+                       "reliability"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  10,
+        "description":  "Brighten the days of young patients and their families by providing play support, reading, crafts, and companionship at SickKids Hospital.",
+        "link":  "https://www.sickkidsfoundation.com/get-involved/volunteer",
+        "source":  "https://www.sickkidsfoundation.com",
+        "latitude":  43.6578,
+        "longitude":  -79.3868
+    },
+    {
+        "organization":  "Code for Canada",
+        "title":  "Civic Tech Volunteer Developer",
+        "cause":  "education",
+        "skills":  [
+                       "programming",
+                       "web development",
+                       "data analysis"
+                   ],
+        "location":  "Remote",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  6,
+        "description":  "Contribute to open-source civic technology projects that improve government services and community digital tools across Canada.",
+        "link":  "https://codefor.ca/volunteer",
+        "source":  "https://codefor.ca",
+        "latitude":  43.6510,
+        "longitude":  -79.3752
+    },
+    {
+        "organization":  "Paws \u0026 Claws Animal Rescue",
+        "title":  "Pet Adoption Event Helper",
+        "cause":  "animal-care",
+        "skills":  [
+                       "animal handling",
+                       "customer service",
+                       "event coordination"
+                   ],
+        "location":  "Mississauga",
+        "time_commitment":  "5 hours per event",
+        "volunteers_needed":  8,
+        "description":  "Help run weekend pet adoption events at local PetSmart and community centres â€” greeting visitors, handling animals, and processing applications.",
+        "link":  "https://www.pawsandclawsrescue.ca/volunteer",
+        "source":  "https://www.pawsandclawsrescue.ca",
+        "latitude":  43.5789,
+        "longitude":  -79.6584
+    },
+    {
+        "organization":  "Art Gallery of Ontario",
+        "title":  "Gallery Guide Volunteer",
+        "cause":  "arts-culture",
+        "skills":  [
+                       "art history",
+                       "public speaking",
+                       "communication"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "4 hours weekly",
+        "volunteers_needed":  6,
+        "description":  "Lead guided tours for visitors of all ages through the AGO\u0027s permanent collection and special exhibitions, sharing stories behind the art.",
+        "link":  "https://ago.ca/join-and-support/volunteer",
+        "source":  "https://ago.ca",
+        "latitude":  43.6536,
+        "longitude":  -79.3925
+    },
+    {
+        "organization":  "Toronto Environment Alliance",
+        "title":  "Climate Action Campaign Volunteer",
+        "cause":  "environment",
+        "skills":  [
+                       "social media",
+                       "writing",
+                       "advocacy"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "2 hours weekly",
+        "volunteers_needed":  6,
+        "description":  "Help run grassroots climate campaigns through community outreach, social media content creation, and participation in city council advocacy.",
+        "link":  "https://www.torontoenvironment.org/volunteer",
+        "source":  "https://www.torontoenvironment.org",
+        "latitude":  43.6640,
+        "longitude":  -79.4094
+    },
+    {
+        "organization":  "North York General Hospital",
+        "title":  "Emergency Department Volunteer",
+        "cause":  "healthcare",
+        "skills":  [
+                       "communication",
+                       "empathy",
+                       "stress management"
+                   ],
+        "location":  "North York",
+        "time_commitment":  "4 hours weekly",
+        "volunteers_needed":  12,
+        "description":  "Assist emergency department staff by helping with patient comfort, wayfinding, and providing emotional support to patients and families.",
+        "link":  "https://www.nygh.on.ca/about-us/get-involved/volunteer",
+        "source":  "https://www.nygh.on.ca",
+        "latitude":  43.7668,
+        "longitude":  -79.3436
+    },
+    {
+        "organization":  "Learning Disabilities Association of Ontario",
+        "title":  "Literacy Tutor",
+        "cause":  "education",
+        "skills":  [
+                       "teaching",
+                       "patience",
+                       "literacy"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "2 hours weekly",
+        "volunteers_needed":  10,
+        "description":  "Provide one-on-one literacy tutoring to adults and youth with learning disabilities, helping build reading and writing confidence.",
+        "link":  "https://www.ldao.ca/get-involved/volunteer/",
+        "source":  "https://www.ldao.ca",
+        "latitude":  43.6629,
+        "longitude":  -79.3957
+    },
+    {
+        "organization":  "Mississauga Humane Society",
+        "title":  "Dog Walking Volunteer",
+        "cause":  "animal-care",
+        "skills":  [
+                       "animal handling",
+                       "physical fitness",
+                       "patience"
+                   ],
+        "location":  "Mississauga",
+        "time_commitment":  "2 hours weekly",
+        "volunteers_needed":  8,
+        "description":  "Walk and socialize shelter dogs to improve their well-being and help them become more adoptable through positive human interaction.",
+        "link":  "https://www.mississaugahumanesociety.ca/volunteer",
+        "source":  "https://www.mississaugahumanesociety.ca",
+        "latitude":  43.5635,
+        "longitude":  -79.6107
+    },
+    {
+        "organization":  "Royal Ontario Museum",
+        "title":  "Education Program Volunteer",
+        "cause":  "arts-culture",
+        "skills":  [
+                       "public speaking",
+                       "history",
+                       "communication"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "4 hours weekly",
+        "volunteers_needed":  8,
+        "description":  "Help deliver educational programs and interactive gallery activities for school groups and families at one of North America\u0027s largest museums.",
+        "link":  "https://www.rom.on.ca/en/join-us/volunteer",
+        "source":  "https://www.rom.on.ca",
+        "latitude":  43.6677,
+        "longitude":  -79.3948
+    },
+    {
+        "organization":  "FoodShare Toronto",
+        "title":  "Good Food Box Packing Volunteer",
+        "cause":  "community",
+        "skills":  [
+                       "organization",
+                       "teamwork",
+                       "food handling"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours monthly",
+        "volunteers_needed":  15,
+        "description":  "Help pack affordable fresh produce boxes for community distribution, supporting food access for low-income families across Toronto.",
+        "link":  "https://foodshare.net/volunteer/",
+        "source":  "https://foodshare.net",
+        "latitude":  43.6809,
+        "longitude":  -79.3521
+    },
+    {
+        "organization":  "United Way Greater Toronto",
+        "title":  "Community Outreach Volunteer",
+        "cause":  "community",
+        "skills":  [
+                       "communication",
+                       "outreach",
+                       "teamwork"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  10,
+        "description":  "Support United Way\u0027s local poverty-reduction initiatives through door-to-door outreach, community engagement events, and fundraising drives.",
+        "link":  "https://www.unitedwaygt.org/volunteer",
+        "source":  "https://www.unitedwaygt.org",
+        "latitude":  43.6481,
+        "longitude":  -79.3856
+    },
+    {
+        "organization":  "YMCA of Greater Toronto",
+        "title":  "Youth Program Volunteer",
+        "cause":  "community",
+        "skills":  [
+                       "leadership",
+                       "mentoring",
+                       "sports"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  15,
+        "description":  "Lead recreational and leadership activities for youth ages 6â€“17 at YMCA community centres, including sports, homework help, and crafts.",
+        "link":  "https://ymcagta.org/get-involved/volunteer",
+        "source":  "https://ymcagta.org",
+        "latitude":  43.6547,
+        "longitude":  -79.3813
+    },
+    {
+        "organization":  "WoodGreen Community Services",
+        "title":  "Newcomer Settlement Volunteer",
+        "cause":  "community",
+        "skills":  [
+                       "multilingual",
+                       "communication",
+                       "empathy"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  8,
+        "description":  "Help newcomers navigate life in Canada with assistance in filling out forms, practising English, and connecting with community resources.",
+        "link":  "https://www.woodgreen.org/volunteer",
+        "source":  "https://www.woodgreen.org",
+        "latitude":  43.6658,
+        "longitude":  -79.3282
+    },
+    {
+        "organization":  "The Salvation Army Toronto",
+        "title":  "Soup Kitchen Server",
+        "cause":  "community",
+        "skills":  [
+                       "food handling",
+                       "teamwork",
+                       "compassion"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours per shift",
+        "volunteers_needed":  12,
+        "description":  "Serve hot meals and provide a welcoming environment for individuals experiencing homelessness and food insecurity in downtown Toronto.",
+        "link":  "https://www.salvationarmy.ca/volunteer/",
+        "source":  "https://www.salvationarmy.ca",
+        "latitude":  43.6553,
+        "longitude":  -79.3760
+    },
+    {
+        "organization":  "Covenant House Toronto",
+        "title":  "Youth Drop-In Volunteer",
+        "cause":  "community",
+        "skills":  [
+                       "empathy",
+                       "communication",
+                       "cooking"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "4 hours weekly",
+        "volunteers_needed":  6,
+        "description":  "Help youth experiencing homelessness by serving meals, organizing donation drives, and providing a safe and supportive presence at drop-in programs.",
+        "link":  "https://www.covenanthousetoronto.ca/get-involved/volunteer",
+        "source":  "https://www.covenanthousetoronto.ca",
+        "latitude":  43.6580,
+        "longitude":  -79.3784
+    },
+    {
+        "organization":  "Yonge Street Mission",
+        "title":  "After-School Program Volunteer",
+        "cause":  "education",
+        "skills":  [
+                       "teaching",
+                       "mentoring",
+                       "sports"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  10,
+        "description":  "Tutor and mentor children from low-income families through after-school homework help, recreation, and creative programming.",
+        "link":  "https://www.ysm.ca/get-involved/volunteer/",
+        "source":  "https://www.ysm.ca",
+        "latitude":  43.6565,
+        "longitude":  -79.3739
+    },
+    {
+        "organization":  "Frontier College",
+        "title":  "Adult Literacy Tutor",
+        "cause":  "education",
+        "skills":  [
+                       "teaching",
+                       "patience",
+                       "communication"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "2 hours weekly",
+        "volunteers_needed":  15,
+        "description":  "Provide one-on-one and small group literacy tutoring to adults who are improving their reading and writing skills across the GTA.",
+        "link":  "https://www.frontiercollege.ca/Get-Involved/Volunteer",
+        "source":  "https://www.frontiercollege.ca",
+        "latitude":  43.6618,
+        "longitude":  -79.3900
+    },
+    {
+        "organization":  "Junior Achievement Canada",
+        "title":  "Financial Literacy Classroom Volunteer",
+        "cause":  "education",
+        "skills":  [
+                       "finance",
+                       "public speaking",
+                       "teaching"
+                   ],
+        "location":  "GTA",
+        "time_commitment":  "2 hours per session",
+        "volunteers_needed":  20,
+        "description":  "Teach financial literacy, entrepreneurship, and work-readiness programs to students in elementary and secondary schools across the GTA.",
+        "link":  "https://jacanada.org/get-involved/volunteer/",
+        "source":  "https://jacanada.org",
+        "latitude":  43.6475,
+        "longitude":  -79.3845
+    },
+    {
+        "organization":  "Pathways to Education",
+        "title":  "Academic Tutor",
+        "cause":  "education",
+        "skills":  [
+                       "math",
+                       "science",
+                       "tutoring"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "2 hours weekly",
+        "volunteers_needed":  12,
+        "description":  "Help high school students in underserved communities stay on track to graduate with weekly tutoring sessions in math, science, and English.",
+        "link":  "https://www.pathwaystoeducation.ca/volunteer",
+        "source":  "https://www.pathwaystoeducation.ca",
+        "latitude":  43.6630,
+        "longitude":  -79.3580
+    },
+    {
+        "organization":  "Teach for Canada",
+        "title":  "Indigenous Education Support Volunteer",
+        "cause":  "education",
+        "skills":  [
+                       "teaching",
+                       "cultural sensitivity",
+                       "communication"
+                   ],
+        "location":  "Remote",
+        "time_commitment":  "5 hours weekly",
+        "volunteers_needed":  6,
+        "description":  "Support educational programming for Indigenous communities by assisting with remote tutoring, curriculum planning, and mentorship.",
+        "link":  "https://www.teachforcanada.ca/get-involved/",
+        "source":  "https://www.teachforcanada.ca",
+        "latitude":  43.6535,
+        "longitude":  -79.3840
+    },
+    {
+        "organization":  "Sunnybrook Health Sciences Centre",
+        "title":  "Patient Visitor Volunteer",
+        "cause":  "healthcare",
+        "skills":  [
+                       "empathy",
+                       "communication",
+                       "reliability"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  15,
+        "description":  "Visit patients who may not have family nearby, offering companionship, reading, and conversation to brighten their hospital stay.",
+        "link":  "https://sunnybrook.ca/content/?page=volunteers",
+        "source":  "https://sunnybrook.ca",
+        "latitude":  43.7232,
+        "longitude":  -79.3725
+    },
+    {
+        "organization":  "Mount Sinai Hospital",
+        "title":  "Information Desk Volunteer",
+        "cause":  "healthcare",
+        "skills":  [
+                       "customer service",
+                       "communication",
+                       "multilingual"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "4 hours weekly",
+        "volunteers_needed":  8,
+        "description":  "Greet and direct patients, visitors, and staff at the main information desk, providing a warm and helpful first impression.",
+        "link":  "https://www.mountsinai.on.ca/about_us/volunteer-services",
+        "source":  "https://www.mountsinai.on.ca",
+        "latitude":  43.6575,
+        "longitude":  -79.3905
+    },
+    {
+        "organization":  "Baycrest Health Sciences",
+        "title":  "Seniors Companion Volunteer",
+        "cause":  "healthcare",
+        "skills":  [
+                       "empathy",
+                       "patience",
+                       "storytelling"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "2 hours weekly",
+        "volunteers_needed":  10,
+        "description":  "Spend time with elderly residents through conversation, games, reading, and accompanied walks at Baycrest\u0027s long-term care facility.",
+        "link":  "https://www.baycrest.org/volunteer",
+        "source":  "https://www.baycrest.org",
+        "latitude":  43.7260,
+        "longitude":  -79.4548
+    },
+    {
+        "organization":  "Alzheimer Society of Toronto",
+        "title":  "Caregiver Support Volunteer",
+        "cause":  "healthcare",
+        "skills":  [
+                       "empathy",
+                       "active listening",
+                       "communication"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  6,
+        "description":  "Provide respite and emotional support to caregivers of people living with dementia through group facilitation and one-on-one check-ins.",
+        "link":  "https://alz.to/get-involved/volunteer/",
+        "source":  "https://alz.to",
+        "latitude":  43.7021,
+        "longitude":  -79.3982
+    },
+    {
+        "organization":  "Canadian Mental Health Association â€“ Toronto",
+        "title":  "Peer Support Volunteer",
+        "cause":  "healthcare",
+        "skills":  [
+                       "active listening",
+                       "empathy",
+                       "communication"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "4 hours weekly",
+        "volunteers_needed":  8,
+        "description":  "Provide peer support and community navigation to individuals experiencing mental health challenges through CMHA\u0027s community programs.",
+        "link":  "https://toronto.cmha.ca/get-involved/volunteer/",
+        "source":  "https://toronto.cmha.ca",
+        "latitude":  43.6615,
+        "longitude":  -79.3470
+    },
+    {
+        "organization":  "Heart \u0026 Stroke Foundation",
+        "title":  "CPR Training Event Volunteer",
+        "cause":  "healthcare",
+        "skills":  [
+                       "first aid",
+                       "teaching",
+                       "event planning"
+                   ],
+        "location":  "GTA",
+        "time_commitment":  "Event-based",
+        "volunteers_needed":  10,
+        "description":  "Help organize and assist at community CPR training sessions to increase emergency preparedness and save lives across the GTA.",
+        "link":  "https://www.heartandstroke.ca/get-involved/volunteer",
+        "source":  "https://www.heartandstroke.ca",
+        "latitude":  43.6601,
+        "longitude":  -79.3870
+    },
+    {
+        "organization":  "OSPCA (Ontario SPCA)",
+        "title":  "Shelter Animal Enrichment Volunteer",
+        "cause":  "animal-care",
+        "skills":  [
+                       "animal handling",
+                       "creativity",
+                       "patience"
+                   ],
+        "location":  "Newmarket",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  10,
+        "description":  "Create and run enrichment activities for shelter animals including puzzle toys, socialization exercises, and basic training sessions.",
+        "link":  "https://ontariospca.ca/get-involved/volunteer/",
+        "source":  "https://ontariospca.ca",
+        "latitude":  44.0592,
+        "longitude":  -79.4613
+    },
+    {
+        "organization":  "Save Our Scruff",
+        "title":  "Rescue Dog Foster Volunteer",
+        "cause":  "animal-care",
+        "skills":  [
+                       "animal care",
+                       "patience",
+                       "responsibility"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "Ongoing (in-home)",
+        "volunteers_needed":  15,
+        "description":  "Provide a temporary loving home for rescued dogs while they await their forever families, including feeding, walking, and basic training.",
+        "link":  "https://saveourscruff.ca/foster/",
+        "source":  "https://saveourscruff.ca",
+        "latitude":  43.6810,
+        "longitude":  -79.3490
+    },
+    {
+        "organization":  "Annex Cat Rescue",
+        "title":  "Trap-Neuter-Return Volunteer",
+        "cause":  "animal-care",
+        "skills":  [
+                       "animal handling",
+                       "driving",
+                       "teamwork"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours per event",
+        "volunteers_needed":  6,
+        "description":  "Help humanely trap community cats for spay/neuter surgery and return them to their colonies to manage feral cat populations in Toronto.",
+        "link":  "https://www.annexcatrescue.ca/volunteer/",
+        "source":  "https://www.annexcatrescue.ca",
+        "latitude":  43.6710,
+        "longitude":  -79.4050
+    },
+    {
+        "organization":  "Dog Tales Rescue and Sanctuary",
+        "title":  "Animal Sanctuary Volunteer",
+        "cause":  "animal-care",
+        "skills":  [
+                       "animal handling",
+                       "physical fitness",
+                       "farming"
+                   ],
+        "location":  "King City",
+        "time_commitment":  "4 hours per shift",
+        "volunteers_needed":  12,
+        "description":  "Help care for rescued dogs, horses, and farm animals at the sanctuary including feeding, grooming, exercising, and facility maintenance.",
+        "link":  "https://www.dogtales.ca/volunteer",
+        "source":  "https://www.dogtales.ca",
+        "latitude":  43.9293,
+        "longitude":  -79.5282
+    },
+    {
+        "organization":  "Toronto Botanical Garden",
+        "title":  "Garden Maintenance Volunteer",
+        "cause":  "environment",
+        "skills":  [
+                       "gardening",
+                       "botany",
+                       "teamwork"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  10,
+        "description":  "Help maintain the botanical garden\u0027s themed gardens through weeding, planting, pruning, and assisting with seasonal horticultural displays.",
+        "link":  "https://torontobotanicalgarden.ca/get-involved/volunteer/",
+        "source":  "https://torontobotanicalgarden.ca",
+        "latitude":  43.7334,
+        "longitude":  -79.3601
+    },
+    {
+        "organization":  "High Park Nature Centre",
+        "title":  "Nature Walk Guide",
+        "cause":  "environment",
+        "skills":  [
+                       "ecology",
+                       "public speaking",
+                       "hiking"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  6,
+        "description":  "Lead guided nature walks through High Park for families and school groups, teaching about local wildlife, trees, and seasonal ecology.",
+        "link":  "https://highparknaturecentre.com/volunteer/",
+        "source":  "https://highparknaturecentre.com",
+        "latitude":  43.6465,
+        "longitude":  -79.4637
+    },
+    {
+        "organization":  "Lake Ontario Waterkeeper",
+        "title":  "Water Quality Monitor",
+        "cause":  "environment",
+        "skills":  [
+                       "data collection",
+                       "science",
+                       "kayaking"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours per event",
+        "volunteers_needed":  8,
+        "description":  "Collect water samples and monitor pollution levels at beaches and harbours along the Toronto waterfront to protect Lake Ontario.",
+        "link":  "https://www.waterkeeper.ca/get-involved",
+        "source":  "https://www.waterkeeper.ca",
+        "latitude":  43.6390,
+        "longitude":  -79.3700
+    },
+    {
+        "organization":  "City of Toronto",
+        "title":  "Urban Tree Planting Volunteer",
+        "cause":  "environment",
+        "skills":  [
+                       "physical fitness",
+                       "gardening",
+                       "teamwork"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "4 hours per event",
+        "volunteers_needed":  25,
+        "description":  "Plant native trees across Toronto neighbourhoods to increase urban canopy cover, improve air quality, and combat heat islands.",
+        "link":  "https://www.toronto.ca/explore-enjoy/parks-gardens-beaches/trees/tree-planting/",
+        "source":  "https://www.toronto.ca",
+        "latitude":  43.6532,
+        "longitude":  -79.3832
+    },
+    {
+        "organization":  "Not Far From The Tree",
+        "title":  "Fruit Picking Volunteer",
+        "cause":  "environment",
+        "skills":  [
+                       "physical fitness",
+                       "teamwork",
+                       "organization"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours per pick",
+        "volunteers_needed":  10,
+        "description":  "Harvest fruit from urban fruit trees across Toronto â€” one-third goes to the homeowner, one-third to a food bank, and one-third to volunteers.",
+        "link":  "https://notfarfromthetree.org/volunteer/",
+        "source":  "https://notfarfromthetree.org",
+        "latitude":  43.6688,
+        "longitude":  -79.4200
+    },
+    {
+        "organization":  "Luminato Festival",
+        "title":  "Arts Festival Volunteer",
+        "cause":  "arts-culture",
+        "skills":  [
+                       "customer service",
+                       "communication",
+                       "art"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "Event-based (June)",
+        "volunteers_needed":  20,
+        "description":  "Support Toronto\u0027s international arts festival by helping with front-of-house, artist hospitality, and audience engagement at various venues.",
+        "link":  "https://luminatofestival.com/get-involved#volunteer",
+        "source":  "https://luminatofestival.com",
+        "latitude":  43.6394,
+        "longitude":  -79.3822
+    },
+    {
+        "organization":  "Hot Docs",
+        "title":  "Documentary Film Festival Volunteer",
+        "cause":  "arts-culture",
+        "skills":  [
+                       "film",
+                       "customer service",
+                       "communication"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "Event-based (Aprilâ€“May)",
+        "volunteers_needed":  15,
+        "description":  "Help run North America\u0027s largest documentary film festival by ushering screenings, managing Q\u0026As, and supporting the box office.",
+        "link":  "https://www.hotdocs.ca/get-involved/volunteer",
+        "source":  "https://www.hotdocs.ca",
+        "latitude":  43.6635,
+        "longitude":  -79.4101
+    },
+    {
+        "organization":  "Harbourfront Centre",
+        "title":  "Cultural Events Volunteer",
+        "cause":  "arts-culture",
+        "skills":  [
+                       "event planning",
+                       "communication",
+                       "customer service"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "4 hours per event",
+        "volunteers_needed":  12,
+        "description":  "Assist with cultural events, concerts, and art installations along Toronto\u0027s waterfront at one of the city\u0027s premier arts venues.",
+        "link":  "https://harbourfrontcentre.com/volunteer/",
+        "source":  "https://harbourfrontcentre.com",
+        "latitude":  43.6374,
+        "longitude":  -79.3837
+    },
+    {
+        "organization":  "Toronto Symphony Orchestra",
+        "title":  "Concert Usher Volunteer",
+        "cause":  "arts-culture",
+        "skills":  [
+                       "customer service",
+                       "music appreciation",
+                       "reliability"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours per concert",
+        "volunteers_needed":  8,
+        "description":  "Welcome concert-goers, distribute programs, and assist with seating at Roy Thomson Hall for one of Canada\u0027s premier orchestras.",
+        "link":  "https://www.tso.ca/support-us/volunteer",
+        "source":  "https://www.tso.ca",
+        "latitude":  43.6466,
+        "longitude":  -79.3866
+    },
+    {
+        "organization":  "Canadian Opera Company",
+        "title":  "Opera House Volunteer",
+        "cause":  "arts-culture",
+        "skills":  [
+                       "customer service",
+                       "communication",
+                       "arts appreciation"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours per performance",
+        "volunteers_needed":  6,
+        "description":  "Support performances at the Four Seasons Centre by assisting with audience services, backstage tours, and community outreach events.",
+        "link":  "https://www.coc.ca/support-us/volunteer",
+        "source":  "https://www.coc.ca",
+        "latitude":  43.6508,
+        "longitude":  -79.3863
+    },
+    {
+        "organization":  "St. John Ambulance",
+        "title":  "Community First Aid Volunteer",
+        "cause":  "healthcare",
+        "skills":  [
+                       "first aid",
+                       "communication",
+                       "teamwork"
+                   ],
+        "location":  "GTA",
+        "time_commitment":  "4 hours per event",
+        "volunteers_needed":  20,
+        "description":  "Provide first aid coverage at community events, marathons, and festivals across the GTA, ensuring safety for participants and spectators.",
+        "link":  "https://www.sja.ca/en/get-involved/volunteer",
+        "source":  "https://www.sja.ca",
+        "latitude":  43.6605,
+        "longitude":  -79.3810
+    },
+    {
+        "organization":  "Aga Khan Museum",
+        "title":  "Museum Docent Volunteer",
+        "cause":  "arts-culture",
+        "skills":  [
+                       "art history",
+                       "public speaking",
+                       "cultural knowledge"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "4 hours per shift",
+        "volunteers_needed":  5,
+        "description":  "Lead tours and engage visitors with the art, heritage, and culture of Muslim civilizations at the Aga Khan Museum.",
+        "link":  "https://agakhanmuseum.org/visit/volunteer",
+        "source":  "https://agakhanmuseum.org",
+        "latitude":  43.7258,
+        "longitude":  -79.3366
+    },
+    {
+        "organization":  "Brampton Animal Services",
+        "title":  "Shelter Cat Socializer",
+        "cause":  "animal-care",
+        "skills":  [
+                       "animal handling",
+                       "patience",
+                       "attention to detail"
+                   ],
+        "location":  "Brampton",
+        "time_commitment":  "2 hours weekly",
+        "volunteers_needed":  8,
+        "description":  "Spend time socializing shelter cats to help them become more comfortable around people and increase their chances of adoption.",
+        "link":  "https://www.brampton.ca/EN/residents/Animal-Services/Pages/Volunteer.aspx",
+        "source":  "https://www.brampton.ca",
+        "latitude":  43.7315,
+        "longitude":  -79.7624
+    },
+    {
+        "organization":  "The Stop Community Food Centre",
+        "title":  "Community Kitchen Volunteer",
+        "cause":  "community",
+        "skills":  [
+                       "cooking",
+                       "food safety",
+                       "teamwork"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours per session",
+        "volunteers_needed":  6,
+        "description":  "Help prepare nutritious community meals, assist with cooking programs, and support food-access initiatives in the Davenport neighbourhood.",
+        "link":  "https://www.thestop.org/get-involved/volunteer/",
+        "source":  "https://www.thestop.org",
+        "latitude":  43.6770,
+        "longitude":  -79.4448
+    },
+    {
+        "organization":  "Eva\u0027s Initiatives for Homeless Youth",
+        "title":  "Life Skills Workshop Volunteer",
+        "cause":  "community",
+        "skills":  [
+                       "mentoring",
+                       "teaching",
+                       "communication"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  5,
+        "description":  "Facilitate life skills workshops for youth experiencing homelessness, covering topics like budgeting, cooking, resume writing, and job readiness.",
+        "link":  "https://www.evas.ca/get-involved/volunteer/",
+        "source":  "https://www.evas.ca",
+        "latitude":  43.6747,
+        "longitude":  -79.4154
+    },
+    {
+        "organization":  "Central Toronto Youth Services",
+        "title":  "LGBTQ+ Youth Group Facilitator",
+        "cause":  "community",
+        "skills":  [
+                       "facilitation",
+                       "empathy",
+                       "cultural sensitivity"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  4,
+        "description":  "Co-facilitate weekly social and support groups for LGBTQ+ youth ages 13â€“24, creating safe spaces for connection and personal growth.",
+        "link":  "https://www.ctys.org/get-involved/volunteer/",
+        "source":  "https://www.ctys.org",
+        "latitude":  43.6690,
+        "longitude":  -79.3868
+    },
+    {
+        "organization":  "Scarborough Centre for Healthy Communities",
+        "title":  "Tax Clinic Volunteer",
+        "cause":  "community",
+        "skills":  [
+                       "accounting",
+                       "communication",
+                       "attention to detail"
+                   ],
+        "location":  "Scarborough",
+        "time_commitment":  "3 hours per session",
+        "volunteers_needed":  8,
+        "description":  "Help low-income community members file their taxes for free during tax season, ensuring they access all eligible credits and benefits.",
+        "link":  "https://www.schcontario.ca/volunteer.html",
+        "source":  "https://www.schcontario.ca",
+        "latitude":  43.7731,
+        "longitude":  -79.2578
+    },
+    {
+        "organization":  "Nature Conservancy of Canada â€“ Ontario",
+        "title":  "Conservation Area Steward",
+        "cause":  "environment",
+        "skills":  [
+                       "ecology",
+                       "physical fitness",
+                       "data collection"
+                   ],
+        "location":  "GTA",
+        "time_commitment":  "4 hours per event",
+        "volunteers_needed":  12,
+        "description":  "Help maintain protected natural areas through invasive species removal, habitat restoration, and wildlife monitoring across Ontario.",
+        "link":  "https://www.natureconservancy.ca/en/where-we-work/ontario/volunteer/",
+        "source":  "https://www.natureconservancy.ca",
+        "latitude":  43.7101,
+        "longitude":  -79.3990
+    },
+    {
+        "organization":  "Ontario Nature",
+        "title":  "Citizen Science Volunteer",
+        "cause":  "environment",
+        "skills":  [
+                       "biology",
+                       "data collection",
+                       "photography"
+                   ],
+        "location":  "GTA",
+        "time_commitment":  "2 hours per event",
+        "volunteers_needed":  15,
+        "description":  "Contribute to biodiversity research by participating in bird counts, amphibian surveys, and plant identification programs across Ontario.",
+        "link":  "https://ontarionature.org/programs/citizen-science/",
+        "source":  "https://ontarionature.org",
+        "latitude":  43.6632,
+        "longitude":  -79.3920
+    },
+    {
+        "organization":  "Rouge National Urban Park",
+        "title":  "Park Ambassador Volunteer",
+        "cause":  "environment",
+        "skills":  [
+                       "communication",
+                       "hiking",
+                       "ecology"
+                   ],
+        "location":  "Scarborough",
+        "time_commitment":  "3 hours per shift",
+        "volunteers_needed":  10,
+        "description":  "Welcome visitors, share information about the park\u0027s ecology and Indigenous history, and help with trail maintenance at Canada\u0027s first national urban park.",
+        "link":  "https://parks.canada.ca/pn-np/on/rouge/activ/benevoles-volunteers",
+        "source":  "https://parks.canada.ca",
+        "latitude":  43.8150,
+        "longitude":  -79.1720
+    },
+    {
+        "organization":  "Downsview Park",
+        "title":  "Urban Farm Volunteer",
+        "cause":  "environment",
+        "skills":  [
+                       "gardening",
+                       "farming",
+                       "teamwork"
+                   ],
+        "location":  "North York",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  8,
+        "description":  "Help grow organic produce at the urban farm, assist with composting programs, and support food-growing workshops for the community.",
+        "link":  "https://downsviewpark.ca/volunteering/",
+        "source":  "https://downsviewpark.ca",
+        "latitude":  43.7480,
+        "longitude":  -79.4793
+    },
+    {
+        "organization":  "William Osler Health System",
+        "title":  "Hospital Gift Shop Volunteer",
+        "cause":  "healthcare",
+        "skills":  [
+                       "retail",
+                       "customer service",
+                       "organization"
+                   ],
+        "location":  "Brampton",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  6,
+        "description":  "Operate the hospital gift shop, assist customers, manage inventory, and provide a cheerful presence for patients and visitors.",
+        "link":  "https://www.williamoslerhs.ca/about-osler/get-involved/volunteer",
+        "source":  "https://www.williamoslerhs.ca",
+        "latitude":  43.7145,
+        "longitude":  -79.7630
+    },
+    {
+        "organization":  "Trillium Health Partners",
+        "title":  "Patient Navigation Volunteer",
+        "cause":  "healthcare",
+        "skills":  [
+                       "communication",
+                       "empathy",
+                       "organization"
+                   ],
+        "location":  "Mississauga",
+        "time_commitment":  "4 hours weekly",
+        "volunteers_needed":  10,
+        "description":  "Guide patients through the healthcare system, help them understand their care plan, and reduce anxiety during their hospital visit.",
+        "link":  "https://trilliumhealthpartners.ca/get-involved/volunteer",
+        "source":  "https://trilliumhealthpartners.ca",
+        "latitude":  43.5891,
+        "longitude":  -79.6441
+    },
+    {
+        "organization":  "Markham Stouffville Hospital",
+        "title":  "Therapeutic Recreation Volunteer",
+        "cause":  "healthcare",
+        "skills":  [
+                       "music",
+                       "art",
+                       "empathy"
+                   ],
+        "location":  "Markham",
+        "time_commitment":  "2 hours weekly",
+        "volunteers_needed":  5,
+        "description":  "Lead therapeutic music, art, and recreational sessions for patients in rehabilitation and long-term care at Markham Stouffville Hospital.",
+        "link":  "https://www.msh.on.ca/about-us/volunteer",
+        "source":  "https://www.msh.on.ca",
+        "latitude":  43.8788,
+        "longitude":  -79.2623
+    },
+    {
+        "organization":  "Sheridan Nurseries Foundation",
+        "title":  "Community Greening Volunteer",
+        "cause":  "environment",
+        "skills":  [
+                       "gardening",
+                       "physical fitness",
+                       "ecology"
+                   ],
+        "location":  "Mississauga",
+        "time_commitment":  "3 hours per event",
+        "volunteers_needed":  15,
+        "description":  "Help plant trees and shrubs in underserved neighbourhoods, beautify parks, and support community greening initiatives across the GTA.",
+        "link":  "https://sheridannurseries.com/community/",
+        "source":  "https://sheridannurseries.com",
+        "latitude":  43.5890,
+        "longitude":  -79.6441
+    },
+    {
+        "organization":  "Bata Shoe Museum",
+        "title":  "Gallery Assistant Volunteer",
+        "cause":  "arts-culture",
+        "skills":  [
+                       "art history",
+                       "customer service",
+                       "communication"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours per shift",
+        "volunteers_needed":  4,
+        "description":  "Assist with visitor engagement, gallery education, and special events at this unique museum dedicated to the history of footwear.",
+        "link":  "https://batashoemuseum.ca/get-involved/",
+        "source":  "https://batashoemuseum.ca",
+        "latitude":  43.6672,
+        "longitude":  -79.4002
+    },
+    {
+        "organization":  "Power Plant Contemporary Art Gallery",
+        "title":  "Exhibition Volunteer",
+        "cause":  "arts-culture",
+        "skills":  [
+                       "contemporary art",
+                       "communication",
+                       "customer service"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours per shift",
+        "volunteers_needed":  5,
+        "description":  "Support exhibition openings, public programs, and educational tours at Toronto\u0027s leading public gallery for contemporary art.",
+        "link":  "https://www.thepowerplant.org/support/volunteer/",
+        "source":  "https://www.thepowerplant.org",
+        "latitude":  43.6385,
+        "longitude":  -79.3810
+    },
+    {
+        "organization":  "Toronto Alliance for the Performing Arts",
+        "title":  "Theatre Outreach Volunteer",
+        "cause":  "arts-culture",
+        "skills":  [
+                       "theatre",
+                       "marketing",
+                       "communication"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  5,
+        "description":  "Help promote local theatre productions, distribute marketing materials, and support community engagement for indie performing arts companies.",
+        "link":  "https://tapa.ca/get-involved/volunteer/",
+        "source":  "https://tapa.ca",
+        "latitude":  43.6591,
+        "longitude":  -79.3808
+    },
+    {
+        "organization":  "Rescuing Unwanted Furry Friends (RUFF)",
+        "title":  "Transport Volunteer",
+        "cause":  "animal-care",
+        "skills":  [
+                       "driving",
+                       "animal handling",
+                       "time management"
+                   ],
+        "location":  "GTA",
+        "time_commitment":  "2 hours per transport",
+        "volunteers_needed":  8,
+        "description":  "Drive rescued animals to vet appointments, foster homes, and adoption events across the GTA to support rescue operations.",
+        "link":  "https://www.rfruff.com/volunteer",
+        "source":  "https://www.rfruff.com",
+        "latitude":  43.6780,
+        "longitude":  -79.4120
+    },
+    {
+        "organization":  "Vaughan Animal Services",
+        "title":  "Kennel Assistant Volunteer",
+        "cause":  "animal-care",
+        "skills":  [
+                       "animal care",
+                       "cleaning",
+                       "teamwork"
+                   ],
+        "location":  "Vaughan",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  6,
+        "description":  "Help maintain kennel cleanliness, feed and water animals, assist with basic grooming, and support adoption services at the shelter.",
+        "link":  "https://www.vaughan.ca/community/animal-services",
+        "source":  "https://www.vaughan.ca",
+        "latitude":  43.8361,
+        "longitude":  -79.4983
+    },
+    {
+        "organization":  "Dixon Hall",
+        "title":  "Meals on Wheels Delivery Volunteer",
+        "cause":  "community",
+        "skills":  [
+                       "driving",
+                       "compassion",
+                       "time management"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "2 hours per delivery",
+        "volunteers_needed":  12,
+        "description":  "Deliver nutritious meals to homebound seniors and individuals with disabilities across Toronto, providing a friendly check-in with each delivery.",
+        "link":  "https://dixonhall.org/get-involved/volunteer/",
+        "source":  "https://dixonhall.org",
+        "latitude":  43.6636,
+        "longitude":  -79.3604
+    },
+    {
+        "organization":  "Community Food Centres Canada",
+        "title":  "Cooking Workshop Facilitator",
+        "cause":  "community",
+        "skills":  [
+                       "cooking",
+                       "teaching",
+                       "food safety"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours per workshop",
+        "volunteers_needed":  4,
+        "description":  "Lead cooking workshops that teach nutritious meal preparation on a budget, helping community members build confidence in the kitchen.",
+        "link":  "https://cfccanada.ca/en/Get-Involved/Volunteer",
+        "source":  "https://cfccanada.ca",
+        "latitude":  43.6600,
+        "longitude":  -79.3500
+    },
+    {
+        "organization":  "Roncesvalles Village BIA",
+        "title":  "Neighbourhood Beautification Volunteer",
+        "cause":  "community",
+        "skills":  [
+                       "gardening",
+                       "teamwork",
+                       "community engagement"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "2 hours per event",
+        "volunteers_needed":  15,
+        "description":  "Help plant flowers, maintain public gardens, and organize street clean-ups in the Roncesvalles Village neighbourhood.",
+        "link":  "https://www.roncesvallesvillage.ca/get-involved/",
+        "source":  "https://www.roncesvallesvillage.ca",
+        "latitude":  43.6479,
+        "longitude":  -79.4489
+    },
+    {
+        "organization":  "Christie Ossington Neighbourhood Centre",
+        "title":  "ESL Conversation Circle Volunteer",
+        "cause":  "education",
+        "skills":  [
+                       "English",
+                       "patience",
+                       "communication"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "2 hours weekly",
+        "volunteers_needed":  6,
+        "description":  "Lead or co-facilitate English conversation circles for newcomers, helping them practise everyday English in a supportive group setting.",
+        "link":  "https://www.conc.ca/volunteer/",
+        "source":  "https://www.conc.ca",
+        "latitude":  43.6630,
+        "longitude":  -79.4290
+    },
+    {
+        "organization":  "Seneca Polytechnic Volunteer Centre",
+        "title":  "Student Peer Tutor",
+        "cause":  "education",
+        "skills":  [
+                       "tutoring",
+                       "subject expertise",
+                       "communication"
+                   ],
+        "location":  "North York",
+        "time_commitment":  "2 hours weekly",
+        "volunteers_needed":  10,
+        "description":  "Provide peer tutoring to fellow students in subjects like math, writing, accounting, and technology at Seneca\u0027s campus learning centres.",
+        "link":  "https://www.senecapolytechnic.ca/student-services-and-support/student-life/volunteer.html",
+        "source":  "https://www.senecapolytechnic.ca",
+        "latitude":  43.7960,
+        "longitude":  -79.3490
+    },
+    {
+        "organization":  "Evergreen CityWorks",
+        "title":  "Urban Design Workshop Volunteer",
+        "cause":  "education",
+        "skills":  [
+                       "design thinking",
+                       "facilitation",
+                       "urban planning"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours per workshop",
+        "volunteers_needed":  5,
+        "description":  "Help facilitate community urban design workshops where residents envision improvements for their streetscapes, parks, and public spaces.",
+        "link":  "https://www.evergreen.ca/cityworks/",
+        "source":  "https://www.evergreen.ca",
+        "latitude":  43.6847,
+        "longitude":  -79.3651
+    },
+    {
+        "organization":  "March of Dimes Canada",
+        "title":  "Accessible Transportation Volunteer",
+        "cause":  "healthcare",
+        "skills":  [
+                       "driving",
+                       "patience",
+                       "compassion"
+                   ],
+        "location":  "GTA",
+        "time_commitment":  "4 hours per shift",
+        "volunteers_needed":  10,
+        "description":  "Drive individuals with disabilities to medical appointments, social events, and errands using accessible vehicles across the GTA.",
+        "link":  "https://www.marchofdimes.ca/en-ca/getinvolved/volunteer/",
+        "source":  "https://www.marchofdimes.ca",
+        "latitude":  43.6490,
+        "longitude":  -79.3860
+    },
+    {
+        "organization":  "Casey House",
+        "title":  "Comfort Care Volunteer",
+        "cause":  "healthcare",
+        "skills":  [
+                       "empathy",
+                       "communication",
+                       "reliability"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  6,
+        "description":  "Provide comfort, companionship, and practical support to individuals living with HIV/AIDS at Canada\u0027s only stand-alone HIV/AIDS hospital.",
+        "link":  "https://www.caseyhouse.com/get-involved/volunteer/",
+        "source":  "https://www.caseyhouse.com",
+        "latitude":  43.6611,
+        "longitude":  -79.3667
+    },
+    {
+        "organization":  "Holland Bloorview Kids Rehabilitation Hospital",
+        "title":  "Social Recreation Volunteer",
+        "cause":  "healthcare",
+        "skills":  [
+                       "creativity",
+                       "patience",
+                       "communication"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "2 hours weekly",
+        "volunteers_needed":  8,
+        "description":  "Engage children and youth with disabilities in recreational activities including games, music, art, and sports at Holland Bloorview.",
+        "link":  "https://hollandbloorview.ca/support-our-work/volunteer",
+        "source":  "https://hollandbloorview.ca",
+        "latitude":  43.7316,
+        "longitude":  -79.3557
+    },
+    {
+        "organization":  "Scarborough Arts",
+        "title":  "Community Arts Event Volunteer",
+        "cause":  "arts-culture",
+        "skills":  [
+                       "event planning",
+                       "communication",
+                       "arts"
+                   ],
+        "location":  "Scarborough",
+        "time_commitment":  "3 hours per event",
+        "volunteers_needed":  10,
+        "description":  "Support local arts events, exhibitions, and festivals celebrating Scarborough\u0027s diverse cultural communities and emerging artists.",
+        "link":  "https://scarborougharts.com/get-involved/",
+        "source":  "https://scarborougharts.com",
+        "latitude":  43.7731,
+        "longitude":  -79.2578
+    },
+    {
+        "organization":  "Nuit Blanche Toronto",
+        "title":  "All-Night Art Festival Volunteer",
+        "cause":  "arts-culture",
+        "skills":  [
+                       "customer service",
+                       "communication",
+                       "endurance"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "6 hours per event (overnight)",
+        "volunteers_needed":  50,
+        "description":  "Support Toronto\u0027s free all-night contemporary art event by guiding visitors, managing installations, and ensuring a safe experience across the city.",
+        "link":  "https://www.toronto.ca/explore-enjoy/festivals-events/nuitblanche/volunteer/",
+        "source":  "https://www.toronto.ca",
+        "latitude":  43.6532,
+        "longitude":  -79.3832
+    },
+    {
+        "organization":  "Burlington Humane Society",
+        "title":  "Small Animal Care Volunteer",
+        "cause":  "animal-care",
+        "skills":  [
+                       "animal handling",
+                       "attention to detail",
+                       "patience"
+                   ],
+        "location":  "Burlington",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  6,
+        "description":  "Help care for rabbits, guinea pigs, and other small animals at the shelter, including feeding, cleaning, socialization, and adoption support.",
+        "link":  "https://burlingtonhumane.ca/volunteer/",
+        "source":  "https://burlingtonhumane.ca",
+        "latitude":  43.3255,
+        "longitude":  -79.7990
+    },
+    {
+        "organization":  "Oakville \u0026 Milton Humane Society",
+        "title":  "Dog Obedience Class Assistant",
+        "cause":  "animal-care",
+        "skills":  [
+                       "dog training",
+                       "communication",
+                       "patience"
+                   ],
+        "location":  "Oakville",
+        "time_commitment":  "2 hours weekly",
+        "volunteers_needed":  4,
+        "description":  "Assist certified trainers in dog obedience classes for shelter dogs and newly adopted pets, helping them learn basic commands and manners.",
+        "link":  "https://omhs.ca/get-involved/volunteer/",
+        "source":  "https://omhs.ca",
+        "latitude":  43.4675,
+        "longitude":  -79.6877
+    },
+    {
+        "organization":  "Credit Valley Conservation",
+        "title":  "Stream Restoration Volunteer",
+        "cause":  "environment",
+        "skills":  [
+                       "physical fitness",
+                       "ecology",
+                       "teamwork"
+                   ],
+        "location":  "Mississauga",
+        "time_commitment":  "3 hours per event",
+        "volunteers_needed":  20,
+        "description":  "Help restore stream banks and riparian zones in the Credit River watershed through planting, erosion control, and invasive species removal.",
+        "link":  "https://cvc.ca/get-involved/volunteer/",
+        "source":  "https://cvc.ca",
+        "latitude":  43.5451,
+        "longitude":  -79.6603
+    },
+    {
+        "organization":  "Toronto and Region Conservation Authority",
+        "title":  "Park Trail Builder",
+        "cause":  "environment",
+        "skills":  [
+                       "physical fitness",
+                       "carpentry",
+                       "teamwork"
+                   ],
+        "location":  "GTA",
+        "time_commitment":  "4 hours per event",
+        "volunteers_needed":  15,
+        "description":  "Build and maintain hiking trails, boardwalks, and bridges in conservation areas throughout the GTA to improve public access to nature.",
+        "link":  "https://trca.ca/get-involved/volunteer/",
+        "source":  "https://trca.ca",
+        "latitude":  43.7070,
+        "longitude":  -79.3460
+    },
+    {
+        "organization":  "Pollinator Partnership Canada",
+        "title":  "Pollinator Garden Installer",
+        "cause":  "environment",
+        "skills":  [
+                       "gardening",
+                       "ecology",
+                       "physical fitness"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours per event",
+        "volunteers_needed":  10,
+        "description":  "Help install pollinator-friendly gardens in schools, parks, and community spaces to support bees, butterflies, and other vital pollinators.",
+        "link":  "https://pollinatorpartnership.ca/en/gardening-for-pollinators",
+        "source":  "https://pollinatorpartnership.ca",
+        "latitude":  43.6590,
+        "longitude":  -79.3930
+    },
+    {
+        "organization":  "Dress for Success Toronto",
+        "title":  "Career Coach Volunteer",
+        "cause":  "community",
+        "skills":  [
+                       "coaching",
+                       "fashion",
+                       "communication"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours per session",
+        "volunteers_needed":  6,
+        "description":  "Help women entering the workforce select professional attire, build interview confidence, and develop career-readiness skills.",
+        "link":  "https://toronto.dressforsuccess.org/get-involved/volunteer/",
+        "source":  "https://toronto.dressforsuccess.org",
+        "latitude":  43.6557,
+        "longitude":  -79.3811
+    },
+    {
+        "organization":  "Parkdale Community Health Centre",
+        "title":  "Community Health Navigator",
+        "cause":  "healthcare",
+        "skills":  [
+                       "multilingual",
+                       "communication",
+                       "healthcare knowledge"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours weekly",
+        "volunteers_needed":  5,
+        "description":  "Help community members navigate the healthcare system, book appointments, understand prescriptions, and access social services in Parkdale.",
+        "link":  "https://www.pchc.on.ca/volunteer/",
+        "source":  "https://www.pchc.on.ca",
+        "latitude":  43.6385,
+        "longitude":  -79.4442
+    },
+    {
+        "organization":  "Epilepsy Toronto",
+        "title":  "Awareness Campaign Volunteer",
+        "cause":  "healthcare",
+        "skills":  [
+                       "social media",
+                       "public speaking",
+                       "advocacy"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "2 hours weekly",
+        "volunteers_needed":  5,
+        "description":  "Help raise public awareness about epilepsy through community events, social media campaigns, and educational presentations in schools and workplaces.",
+        "link":  "https://epilepsytoronto.org/get-involved/volunteer/",
+        "source":  "https://epilepsytoronto.org",
+        "latitude":  43.6650,
+        "longitude":  -79.3870
+    },
+    {
+        "organization":  "Toronto Bicycling Network",
+        "title":  "Group Ride Leader",
+        "cause":  "community",
+        "skills":  [
+                       "cycling",
+                       "leadership",
+                       "navigation"
+                   ],
+        "location":  "Toronto",
+        "time_commitment":  "3 hours per ride",
+        "volunteers_needed":  8,
+        "description":  "Lead guided group bicycle rides across Toronto\u0027s trails and streets, promoting cycling safety, fitness, and exploration of the city.",
+        "link":  "https://www.tbn.ca/volunteer",
+        "source":  "https://www.tbn.ca",
+        "latitude":  43.6590,
+        "longitude":  -79.3850
+    }
+]

@@ -28,5 +28,4 @@ Thumbs.db
 backend/.env
 .secrets/
 *.dpapi
-static_opportunities.json
 backend/RUNBOOK.md
