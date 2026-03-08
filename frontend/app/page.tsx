@@ -113,6 +113,86 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Feature image divider with caution tape */}
+      <section className="relative min-h-[480px] overflow-hidden">
+        {/* Full-width background image */}
+        <img
+          src="/assets/images/cabin.webp"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover object-[50%_50%]"
+        />
+        <div className="absolute inset-0 bg-black/40" />
+
+        {/* Feature 1 — bottom left */}
+        <div className="absolute bottom-14 left-10 max-w-[38%] z-10">
+          <div className="inline-flex rounded-xl bg-white/20 p-3 text-white backdrop-blur-sm">
+            {FEATURES[0].icon}
+          </div>
+          <h3 className="mt-3 text-lg font-semibold text-white">{FEATURES[0].title}</h3>
+          <p className="mt-1 text-sm leading-relaxed text-white/80">{FEATURES[0].desc}</p>
+        </div>
+
+        {/* Feature 2 — top right */}
+        <div className="absolute right-10 top-14 max-w-[38%] text-right z-10">
+          <div className="inline-flex justify-end rounded-xl bg-white/20 p-3 text-white backdrop-blur-sm">
+            {FEATURES[1].icon}
+          </div>
+          <h3 className="mt-3 text-lg font-semibold text-white">{FEATURES[1].title}</h3>
+          <p className="mt-1 text-sm leading-relaxed text-white/80">{FEATURES[1].desc}</p>
+        </div>
+
+        {/* Caution tape 1 — bottom-left to top-right */}
+        <div
+          className="absolute z-10 overflow-hidden"
+          style={{
+            top: "50%",
+            left: "-50%",
+            width: "200%",
+            transform: "translateY(-50%) rotate(17deg)",
+            height: "42px",
+            background: "#FFD700",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.45)",
+          }}
+        >
+          <div className="animate-marquee flex h-full items-center whitespace-nowrap">
+            {Array.from({ length: 30 }).map((_, i) => (
+              <span
+                key={i}
+                style={{ fontFamily: "sans-serif", color: "#141414", padding: "0 1.5rem", lineHeight: "42px", display: "inline-block", fontWeight: 900, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.25em" }}
+              >
+                CAUTION
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Caution tape 2 — middle-left to top-right */}
+        <div
+          className="absolute z-10 overflow-hidden"
+          style={{
+            top: "15%",
+            left: "-50%",
+            width: "200%",
+            transform: "translateY(-50%) rotate(-12deg)",
+            height: "42px",
+            background: "#FFD700",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.45)",
+          }}
+        >
+          <div className="animate-marquee flex h-full items-center whitespace-nowrap">
+            {Array.from({ length: 30 }).map((_, i) => (
+              <span
+                key={i}
+                style={{ fontFamily: "sans-serif", color: "#141414", padding: "0 1.5rem", lineHeight: "42px", display: "inline-block", fontWeight: 900, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.25em" }}
+              >
+                CAUTION
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Stats strip */}
       <section className="border-y border-[#9fc4ef] bg-gradient-to-r from-[#eff8ff] via-[#ffffff] to-[#ecfcff] backdrop-blur">
         <div className="mx-auto grid max-w-[1100px] grid-cols-2 gap-6 px-4 py-8 md:grid-cols-4 md:px-6">
@@ -124,29 +204,6 @@ export default function LandingPage() {
           ))}
         </div>
       </section>
-
-      {/* Features */}
-      <section id="features" className="mx-auto max-w-[1100px] px-4 py-16 md:px-6 md:py-24">
-        <h2 className="text-center text-2xl font-semibold sm:text-3xl">
-          Everything you need to make an impact
-        </h2>
-        <p className="mx-auto mt-3 max-w-xl text-center text-sm text-[#4876aa] md:text-base">
-          From intelligent matching to interactive maps, ImpactMatch makes it effortless to find and track volunteer work.
-        </p>
-        <div className="mt-12 grid gap-6 sm:grid-cols-2">
-          {FEATURES.map((f) => (
-            <div
-              key={f.title}
-              className="rounded-2xl border border-[#c2daf8] bg-white p-6 transition-shadow duration-200 hover:shadow-md"
-            >
-              <div className="inline-flex rounded-xl bg-[#deecff] p-3 text-[#235b9f]">{f.icon}</div>
-              <h3 className="mt-4 text-lg font-semibold">{f.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-[#4876aa]">{f.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* Cause tags */}
       <section className="border-y border-[#c2daf8] bg-white/70 backdrop-blur">
         <div className="mx-auto max-w-[1100px] px-4 py-12 text-center md:px-6">

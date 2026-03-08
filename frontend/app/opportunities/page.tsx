@@ -3,9 +3,33 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Header } from "@/components/header"
-import type { V1OpportunityRead } from "@/lib/utils"
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000"
+
+type Opportunity = {
+  id: string
+  title: string
+  description: string
+  organization_name: string | null
+  cause_category: string | null
+  location_text: string | null
+  location_lat: number | null
+  location_lng: number | null
+  event_date: string | null
+  event_time: string | null
+  volunteers_needed: number | null
+  volunteers_signed: number
+  skills_required: string[]
+  source_url: string | null
+  image_url: string | null
+  is_scraped: boolean
+  created_at: string | null
+}
+
+type OpportunitiesResponse = {
+  total: number
+  items: Opportunity[]
+}
 
 const CAUSE_COLORS: Record<string, { bg: string; text: string }> = {
   environment: { bg: "bg-emerald-100", text: "text-emerald-700" },
@@ -47,23 +71,27 @@ export default function OpportunitiesPage() {
       setLoading(true)
       setError(null)
       try {
-        const url = new URL(`${API_BASE}/v1/opportunities`)
-        url.searchParams.set("limit", String(PAGE_SIZE))
-        url.searchParams.set("offset", String(page * PAGE_SIZE))
-
+        const params = new URLSearchParams({
+          limit: String(PAGE_SIZE),
+          offset: String(page * PAGE_SIZE),
+        })
         if (search.trim()) {
-          url.searchParams.set("q", search.trim())
+          params.set("q", search.trim())
         }
         if (causeFilter) {
-          url.searchParams.set("category", causeFilter)
+          params.set("category", causeFilter)
         }
 
-        const response = await fetch(url.toString())
-        if (!response.ok) throw new Error(`Server error ${response.status}`)
+        const response = await fetch(`${API_BASE}/v1/opportunities?${params.toString()}`, {
+          cache: "no-store",
+        })
+        if (!response.ok) {
+          throw new Error(`Server error ${response.status}`)
+        }
 
-        const data = (await response.json()) as { total: number; items: V1OpportunityRead[] }
-        setItems(data.items)
-        setTotal(data.total)
+        const data = (await response.json()) as OpportunitiesResponse
+        setItems(data.items ?? [])
+        setTotal(data.total ?? 0)
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load opportunities")
       } finally {
@@ -171,6 +199,10 @@ export default function OpportunitiesPage() {
 
                     {item.location_text && (
                       <p className="mt-1.5 text-xs text-[#6C645F]">{item.location_text}</p>
+                    )}
+
+                    {item.organization_name && (
+                      <p className="mt-1 text-xs text-[#4676aa]">{item.organization_name}</p>
                     )}
 
                     <p className="mt-2 line-clamp-3 text-sm text-[#4676aa]">{item.description}</p>
