@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Header } from "@/components/header"
-import { supabase } from "@/lib/supabase"
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000"
 
 type Opportunity = {
   id: string
   title: string
   description: string
+  organization_name: string | null
   cause_category: string | null
   location_text: string | null
   location_lat: number | null
@@ -22,6 +24,11 @@ type Opportunity = {
   image_url: string | null
   is_scraped: boolean
   created_at: string | null
+}
+
+type OpportunitiesResponse = {
+  total: number
+  items: Opportunity[]
 }
 
 const CAUSE_COLORS: Record<string, { bg: string; text: string }> = {
@@ -64,26 +71,27 @@ export default function OpportunitiesPage() {
       setLoading(true)
       setError(null)
       try {
-        let query = supabase
-          .from("opportunities")
-          .select("*", { count: "exact" })
-          .order("created_at", { ascending: false })
-          .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1)
-
+        const params = new URLSearchParams({
+          limit: String(PAGE_SIZE),
+          offset: String(page * PAGE_SIZE),
+        })
         if (search.trim()) {
-          query = query.or(
-            `title.ilike.%${search.trim()}%,description.ilike.%${search.trim()}%`
-          )
+          params.set("q", search.trim())
         }
         if (causeFilter) {
-          query = query.eq("cause_category", causeFilter)
+          params.set("category", causeFilter)
         }
 
-        const { data, error: sbError, count } = await query
+        const response = await fetch(`${API_BASE}/v1/opportunities?${params.toString()}`, {
+          cache: "no-store",
+        })
+        if (!response.ok) {
+          throw new Error(`Server error ${response.status}`)
+        }
 
-        if (sbError) throw new Error(sbError.message)
-        setItems((data as Opportunity[]) ?? [])
-        setTotal(count ?? 0)
+        const data = (await response.json()) as OpportunitiesResponse
+        setItems(data.items ?? [])
+        setTotal(data.total ?? 0)
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load opportunities")
       } finally {
@@ -191,6 +199,10 @@ export default function OpportunitiesPage() {
 
                     {item.location_text && (
                       <p className="mt-1.5 text-xs text-[#6C645F]">{item.location_text}</p>
+                    )}
+
+                    {item.organization_name && (
+                      <p className="mt-1 text-xs text-[#4676aa]">{item.organization_name}</p>
                     )}
 
                     <p className="mt-2 line-clamp-3 text-sm text-[#4676aa]">{item.description}</p>
