@@ -10,6 +10,15 @@
   animation: marquee 28s linear infinite;
 }
 
+@keyframes marquee-reverse {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+
+.animate-marquee-reverse {
+  animation: marquee-reverse 28s linear infinite;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 :root {

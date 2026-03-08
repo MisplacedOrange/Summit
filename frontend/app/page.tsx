@@ -125,7 +125,7 @@ export default function LandingPage() {
             >
               Climb Higher
               <br />
-              Reach your <a href="/discover">SUMMIT</a>.
+              Reach your <a href="/discover"><u>SUMMIT</u></a>.
             </h1>
           </motion.div>
 
@@ -135,10 +135,10 @@ export default function LandingPage() {
             style={{ opacity: missionOpacity, y: missionY }}
           >
             <p
-              className="max-w-2xl text-lg leading-relaxed text-white md:text-xl"
+              className="max-w-2xl text-xl leading-relaxed text-white md:text-xl"
               style={{ fontFamily: "'Times New Roman', Times, serif", fontStyle: "italic" }}
             >
-              We believe every person has the power to create change. Summit connects volunteers with the opportunities that matter most — in their community, on their schedule, aligned with their passion.
+              To connect students with high impact local service through advanced matching and location-based technology.
             </p>
           </motion.div>
 
@@ -171,7 +171,7 @@ export default function LandingPage() {
         </div>
 
         {/* Feature 2 — top right */}
-        <div className="absolute right-10 top-14 max-w-[38%] text-right z-10">
+        <div className="absolute right-10 top-18 max-w-[38%] text-right z-10">
           <div className="inline-flex justify-end rounded-xl bg-white/20 p-3 text-white backdrop-blur-sm">
             {FEATURES[1].icon}
           </div>
@@ -217,7 +217,7 @@ export default function LandingPage() {
             boxShadow: "0 4px 24px rgba(0,0,0,0.45)",
           }}
         >
-          <div className="animate-marquee flex h-full items-center whitespace-nowrap">
+          <div className="animate-marquee-reverse flex h-full items-center whitespace-nowrap">
             {Array.from({ length: 30 }).map((_, i) => (
               <span
                 key={i}
@@ -231,8 +231,7 @@ export default function LandingPage() {
       </section>
 
       {/* Stats strip */}
-      <section className="relative isolate border-y border-[#2a4e7a] bg-[#071a31]">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_10%,rgba(35,131,255,0.22),transparent_45%),radial-gradient(circle_at_84%_80%,rgba(0,219,168,0.15),transparent_40%),linear-gradient(180deg,#0b1f3a_0%,#071a31_100%)]" />
+      <section className="relative isolate bg-black">
         <div className="mx-auto grid max-w-[1100px] grid-cols-2 gap-6 px-4 py-8 md:grid-cols-4 md:px-6">
           {STATS.map((s) => (
             <div key={s.label} className="text-center">
@@ -243,27 +242,110 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Cause tags */}
-      <section className="relative isolate border-y border-[#2b4f7a] bg-[#08182d]">
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,#0a1f3b_0%,#08182d_100%)]" />
-        <div className="mx-auto max-w-[1100px] px-4 py-12 text-center md:px-6">
-          <h2 className="text-xl font-semibold text-[#f1f8ff] sm:text-2xl">Causes you can support</h2>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
-            {CAUSES.map((c) => (
+      {/* Cause diagonal */}
+      <section className="relative bg-black min-h-[620px] overflow-hidden">
+        {/* Background watermark words */}
+        <motion.span
+          className="pointer-events-none select-none absolute right-[4vw] top-[50px] text-[8vw] font-black leading-none"
+          initial={{ color: "#2a2a2a" }}
+          whileInView={{ color: "#D3D3D3" }}
+          viewport={{ once: false, amount: 0.8 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+        >ENDLESS</motion.span>
+        <motion.span
+          className="pointer-events-none select-none absolute left-[4vw] top-[500px] text-[8vw] font-black leading-none"
+          initial={{ color: "#2a2a2a" }}
+          whileInView={{ color: "#D3D3D3" }}
+          viewport={{ once: false, amount: 0.8 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+        >OPTIONS</motion.span>
+
+        {/* Diagonal cause nodes */}
+        {CAUSES.map((c, i) => (
+          <div
+            key={c.name}
+            className="absolute"
+            style={{ left: `calc(2vw + ${i * 12}vw)`, top: `${60 + i * 88}px` }}
+          >
+            <motion.span
+              className="text-[4.5vw] font-black leading-none"
+              initial={{ color: "#2a2a2a" }}
+              whileInView={{ color: "#ffffff" }}
+              viewport={{ once: false, amount: 0.8 }}
+              transition={{ duration: 1.2, ease: "easeOut" }}
+            >{c.name}</motion.span>
+          </div>
+        ))}
+      </section>
+
+      {/* CTA */}
+      <section className="relative bg-black px-4 py-32 text-center md:px-6 overflow-hidden">
+        {/* Caution tape */}
+        <div
+          className="absolute z-10 overflow-hidden pointer-events-none"
+          style={{
+            top: "",
+            left: "-50%",
+            width: "200%",
+            transform: "translateY(-50%)",
+            height: "42px",
+            background: "#FFD700",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.45)",
+          }}
+        >
+          <div className="animate-marquee flex h-full items-center whitespace-nowrap">
+            {Array.from({ length: 30 }).map((_, i) => (
               <span
-                key={c.name}
-                className="inline-flex items-center gap-2 rounded-full border border-[#3f648d] bg-[#0c2a4a] px-4 py-2 text-sm font-medium text-[#d9ecff]"
+                key={i}
+                style={{ fontFamily: "sans-serif", color: "#141414", padding: "0 1.5rem", lineHeight: "42px", display: "inline-block", fontWeight: 900, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.25em" }}
               >
-                <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: c.color }} />
-                {c.name}
+                GET STARTED
               </span>
             ))}
           </div>
         </div>
+        <div
+          className="absolute z-10 overflow-hidden pointer-events-none"
+          style={{
+            top: "90%",
+            left: "-50%",
+            width: "200%",
+            transform: "translateY(-50%)",
+            height: "42px",
+            background: "#FFD700",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.45)",
+          }}
+        >
+          <div className="animate-marquee-reverse flex h-full items-center whitespace-nowrap">
+            {Array.from({ length: 30 }).map((_, i) => (
+              <span
+                key={i}
+                style={{ fontFamily: "sans-serif", color: "#141414", padding: "0 1.5rem", lineHeight: "42px", display: "inline-block", fontWeight: 900, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.25em" }}
+              >
+                GET STARTED
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="relative z-20 mx-auto max-w-[860px] mt-16">
+          <h2 className="text-4xl font-black text-white md:text-5xl lg:text-6xl leading-tight">
+            Ready to make<br />an impact?
+          </h2>
+          <p className="mx-auto mt-5 max-w-lg text-base text-white/50 md:text-lg">
+            Join students and nonprofits already using Summit to connect, track, and grow real local impact.
+          </p>
+          <Link
+            href="/discover"
+            className="mt-8 inline-flex rounded-full bg-white px-10 py-4 text-sm font-bold text-black shadow-[0_0_40px_rgba(255,255,255,0.15)] transition-all hover:scale-[1.03] hover:shadow-[0_0_56px_rgba(255,255,255,0.25)]"
+          >
+            Get Started — It&apos;s Free
+          </Link>
+        </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-[#284d78] bg-[#050e1b]">
+      <footer className="bg-[#000000]">
         <div className="mx-auto flex max-w-[1100px] items-center justify-between px-4 py-6 md:px-6">
           <span className="text-sm font-medium text-[#86afd8]">&copy; 2026 Summit</span>
           <div className="flex gap-4 text-sm text-[#86afd8]">
