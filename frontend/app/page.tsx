@@ -1,7 +1,9 @@
 "use client"
 
+import { useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { motion, useScroll, useTransform } from "framer-motion"
 import { useAuth } from "./auth-context"
 import { Header } from "@/components/header"
 
@@ -66,50 +68,165 @@ const STATS = [
 export default function LandingPage() {
   const { user } = useAuth()
 
+  const panelRef = useRef<HTMLElement>(null)
+  const { scrollYProgress } = useScroll({ target: panelRef, offset: ["start start", "end end"] })
+
+  const headlineOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0])
+  const missionOpacity = useTransform(scrollYProgress, [0.15, 0.35, 0.55], [0, 1, 1])
+  const missionY = useTransform(scrollYProgress, [0.15, 0.35], [40, 0])
+  const blackOpacity = useTransform(scrollYProgress, [0.77, 0.99], [0, 0.9])
+
   return (
     <main className="min-h-screen bg-[#eef6ff] text-[#143d73]">
       <Header />
 
-      {/* Hero */}
-      <section className="relative h-screen overflow-hidden">
-        {/* Background image */}
+      {/* Unified Hero + Transition — one section, one mountain image, one sticky viewport */}
+      <section ref={panelRef} style={{ height: "300vh", position: "relative" }}>
+        <div style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden" }}>
+          {/* Single mountain image */}
+          <img
+            src="/assets/images/mountain.webp"
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-cover object-top"
+          />
+
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
+
+          {/* SUMMIT watermark */}
+          <motion.div
+            className="pointer-events-none absolute inset-0 z-20 flex select-none flex-col items-center justify-center pb-[35vh]"
+            style={{ opacity: headlineOpacity }}
+          >
+            <span
+              className="block w-full text-center leading-none text-white opacity-20"
+              style={{
+                fontSize: "22vw",
+                letterSpacing: "-0.04em",
+                fontFamily: "sans-serif",
+                fontWeight: 900,
+                WebkitMaskImage: "linear-gradient(to bottom, black 30%, transparent 100%)",
+                maskImage: "linear-gradient(to bottom, black 30%, transparent 100%)",
+              }}
+            >
+              SUMMIT
+            </span>
+          </motion.div>
+
+          {/* Headline — fades out as mission fades in */}
+          <motion.div
+            className="absolute bottom-0 left-0 z-30 px-8 pb-14 md:px-16 lg:px-24"
+            style={{ opacity: headlineOpacity }}
+          >
+            <h1
+              className="max-w-3xl text-4xl leading-tight text-white md:text-5xl lg:text-6xl"
+              style={{ fontFamily: "'Times New Roman', Times, serif", fontStyle: "italic" }}
+            >
+              Climb Higher
+              <br />
+              Reach your <b>SUMMIT</b>.
+            </h1>
+          </motion.div>
+
+          {/* Mission statement — fades in bottom-left */}
+          <motion.div
+            className="absolute bottom-0 left-0 z-30 px-8 pb-14 md:px-16 lg:px-24"
+            style={{ opacity: missionOpacity, y: missionY }}
+          >
+            <p
+              className="max-w-2xl text-lg leading-relaxed text-white md:text-xl"
+              style={{ fontFamily: "'Times New Roman', Times, serif", fontStyle: "italic" }}
+            >
+              We believe every person has the power to create change. Summit connects volunteers with the opportunities that matter most — in their community, on their schedule, aligned with their passion.
+            </p>
+          </motion.div>
+
+          {/* Black dissolve overlay */}
+          <motion.div
+            className="absolute inset-0 z-40 bg-black"
+            style={{ opacity: blackOpacity }}
+          />
+        </div>
+      </section>
+
+      {/* Feature image divider with caution tape */}
+      <section id="caution-section" className="relative min-h-[480px] overflow-hidden">
+        {/* Full-width background image */}
         <img
-          src="/assets/images/mountain.webp"
+          src="/assets/images/cabin.webp"
           alt=""
           aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover object-top"
+          className="absolute inset-0 h-full w-full object-cover object-[50%_50%]"
         />
+        <div className="absolute inset-0 bg-black/40" />
 
-        {/* Overlay — top for navbar readability, bottom for headline readability */}
-        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
-
-        {/* SUMMIT — white, translucent, fades at bottom, above center */}
-        <div className="pointer-events-none absolute inset-0 z-20 flex select-none flex-col items-center justify-center pb-[35vh]">
-          <span
-            className="block w-full text-center leading-none text-white opacity-20"
-            style={{
-              fontSize: "22vw",
-              letterSpacing: "-0.04em",
-              fontFamily: "sans-serif",
-              fontWeight: 900,
-              WebkitMaskImage: "linear-gradient(to bottom, black 30%, transparent 100%)",
-              maskImage: "linear-gradient(to bottom, black 30%, transparent 100%)",
-            }}
-          >
-            SUMMIT
-          </span>
+        {/* Feature 1 — bottom left */}
+        <div className="absolute bottom-14 left-10 max-w-[38%] z-10">
+          <div className="inline-flex rounded-xl bg-white/20 p-3 text-white backdrop-blur-sm">
+            {FEATURES[0].icon}
+          </div>
+          <h3 className="mt-3 text-lg font-semibold text-white">{FEATURES[0].title}</h3>
+          <p className="mt-1 text-sm leading-relaxed text-white/80">{FEATURES[0].desc}</p>
         </div>
 
-        {/* Bottom-left headline */}
-        <div className="absolute bottom-0 left-0 z-30 px-8 pb-14 md:px-16 lg:px-24">
-          <h1
-            className="max-w-3xl text-4xl leading-tight text-white md:text-5xl lg:text-6xl"
-            style={{ fontFamily: "'Times New Roman', Times, serif", fontStyle: "italic" }}
-          >
-            Climb Higher
-            <br />
-            Reach your <b>SUMMIT</b>.
-          </h1>
+        {/* Feature 2 — top right */}
+        <div className="absolute right-10 top-14 max-w-[38%] text-right z-10">
+          <div className="inline-flex justify-end rounded-xl bg-white/20 p-3 text-white backdrop-blur-sm">
+            {FEATURES[1].icon}
+          </div>
+          <h3 className="mt-3 text-lg font-semibold text-white">{FEATURES[1].title}</h3>
+          <p className="mt-1 text-sm leading-relaxed text-white/80">{FEATURES[1].desc}</p>
+        </div>
+
+        {/* Caution tape 1 — bottom-left to top-right */}
+        <div
+          className="absolute z-10 overflow-hidden"
+          style={{
+            top: "50%",
+            left: "-50%",
+            width: "200%",
+            transform: "translateY(-50%) rotate(17deg)",
+            height: "42px",
+            background: "#FFD700",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.45)",
+          }}
+        >
+          <div className="animate-marquee flex h-full items-center whitespace-nowrap">
+            {Array.from({ length: 30 }).map((_, i) => (
+              <span
+                key={i}
+                style={{ fontFamily: "sans-serif", color: "#141414", padding: "0 1.5rem", lineHeight: "42px", display: "inline-block", fontWeight: 900, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.25em" }}
+              >
+                CAUTION
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Caution tape 2 — middle-left to top-right */}
+        <div
+          className="absolute z-10 overflow-hidden"
+          style={{
+            top: "16%",
+            left: "-50%",
+            width: "200%",
+            transform: "translateY(-50%) rotate(-5deg)",
+            height: "42px",
+            background: "#FFD700",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.45)",
+          }}
+        >
+          <div className="animate-marquee flex h-full items-center whitespace-nowrap">
+            {Array.from({ length: 30 }).map((_, i) => (
+              <span
+                key={i}
+                style={{ fontFamily: "sans-serif", color: "#141414", padding: "0 1.5rem", lineHeight: "42px", display: "inline-block", fontWeight: 900, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.25em" }}
+              >
+                CAUTION
+              </span>
+            ))}
+          </div>
         </div>
       </section>
 

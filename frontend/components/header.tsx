@@ -20,7 +20,9 @@ export function Header() {
     if (!isHomePage) return
 
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
+      const cautionEl = document.getElementById('caution-section')
+      const threshold = cautionEl ? cautionEl.offsetTop : 50
+      setIsScrolled(window.scrollY >= threshold)
     }
 
     window.addEventListener("scroll", handleScroll)
@@ -58,7 +60,7 @@ export function Header() {
           {/* Left: Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <Image
-              src="/assets/images/summit.png"
+              src="/assets/images/summit.svg"
               alt="Summit Logo"
               width={24}
               height={24}
