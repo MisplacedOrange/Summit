@@ -10,7 +10,7 @@ import { useAuth } from "@/app/auth-context"
 import { Button } from "@/components/ui/button"
 
 export function Header() {
-  const { user, loading } = useAuth()
+  const { user, loading, logout } = useAuth()
   const { user: auth0User, isLoading: auth0Loading } = useUser()
   const pathname = usePathname()
   const isHomePage = pathname === "/"
@@ -35,6 +35,7 @@ export function Header() {
   const isTransparent = isHomePage && !isScrolled
   const isGlassmorphism = isHomePage && isScrolled
   const isAuthenticated = Boolean(auth0User || user)
+  const isAuth0Session = Boolean(auth0User)
   const isAuthLoading = loading || auth0Loading
   const displayName =
     auth0User?.name?.trim() ||
@@ -137,15 +138,21 @@ export function Header() {
                   <Link href="/profile">{displayName}</Link>
                 </Button>
                 <Button
-                  asChild
                   variant="ghost"
+                  onClick={() => {
+                    if (isAuth0Session) {
+                      window.location.assign("/api/auth/logout?returnTo=/")
+                      return
+                    }
+                    logout()
+                  }}
                   className={`transition-colors duration-300 ${
                     isTransparent
                       ? "text-white hover:bg-white/10"
                       : "text-[#37322f] hover:bg-[#37322f]/5"
                   }`}
                 >
-                  <a href="/api/auth/logout?returnTo=/">Logout</a>
+                  Logout
                 </Button>
               </>
             ) : (
@@ -159,7 +166,7 @@ export function Header() {
                       : "text-[#37322f] hover:bg-[#37322f]/5"
                   }`}
                 >
-                  <a href="/api/auth/login?returnTo=/dashboard">Log in</a>
+                  <Link href="/login">Log in</Link>
                 </Button>
                 <Button
                   asChild
@@ -169,7 +176,7 @@ export function Header() {
                       : "bg-[#2f6fd1] text-white hover:bg-[#2159b0]"
                   }`}
                 >
-                  <a href="/api/auth/login?screen_hint=signup&returnTo=/dashboard">Sign up</a>
+                  <Link href="/signup">Sign up</Link>
                 </Button>
               </>
             )}

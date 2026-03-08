@@ -877,7 +877,9 @@ export default function ImpactMatchPage() {
       if (selectedInterestFilters.length === 0 && prefs.interests.length > 0) {
         setSelectedInterestFilters(prefs.interests.slice(0, 3))
       }
-      window.setTimeout(() => setProfileSaved(false), 3000)
+      window.setTimeout(() => {
+        window.location.reload()
+      }, 350)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save recommendation profile")
     } finally {

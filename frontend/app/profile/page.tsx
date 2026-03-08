@@ -80,7 +80,9 @@ export default function ProfilePage() {
     try {
       await updatePreferences(prefs)
       setSaved(true)
-      setTimeout(() => setSaved(false), 3000)
+      window.setTimeout(() => {
+        window.location.reload()
+      }, 350)
     } catch {
       alert("Failed to save preferences")
     } finally {
@@ -196,7 +198,7 @@ export default function ProfilePage() {
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M20 6L9 17l-5-5" />
                 </svg>
-                Saved! AI Match will use these.
+                Saved! Refreshing your profile...
               </span>
             )}
           </div>

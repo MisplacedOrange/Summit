@@ -29,6 +29,13 @@ type LoginInput = {
   password: string
 }
 
+type RegisterInput = {
+  email: string
+  password: string
+  full_name?: string
+  role?: "student" | "organization"
+}
+
 type Auth0SessionUser = {
   sub: string
   email: string
@@ -47,6 +54,7 @@ type AuthContextValue = {
   token: string | null
   loading: boolean
   login: (input: LoginInput) => Promise<void>
+  register: (input: RegisterInput) => Promise<void>
   logout: () => void
   refreshProfile: () => Promise<void>
   updatePreferences: (prefs: UserPreferences) => Promise<void>
@@ -57,6 +65,7 @@ const AuthContext = createContext<AuthContextValue>({
   token: null,
   loading: true,
   login: async () => {},
+  register: async () => {},
   logout: () => {},
   refreshProfile: async () => {},
   updatePreferences: async () => {},
@@ -70,6 +79,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [token, setToken] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+
+  const persistAuth = useCallback((accessToken: string, profile: AuthUser) => {
+    localStorage.setItem(TOKEN_STORAGE_KEY, accessToken)
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(profile))
+    setToken(accessToken)
+    setUser(profile)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -121,13 +137,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return false
       }
 
-      localStorage.setItem(TOKEN_STORAGE_KEY, exchangeData.access_token)
-      setToken(exchangeData.access_token)
-
       const profile = await loadProfileFromToken(exchangeData.access_token, session.user.picture ?? null)
       if (!cancelled) {
-        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(profile))
-        setUser(profile)
+        persistAuth(exchangeData.access_token, profile)
       }
       return true
     }
@@ -190,9 +202,58 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const login = useCallback(async (_input: LoginInput) => {
-    window.location.assign("/api/auth/login?returnTo=/dashboard")
-  }, [])
+  const login = useCallback(async (input: LoginInput) => {
+    const email = input.email.trim().toLowerCase()
+    const password = input.password
+
+    if (!email || !password) {
+      window.location.assign("/api/auth/login?returnTo=/dashboard")
+      return
+    }
+
+    const res = await fetch(`${API_BASE}/v1/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    })
+
+    const payload = (await res.json().catch(() => ({}))) as {
+      detail?: string
+      access_token?: string
+      user?: AuthUser
+    }
+
+    if (!res.ok || !payload.access_token || !payload.user) {
+      throw new Error(payload.detail || "Sign in failed")
+    }
+
+    persistAuth(payload.access_token, payload.user)
+  }, [persistAuth])
+
+  const register = useCallback(async (input: RegisterInput) => {
+    const email = input.email.trim().toLowerCase()
+    const password = input.password
+    const full_name = input.full_name?.trim() || undefined
+    const role = input.role ?? "student"
+
+    const res = await fetch(`${API_BASE}/v1/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, full_name, role }),
+    })
+
+    const payload = (await res.json().catch(() => ({}))) as {
+      detail?: string
+      access_token?: string
+      user?: AuthUser
+    }
+
+    if (!res.ok || !payload.access_token || !payload.user) {
+      throw new Error(payload.detail || "Sign up failed")
+    }
+
+    persistAuth(payload.access_token, payload.user)
+  }, [persistAuth])
 
   const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_STORAGE_KEY)
@@ -244,7 +305,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   )
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, refreshProfile, updatePreferences }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout, refreshProfile, updatePreferences }}>
       {children}
     </AuthContext.Provider>
   )

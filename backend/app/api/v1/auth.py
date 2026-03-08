@@ -7,8 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
 from app.models.auth_credential import UserCredential
-from app.models.user import User
-from app.schemas.user import UserRead
+from app.models.user import User, UserPreference
+from app.schemas.user import UserPreferencesRead, UserRead
 from app.security import create_local_access_token, hash_password, verify_password
 
 router = APIRouter()
@@ -40,7 +40,10 @@ class AuthResponse(BaseModel):
     user: UserRead
 
 
-def _build_user_read(user: User) -> UserRead:
+async def _build_user_read(db: AsyncSession, user: User) -> UserRead:
+    pref_result = await db.execute(select(UserPreference).where(UserPreference.user_id == user.id))
+    preference = pref_result.scalar_one_or_none()
+    preference_read = UserPreferencesRead.model_validate(preference) if preference is not None else None
     return UserRead(
         id=user.id,
         auth0_id=user.auth0_id,
@@ -50,7 +53,7 @@ def _build_user_read(user: User) -> UserRead:
         role=user.role,
         created_at=user.created_at,
         updated_at=user.updated_at,
-        preferences=None,
+        preferences=preference_read,
     )
 
 
@@ -119,7 +122,12 @@ async def register(payload: RegisterRequest, db: AsyncSession = Depends(get_db))
     await db.refresh(user)
 
     token = create_local_access_token(subject=user.auth0_id)
-    return AuthResponse(access_token=token, token_type="bearer", requires_email_verification=False, user=_build_user_read(user))
+    return AuthResponse(
+        access_token=token,
+        token_type="bearer",
+        requires_email_verification=False,
+        user=await _build_user_read(db, user),
+    )
 
 
 @router.post("/login", response_model=AuthResponse)
@@ -136,7 +144,12 @@ async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)) -> Au
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid login credentials")
 
     token = create_local_access_token(subject=user.auth0_id)
-    return AuthResponse(access_token=token, token_type="bearer", requires_email_verification=False, user=_build_user_read(user))
+    return AuthResponse(
+        access_token=token,
+        token_type="bearer",
+        requires_email_verification=False,
+        user=await _build_user_read(db, user),
+    )
 
 
 @router.post("/exchange")
