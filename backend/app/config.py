@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     APP_JWT_EXPIRE_HOURS: int = 24
 
     GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-2.0-flash"
+    GEMINI_EMBED_MODEL: str = "gemini-embedding-001"
     MAPBOX_SECRET_TOKEN: str = ""
 
     CLOUDINARY_CLOUD_NAME: str = ""

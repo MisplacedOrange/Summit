@@ -1,0 +1,25 @@
+version: 2
+updates:
+  # Frontend: npm
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "Crackle2K"
+    labels:
+      - "dependencies"
+      - "frontend"
+
+  # Backend: pip (FastAPI)
+  - package-ecosystem: "pip"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "Crackle2K"
+    labels:
+      - "dependencies"
+      - "backend"

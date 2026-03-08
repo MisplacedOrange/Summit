@@ -1,6 +1,7 @@
 "use client"
 
 import { FormEvent, useState } from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
@@ -69,13 +70,23 @@ export default function SignUpPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f5f3] text-[#37322f]">
+    <main className="min-h-screen bg-[#eef6ff] text-[#143d73]">
       <Header />
 
       <section className="mx-auto flex max-w-[1060px] px-4 pb-16 pt-24">
-        <div className="mx-auto w-full max-w-md rounded-lg border border-[#e0dedb] bg-white p-6">
+        <div className="mx-auto w-full max-w-md rounded-lg border border-[#c2daf8] bg-white p-6 shadow-sm">
+          <div className="mb-5 overflow-hidden rounded-xl border border-[#b6d4f7] bg-[#f5faff] p-1.5">
+            <Image
+              src="/assets/images/hero-vibrant-orb.svg"
+              alt="Vibrant Summit signup"
+              width={960}
+              height={640}
+              className="h-28 w-full rounded-lg object-cover"
+            />
+          </div>
+
           <h1 className="text-3xl font-semibold tracking-tight">Sign up</h1>
-          <p className="mt-2 text-sm text-[#605a57]">Create a Summit account to track hours and discover opportunities.</p>
+          <p className="mt-2 text-sm text-[#4876aa]">Create a Summit account to track hours and discover opportunities.</p>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div>
@@ -87,7 +98,7 @@ export default function SignUpPage() {
                 name="fullName"
                 type="text"
                 placeholder="Your full name"
-                className="w-full rounded-md border border-[#d7d3ce] bg-white px-3 py-2 text-sm outline-none transition focus:border-[#37322f]"
+                className="w-full rounded-md border border-[#c2daf8] bg-white px-3 py-2 text-sm outline-none transition focus:border-[#2f6fd1]"
               />
             </div>
 
@@ -100,7 +111,7 @@ export default function SignUpPage() {
                 name="email"
                 type="email"
                 placeholder="you@example.com"
-                className="w-full rounded-md border border-[#d7d3ce] bg-white px-3 py-2 text-sm outline-none transition focus:border-[#37322f]"
+                className="w-full rounded-md border border-[#c2daf8] bg-white px-3 py-2 text-sm outline-none transition focus:border-[#2f6fd1]"
               />
             </div>
 
@@ -113,25 +124,25 @@ export default function SignUpPage() {
                 name="password"
                 type="password"
                 placeholder="Create a password"
-                className="w-full rounded-md border border-[#d7d3ce] bg-white px-3 py-2 text-sm outline-none transition focus:border-[#37322f]"
+                className="w-full rounded-md border border-[#c2daf8] bg-white px-3 py-2 text-sm outline-none transition focus:border-[#2f6fd1]"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-md bg-[#37322f] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#2d2825]"
+              className="w-full rounded-md bg-[#2f6fd1] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#245cb0]"
             >
               {loading ? "Creating account..." : "Create account"}
             </button>
           </form>
 
           {errorMessage ? <p className="mt-3 text-sm text-red-700">{errorMessage}</p> : null}
-          {notice ? <p className="mt-3 text-sm text-[#605a57]">{notice}</p> : null}
+          {notice ? <p className="mt-3 text-sm text-[#4876aa]">{notice}</p> : null}
 
-          <p className="mt-4 text-sm text-[#605a57]">
+          <p className="mt-4 text-sm text-[#4876aa]">
             Already have an account?{" "}
-            <Link href="/login" className="font-medium text-[#37322f] underline underline-offset-2">
+            <Link href="/login" className="font-medium text-[#245cb0] underline underline-offset-2">
               Log in
             </Link>
           </p>
