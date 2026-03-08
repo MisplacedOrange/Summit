@@ -99,6 +99,26 @@ export function Header() {
             >
               Discover
             </Link>
+            <Link
+              href="/pricing"
+              className={`text-sm font-medium transition-colors duration-300 ${
+                isTransparent
+                  ? "text-white hover:text-white/80"
+                  : "text-[#1f4f89] hover:text-[#2f6cb3]"
+              }`}
+            >
+              Pricing
+            </Link>
+            <Link
+              href="/contact"
+              className={`text-sm font-medium transition-colors duration-300 ${
+                isTransparent
+                  ? "text-white hover:text-white/80"
+                  : "text-[#1f4f89] hover:text-[#2f6cb3]"
+              }`}
+            >
+              Contact
+            </Link>
           </div>
 
           {/* Right: Auth buttons */}
