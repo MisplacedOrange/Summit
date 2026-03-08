@@ -18,7 +18,7 @@ KEYWORDS = {
 
 
 async def fetch_html(url: str, timeout_s: float = 20.0) -> str | None:
-    headers = {"User-Agent": "Mozilla/5.0 (ImpactMatchScraper/1.0)"}
+    headers = {"User-Agent": "Mozilla/5.0 (SummitScraper/1.0)"}
     try:
         async with httpx.AsyncClient(timeout=timeout_s, follow_redirects=True) as client:
             response = await client.get(url, headers=headers)

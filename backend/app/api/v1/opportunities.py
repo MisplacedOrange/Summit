@@ -255,7 +255,7 @@ async def upload_opportunity_image(
     if org is None or opportunity.organization_id != org.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your opportunity")
 
-    url = await upload_image(file, folder="impactmatch/opportunities")
+    url = await upload_image(file, folder="summit/opportunities")
     opportunity.image_url = url
     db.add(opportunity)
     await db.commit()

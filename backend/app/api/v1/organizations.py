@@ -72,7 +72,7 @@ async def upload_logo(
     if organization is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Create your organization first")
 
-    url = await upload_image(file, folder="impactmatch/logos")
+    url = await upload_image(file, folder="summit/logos")
     organization.logo_url = url
     db.add(organization)
     await db.commit()

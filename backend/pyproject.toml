@@ -1,7 +1,7 @@
 [project]
-name = "impactmatch-backend"
+name = "summit-backend"
 version = "0.1.0"
-description = "ImpactMatch FastAPI backend"
+description = "Summit FastAPI backend"
 readme = "../README.md"
 requires-python = ">=3.11"
 dependencies = [

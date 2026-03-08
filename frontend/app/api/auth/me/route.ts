@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 
 export const dynamic = "force-dynamic"
-const ROLE_CLAIM = "https://impactmatch.app/role"
+const ROLE_CLAIM = "https://summit.app/role"
 
 function getAuth0Domain() {
   const rawDomain = process.env.AUTH0_DOMAIN?.trim()

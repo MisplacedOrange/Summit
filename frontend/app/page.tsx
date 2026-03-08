@@ -265,7 +265,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-[#284d78] bg-[#050e1b]">
         <div className="mx-auto flex max-w-[1100px] items-center justify-between px-4 py-6 md:px-6">
-          <span className="text-sm font-medium text-[#86afd8]">&copy; 2026 Summit ImpactMatch</span>
+          <span className="text-sm font-medium text-[#86afd8]">&copy; 2026 Summit</span>
           <div className="flex gap-4 text-sm text-[#86afd8]">
             <Link href="/discover" className="hover:underline">Discover</Link>
             <Link href="/profile" className="hover:underline">Profile</Link>

@@ -8,7 +8,7 @@ from app.scraper.runner import run_pipeline_and_save
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run ImpactMatch scraping pipeline")
+    parser = argparse.ArgumentParser(description="Run Summit scraping pipeline")
     parser.add_argument(
         "--output-root",
         type=str,

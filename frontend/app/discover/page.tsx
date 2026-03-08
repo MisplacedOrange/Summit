@@ -703,7 +703,7 @@ function OpportunityCard({ item, isAiResult }: { item: Opportunity; isAiResult: 
   )
 }
 
-export default function ImpactMatchPage() {
+export default function SummitPage() {
   const { user, token, loading: authLoading, login, updatePreferences } = useAuth()
   const router = useRouter()
 
@@ -847,7 +847,7 @@ export default function ImpactMatchPage() {
       if (!response.ok) throw new Error(`Backend returned ${response.status}`)
       const data: V1ListResponse = await response.json()
       setItems(data.items.map((r) => mapOpportunityRead(r)))
-      setSource("ImpactMatch v1")
+      setSource("Summit v1")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error")
     } finally {

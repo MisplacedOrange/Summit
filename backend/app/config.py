@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "sqlite+aiosqlite:///./impactmatch.db"
+    DATABASE_URL: str = "sqlite+aiosqlite:///./summit.db"
     REDIS_URL: str = "redis://localhost:6379/0"
 
     AUTH0_DOMAIN: str = ""

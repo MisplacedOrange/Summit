@@ -84,7 +84,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     yield
 
 
-app = FastAPI(title="ImpactMatch API", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="Summit API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -218,7 +218,7 @@ def _build_legacy_item(opp: Opportunity, score: float = 0.0) -> LegacyOpportunit
     return LegacyOpportunity(
         id=opp.id,
         title=opp.title,
-        organization="ImpactMatch Organization",
+        organization="Summit Organization",
         description=opp.description,
         url=opp.source_url or "#",
         cause=opp.cause_category or "community",
@@ -273,7 +273,7 @@ def _load_legacy_seed_items(limit: int) -> list[LegacyOpportunity]:
             LegacyOpportunity(
                 id=str(row.get("id", f"seed-{index}")),
                 title=title,
-                organization=str(row.get("organization", "ImpactMatch Organization")).strip() or "ImpactMatch Organization",
+                organization=str(row.get("organization", "Summit Organization")).strip() or "Summit Organization",
                 description=str(row.get("description", "Volunteer opportunity")).strip() or "Volunteer opportunity",
                 url=link,
                 cause=category,
@@ -325,7 +325,7 @@ async def legacy_discover(
         return LegacyOpportunityResponse(
             query=q,
             count=len(items),
-            source="ImpactMatch file fallback (opportunities.json/static_opportunities.json)",
+            source="Summit file fallback (opportunities.json/static_opportunities.json)",
             items=items,
         )
 
@@ -342,7 +342,7 @@ async def legacy_discover(
     return LegacyOpportunityResponse(
         query=q,
         count=len(items),
-        source="ImpactMatch API compatibility layer",
+        source="Summit API compatibility layer",
         items=items,
     )
 
@@ -556,7 +556,7 @@ async def legacy_recommendations(
         return LegacyOpportunityResponse(
             query=query_label,
             count=len(items),
-            source="ImpactMatch AI matching",
+            source="Summit AI matching",
             items=items,
         )
 
@@ -580,12 +580,12 @@ async def legacy_recommendations(
     return LegacyOpportunityResponse(
         query=query_label,
         count=len(result_items),
-        source="ImpactMatch AI matching (seed data)",
+        source="Summit AI matching (seed data)",
         items=result_items,
     )
 @app.get("/")
 async def read_root() -> dict[str, str]:
-    return {"message": "ImpactMatch backend is running"}
+    return {"message": "Summit backend is running"}
 
 
 @app.get("/api/health")

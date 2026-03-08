@@ -5,7 +5,7 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 # Ensure config resolves test DB before app imports.
-os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///./test_impactmatch.db")
+os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///./test_summit.db")
 
 from app.db.base import Base
 import app.models  # noqa: F401
@@ -20,7 +20,7 @@ def anyio_backend() -> str:
 
 @pytest.fixture(scope="session")
 async def test_engine():
-    engine = create_async_engine("sqlite+aiosqlite:///./test_impactmatch.db", future=True)
+    engine = create_async_engine("sqlite+aiosqlite:///./test_summit.db", future=True)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)

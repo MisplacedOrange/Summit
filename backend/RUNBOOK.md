@@ -1,4 +1,4 @@
-# ImpactMatch Backend Runbook
+# Summit Backend Runbook
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ Create `backend/.env` from `backend/.env.example` and fill secrets.
 Minimum useful local values:
 
 ```env
-DATABASE_URL=sqlite+aiosqlite:///./impactmatch.db
+DATABASE_URL=sqlite+aiosqlite:///./summit.db
 REDIS_URL=redis://localhost:6379/0
 AUTH0_DOMAIN=
 AUTH0_AUDIENCE=

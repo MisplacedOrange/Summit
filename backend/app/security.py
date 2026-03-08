@@ -11,7 +11,7 @@ from jose import JWTError, jwt
 
 from app.config import settings
 
-LOCAL_JWT_ISSUER = "impactmatch-local"
+LOCAL_JWT_ISSUER = "summit-local"
 LOCAL_JWT_ALGORITHM = "HS256"
 PASSWORD_HASH_ITERATIONS = 120_000
 

@@ -31,7 +31,7 @@ services:
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: impactmatch
+      POSTGRES_DB: summit
     ports:
       - "5432:5432"
     volumes:

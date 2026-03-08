@@ -86,7 +86,7 @@ async def upload_avatar(
 ) -> UserRead:
     from app.services.cloudinary import upload_image
 
-    url = await upload_image(file, folder="impactmatch/avatars")
+    url = await upload_image(file, folder="summit/avatars")
     current_user.avatar_url = url
     db.add(current_user)
     await db.commit()

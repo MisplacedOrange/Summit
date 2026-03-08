@@ -4,7 +4,7 @@ from app.config import settings
 
 
 celery_app = Celery(
-    "impactmatch",
+    "summit",
     broker=settings.REDIS_URL,
     backend=settings.REDIS_URL,
     include=["app.workers.tasks"],

@@ -25,7 +25,7 @@ export default function ContactPage() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    const subjectBase = topic === "pricing" ? "Pricing Inquiry" : topic === "partnerships" ? "Partnership Inquiry" : "Contact Inquiry"
+    const subjectBase = topic === "partnerships" ? "Partnership Inquiry" : "Contact Inquiry"
     const subject = planParam ? `${subjectBase} - ${planParam}` : subjectBase
 
     const bodyLines = [
@@ -37,7 +37,7 @@ export default function ContactPage() {
       effectiveMessage || "(No additional message provided)",
     ]
 
-    const mailto = `mailto:partners@summitimpactmatch.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join("\n"))}`
+    const mailto = `mailto:richardliu200127@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join("\n"))}`
     window.location.href = mailto
   }
 
@@ -98,7 +98,6 @@ export default function ContactPage() {
                   className="rounded-lg border border-[#3e648d] bg-[#12365a] px-3 py-2 text-[#e8f3ff] outline-none focus:border-[#56b0ff]"
                 >
                   <option value="general">General</option>
-                  <option value="pricing">Pricing</option>
                   <option value="partnerships">Partnerships</option>
                   <option value="support">Support</option>
                 </select>
