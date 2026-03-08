@@ -90,14 +90,14 @@ export function Header() {
               Home
             </Link>
             <Link
-              href="/dashboard"
+              href="/discover"
               className={`text-sm font-medium transition-colors duration-300 ${
                 isTransparent
                   ? "text-white hover:text-white/80"
                   : "text-[#1f4f89] hover:text-[#2f6cb3]"
               }`}
             >
-              Dashboard
+              Discover
             </Link>
           </div>
 
