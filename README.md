@@ -1,4 +1,4 @@
-# HackCanada-2026
+# Summit
 This is the repository for the Hack Canada Hackathon at the Spur Innovation Centre:
 
 Our app helps Canadian high schoolers across the nation fulfill their volunteering hour requirements with ease.
