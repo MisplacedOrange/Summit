@@ -86,6 +86,16 @@ export function Header() {
               >
                 Dashboard
               </Link>
+              <Link
+                href="/opportunities"
+                className={`text-sm font-medium transition-colors duration-300 ${
+                  isTransparent
+                    ? "text-white hover:text-white/80"
+                    : "text-[#1f4f89] hover:text-[#2f6cb3]"
+                }`}
+              >
+                Opportunities
+              </Link>
             </div>
           </div>
           <div className="flex items-center gap-2">
