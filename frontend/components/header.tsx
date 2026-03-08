@@ -50,9 +50,7 @@ export function Header() {
       } ${
         isTransparent
           ? "bg-transparent border-b border-transparent"
-          : isGlassmorphism
-          ? "bg-white/65 backdrop-blur-md border-b border-[#b8d4f6]/50"
-          : "bg-[#f4f9ff] border-b border-[#b8d4f6]/60"
+          : "bg-black/60 backdrop-blur-md border-b border-white/10"
       }`}
     >
       <div className="max-w-[1060px] mx-auto px-4">
@@ -64,16 +62,10 @@ export function Header() {
               alt="Summit Logo"
               width={24}
               height={24}
-              className={`transition-all duration-300 ${
-                isTransparent ? "brightness-0 invert" : "drop-shadow-[0_0_8px_rgba(70,148,255,0.28)]"
-              }`}
+              className="brightness-0 invert"
             />
-            <span
-              className={`font-semibold text-lg transition-colors duration-300 ${
-                isTransparent ? "text-white" : "text-[#143d73]"
-              }`}
-            >
-              Summit
+            <span className="font-semibold text-lg text-white">
+              SUMMIT
             </span>
           </Link>
 
@@ -81,41 +73,25 @@ export function Header() {
           <div className="absolute left-1/2 hidden -translate-x-1/2 items-center space-x-6 md:flex">
             <Link
               href="/"
-              className={`text-sm font-medium transition-colors duration-300 ${
-                isTransparent
-                  ? "text-white hover:text-white/80"
-                  : "text-[#1f4f89] hover:text-[#2f6cb3]"
-              }`}
+              className="text-sm font-medium text-white hover:text-white/80 transition-colors duration-300"
             >
               Home
             </Link>
             <Link
               href="/discover"
-              className={`text-sm font-medium transition-colors duration-300 ${
-                isTransparent
-                  ? "text-white hover:text-white/80"
-                  : "text-[#1f4f89] hover:text-[#2f6cb3]"
-              }`}
+              className="text-sm font-medium text-white hover:text-white/80 transition-colors duration-300"
             >
               Discover
             </Link>
             <Link
               href="/pricing"
-              className={`text-sm font-medium transition-colors duration-300 ${
-                isTransparent
-                  ? "text-white hover:text-white/80"
-                  : "text-[#1f4f89] hover:text-[#2f6cb3]"
-              }`}
+              className="text-sm font-medium text-white hover:text-white/80 transition-colors duration-300"
             >
               Pricing
             </Link>
             <Link
               href="/contact"
-              className={`text-sm font-medium transition-colors duration-300 ${
-                isTransparent
-                  ? "text-white hover:text-white/80"
-                  : "text-[#1f4f89] hover:text-[#2f6cb3]"
-              }`}
+              className="text-sm font-medium text-white hover:text-white/80 transition-colors duration-300"
             >
               Contact
             </Link>
@@ -128,22 +104,14 @@ export function Header() {
                 <Button
                   asChild
                   variant="ghost"
-                  className={`transition-colors duration-300 ${
-                    isTransparent
-                      ? "text-white hover:bg-white/10"
-                      : "text-[#1f4f89] hover:bg-[#dcecff]"
-                  }`}
+                  className="text-white hover:bg-white/10 transition-colors duration-300"
                 >
                   <Link href="/profile">{displayName}</Link>
                 </Button>
                 <Button
                   asChild
                   variant="ghost"
-                  className={`transition-colors duration-300 ${
-                    isTransparent
-                      ? "text-white hover:bg-white/10"
-                      : "text-[#37322f] hover:bg-[#37322f]/5"
-                  }`}
+                  className="text-white hover:bg-white/10 transition-colors duration-300"
                 >
                   <a href="/api/auth/logout?returnTo=/">Logout</a>
                 </Button>
@@ -153,21 +121,13 @@ export function Header() {
                 <Button
                   asChild
                   variant="ghost"
-                  className={`transition-colors duration-300 ${
-                    isTransparent
-                      ? "text-white hover:bg-white/10"
-                      : "text-[#37322f] hover:bg-[#37322f]/5"
-                  }`}
+                  className="text-white hover:bg-white/10 transition-colors duration-300"
                 >
                   <a href="/api/auth/login?returnTo=/dashboard">Log in</a>
                 </Button>
                 <Button
                   asChild
-                  className={`transition-colors duration-300 ${
-                    isTransparent
-                      ? "bg-white text-[#18447f] hover:bg-[#ecf5ff]"
-                      : "bg-[#2f6fd1] text-white hover:bg-[#2159b0]"
-                  }`}
+                  className="bg-white text-black hover:bg-white/90 transition-colors duration-300"
                 >
                   <a href="/api/auth/login?screen_hint=signup&returnTo=/dashboard">Sign up</a>
                 </Button>
