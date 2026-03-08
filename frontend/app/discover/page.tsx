@@ -255,6 +255,8 @@ function SearchHeaderSection({
   discoverOpportunities,
   source,
   error,
+  profileActive,
+  onProfileToggle,
 }: {
   loading: boolean
   isAiResult: boolean
@@ -272,6 +274,8 @@ function SearchHeaderSection({
   discoverOpportunities: () => Promise<void>
   source: string
   error: string | null
+  profileActive: boolean
+  onProfileToggle: () => void
 }) {
   const geographyLabel = GEOGRAPHY_OPTIONS.find((option) => option.value === geography)?.label ?? "All places"
   const [openPanel, setOpenPanel] = useState<"location" | "themes" | null>(null)
@@ -279,7 +283,23 @@ function SearchHeaderSection({
   return (
     <section className="sticky top-16 isolate z-[80] border-y border-[#2f547d]/80 bg-[#071a31]/80 backdrop-blur-xl">
       <div className="mx-auto w-full max-w-[1680px] px-4 py-3 md:px-6 xl:px-8">
-        <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {profileActive ? (
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-[#d7ebff]">Recommendation Profile</span>
+            <button
+              type="button"
+              onClick={onProfileToggle}
+              className="ml-auto flex items-center gap-1.5 rounded-full border border-[#3e648d] bg-[#103558]/80 px-3 py-2 text-sm font-medium text-[#d7ebff] transition-colors hover:bg-[#184268]"
+              aria-label="Close profile"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+              Close
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <div className="relative min-w-[320px] flex-1">
               <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#6f9bca]">
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -307,111 +327,17 @@ function SearchHeaderSection({
               )}
             </div>
 
-            <div className="relative shrink-0">
-              <button
-                type="button"
-                onClick={() => setOpenPanel((current) => (current === "location" ? null : "location"))}
-                className={`rounded-full border px-4 py-2 text-sm font-medium backdrop-blur-sm transition-colors ${
-                  openPanel === "location"
-                    ? "border-[#48a3ff]/60 bg-[#1d4b78] text-[#dff0ff]"
-                    : "border-[#3e648d] bg-[#103558]/80 text-[#d7ebff] hover:bg-[#184268]"
-                }`}
-                aria-expanded={openPanel === "location"}
-              >
-                Location: {geographyLabel}
-              </button>
-              {openPanel === "location" && (
-                <div className="absolute left-0 top-[calc(100%+10px)] z-[80] w-64 rounded-2xl border border-[#3d6188] bg-[#0d2f52]/95 p-3 shadow-xl backdrop-blur-xl">
-                <div className="grid gap-2">
-                  {GEOGRAPHY_OPTIONS.map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => {
-                        setGeography(option.value)
-                        setOpenPanel(null)
-                      }}
-                      className={`rounded-xl border px-3 py-2 text-left text-sm transition-colors ${
-                        geography === option.value
-                          ? "border-[#48a3ff]/60 bg-[#1d4b78] text-[#dff0ff]"
-                          : "border-[#3d6188] bg-[#153d64] text-[#9dc2e6] hover:bg-[#1a476f]"
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    startWatchingLocation()
-                    setOpenPanel(null)
-                  }}
-                  className="mt-3 w-full rounded-xl border border-[#3d6188] bg-[#163f66] px-3 py-2 text-sm font-medium text-[#a5d4ff] transition-colors hover:bg-[#1c4e7d]"
-                >
-                  {userCoords ? "Refresh live location" : "Use live location"}
-                </button>
-              </div>
-              )}
-            </div>
-
-            <div className="relative shrink-0">
-              <button
-                type="button"
-                onClick={() => setOpenPanel((current) => (current === "themes" ? null : "themes"))}
-                className={`rounded-full border px-4 py-2 text-sm font-medium backdrop-blur-sm transition-colors ${
-                  openPanel === "themes"
-                    ? "border-[#48a3ff]/60 bg-[#1d4b78] text-[#dff0ff]"
-                    : "border-[#3e648d] bg-[#103558]/80 text-[#d7ebff] hover:bg-[#184268]"
-                }`}
-                aria-expanded={openPanel === "themes"}
-              >
-                Themes{selectedInterestFilters.length ? `: ${selectedInterestFilters.length}` : ""}
-              </button>
-              {openPanel === "themes" && (
-                <div className="absolute left-0 top-[calc(100%+10px)] z-[80] w-[320px] rounded-2xl border border-[#3d6188] bg-[#0d2f52]/95 p-3 shadow-xl backdrop-blur-xl">
-                <div className="mb-2 flex items-center justify-between gap-3">
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#8bb3dc]">Themes</p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedInterestFilters([])
-                      setOpenPanel(null)
-                    }}
-                    className="text-xs font-medium text-[#95bfe7] hover:text-[#e4f2ff]"
-                  >
-                    Clear
-                  </button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {availableInterestFilters.map((interest) => (
-                    <button
-                      key={interest}
-                      type="button"
-                      onClick={() => setSelectedInterestFilters((current) => toggleTag(current, interest))}
-                      className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${getInterestButtonClasses(
-                        interest,
-                        selectedInterestFilters.includes(interest),
-                      )}`}
-                    >
-                      {toLabel(interest)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              )}
-            </div>
-
             <button
-              onClick={() => void discoverOpportunities()}
-              className="shrink-0 rounded-full border border-[#2f78d4]/50 bg-[#19416c] px-4 py-2 text-sm font-medium text-[#d7ebff] transition-colors hover:bg-[#245585]"
-              disabled={loading}
+              type="button"
+              onClick={onProfileToggle}
+              className="shrink-0 rounded-full border border-[#3e648d] bg-[#103558]/80 px-4 py-2 text-sm font-medium text-[#d7ebff] backdrop-blur-sm transition-colors hover:bg-[#184268]"
             >
-              {loading ? "Loading..." : "Refresh"}
+              Profile
             </button>
           </div>
+        )}
 
-          {error && <p className="mt-2 px-1 text-sm text-rose-300">Could not fetch opportunities: {error}</p>}
+        {error && <p className="mt-2 px-1 text-sm text-rose-300">Could not fetch opportunities: {error}</p>}
       </div>
     </section>
   )
@@ -903,8 +829,7 @@ export default function SummitPage() {
     <main className="min-h-screen bg-[radial-gradient(circle_at_12%_8%,rgba(26,124,235,0.2),transparent_34%),radial-gradient(circle_at_88%_78%,rgba(0,205,178,0.14),transparent_32%),linear-gradient(180deg,#07162a_0%,#081b33_45%,#061120_100%)] text-[#d9ebff]">
       <Header />
 
-      {activeTab !== "profile" && (
-        <SearchHeaderSection
+      <SearchHeaderSection
           loading={loading}
           isAiResult={isAiResult}
           query={query}
@@ -921,21 +846,31 @@ export default function SummitPage() {
           discoverOpportunities={discoverOpportunities}
           source={source}
           error={error}
+          profileActive={activeTab === "profile"}
+          onProfileToggle={() => setActiveTab((t) => t === "profile" ? "discover" : "profile")}
         />
-      )}
 
       <section className="mx-auto mt-4 w-full max-w-[1680px] px-4 pb-16 md:px-6 xl:px-8">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="gap-4">
-          <TabsList className="h-auto rounded-full border border-[#315781] bg-[#0c2a49] p-1">
-            <TabsTrigger value="discover" className="rounded-full px-4 py-2 text-[#c0dbf5] data-[state=active]:bg-[#1d4f7f] data-[state=active]:text-white">
-              Discover
-            </TabsTrigger>
-            <TabsTrigger value="profile" className="rounded-full px-4 py-2 text-[#c0dbf5] data-[state=active]:bg-[#1d4f7f] data-[state=active]:text-white">
-              Profile
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="discover" className="space-y-4">
+        {activeTab === "profile" ? (
+          <div className="mx-auto max-w-[880px]">
+            <RecommendationProfileCard
+              profileInterests={profileInterests}
+              setProfileInterests={setProfileInterests}
+              customInterest={customInterest}
+              setCustomInterest={setCustomInterest}
+              addCustomInterest={addCustomInterest}
+              profileSkills={profileSkills}
+              setProfileSkills={setProfileSkills}
+              startWatchingLocation={startWatchingLocation}
+              userCoords={userCoords}
+              saveRecommendationProfile={saveRecommendationProfile}
+              savingProfile={savingProfile}
+              user={user}
+              profileSaved={profileSaved}
+            />
+          </div>
+        ) : (
+          <div className="space-y-4">
             <LocalImpactMapCard
               filteredItems={filteredItems}
               userCoords={userCoords}
@@ -965,28 +900,8 @@ export default function SummitPage() {
                 ) : visibleItems.map((item) => <OpportunityCard key={item.id} item={item} isAiResult={isAiResult} />)}
               </div>
             </div>
-          </TabsContent>
-
-          <TabsContent value="profile">
-            <div className="mx-auto max-w-[880px]">
-              <RecommendationProfileCard
-                profileInterests={profileInterests}
-                setProfileInterests={setProfileInterests}
-                customInterest={customInterest}
-                setCustomInterest={setCustomInterest}
-                addCustomInterest={addCustomInterest}
-                profileSkills={profileSkills}
-                setProfileSkills={setProfileSkills}
-                startWatchingLocation={startWatchingLocation}
-                userCoords={userCoords}
-                saveRecommendationProfile={saveRecommendationProfile}
-                savingProfile={savingProfile}
-                user={user}
-                profileSaved={profileSaved}
-              />
-            </div>
-          </TabsContent>
-        </Tabs>
+          </div>
+        )}
       </section>
     </main>
   )
