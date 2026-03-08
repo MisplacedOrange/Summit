@@ -34,15 +34,46 @@ async def _run_sqlite_compat_migrations() -> None:
         return
 
     async with engine.begin() as conn:
-        exists_result = await conn.exec_driver_sql("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
-        if exists_result.first() is None:
-            return
+        async def table_exists(table_name: str) -> bool:
+            exists_result = await conn.exec_driver_sql(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name=:table_name",
+                {"table_name": table_name},
+            )
+            return exists_result.first() is not None
 
-        columns_result = await conn.exec_driver_sql("PRAGMA table_info(users)")
-        columns = {row[1] for row in columns_result.fetchall()}
+        async def ensure_columns(table_name: str, column_definitions: dict[str, str]) -> None:
+            if not await table_exists(table_name):
+                return
 
-        if "avatar_url" not in columns:
-            await conn.exec_driver_sql("ALTER TABLE users ADD COLUMN avatar_url TEXT")
+            columns_result = await conn.exec_driver_sql(f"PRAGMA table_info({table_name})")
+            existing_columns = {row[1] for row in columns_result.fetchall()}
+
+            for column_name, column_sql in column_definitions.items():
+                if column_name not in existing_columns:
+                    await conn.exec_driver_sql(f"ALTER TABLE {table_name} ADD COLUMN {column_sql}")
+
+        await ensure_columns(
+            "users",
+            {
+                "avatar_url": "avatar_url TEXT",
+            },
+        )
+        await ensure_columns(
+            "organizations",
+            {
+                "logo_url": "logo_url TEXT",
+            },
+        )
+        await ensure_columns(
+            "opportunities",
+            {
+                "image_url": "image_url TEXT",
+                "geocode_source": "geocode_source VARCHAR(20)",
+                "geocode_confidence": "geocode_confidence FLOAT",
+                "geocoded_at": "geocoded_at DATETIME",
+                "is_scraped": "is_scraped BOOLEAN DEFAULT FALSE NOT NULL",
+            },
+        )
 
 
 @asynccontextmanager

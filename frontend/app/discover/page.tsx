@@ -1,12 +1,11 @@
 "use client"
 
 import dynamic from "next/dynamic"
-import Image from "next/image"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Header } from "@/components/header"
-import { useAuth } from "../auth-context"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useAuth, type UserPreferences } from "../auth-context"
 import { mapOpportunityRead, type V1OpportunityRead } from "@/lib/utils"
 
 const OpportunityMap = dynamic(() => import("@/components/opportunity-map"), { ssr: false, loading: () => <div className="flex h-[380px] items-center justify-center rounded-xl bg-[#F9F6F2]"><p className="text-sm text-[#999]">Loading map…</p></div> })
@@ -37,6 +36,26 @@ const MAP_OPPORTUNITY_LIMIT = 100
 const LIST_OPPORTUNITY_LIMIT = 24
 
 const CAUSE_OPTIONS = ["", "environment", "education", "healthcare", "community", "animal-care", "arts-culture"]
+const INTEREST_SUGGESTIONS = [
+  "environment",
+  "education",
+  "healthcare",
+  "community",
+  "animal-care",
+  "arts-culture",
+  "mentorship",
+  "food security",
+  "seniors",
+  "youth leadership",
+  "sports",
+  "technology",
+]
+const GEOGRAPHY_OPTIONS = [
+  { value: "all", label: "All places" },
+  { value: "nearby", label: "Nearby" },
+  { value: "map-ready", label: "Has map pin" },
+  { value: "remote", label: "Remote or virtual" },
+] as const
 
 const CAUSE_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
   environment: { bg: "bg-emerald-100", text: "text-emerald-700", dot: "#059669" },
@@ -50,6 +69,48 @@ const CAUSE_COLORS: Record<string, { bg: string; text: string; dot: string }> = 
 function toLabel(value: string): string {
   if (!value) return "All causes"
   return value.replace(/-/g, " ").replace(/\b\w/g, (m) => m.toUpperCase())
+}
+
+function normalizeTag(value: string): string {
+  return value.trim().toLowerCase()
+}
+
+function parseTags(value: string): string[] {
+  return Array.from(
+    new Set(
+      value
+        .split(",")
+        .map((entry) => normalizeTag(entry))
+        .filter(Boolean),
+    ),
+  )
+}
+
+function toggleTag(list: string[], value: string): string[] {
+  return list.includes(value) ? list.filter((entry) => entry !== value) : [...list, value]
+}
+
+function hasCoordinates(item: Opportunity): boolean {
+  return Number.isFinite(item.latitude) && Number.isFinite(item.longitude) && !(item.latitude === 0 && item.longitude === 0)
+}
+
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const toRadians = (degrees: number) => (degrees * Math.PI) / 180
+  const earthRadiusKm = 6371
+  const dLat = toRadians(lat2 - lat1)
+  const dLng = toRadians(lng2 - lng1)
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLng / 2) ** 2
+  return 2 * earthRadiusKm * Math.asin(Math.sqrt(a))
+}
+
+function matchesInterestFilters(item: Opportunity, filters: string[]): boolean {
+  if (filters.length === 0) return true
+  const haystack = [item.title, item.description, item.cause, item.location, ...item.skills]
+    .join(" ")
+    .toLowerCase()
+  return filters.some((filter) => haystack.includes(filter))
 }
 
 function SkeletonCard() {
@@ -109,17 +170,21 @@ function EmptyState({ isError, onRetry }: { isError?: boolean; onRetry: () => vo
 
 
 export default function ImpactMatchPage() {
-  const { user, token, loading: authLoading, login, logout } = useAuth()
+  const { user, token, loading: authLoading, login, updatePreferences } = useAuth()
   const router = useRouter()
 
   const [query, setQuery] = useState("student volunteer opportunities Toronto")
   const [cause, setCause] = useState("")
-  const [location, setLocation] = useState("Toronto")
-  const [remoteOnly, setRemoteOnly] = useState(false)
+  const [geography, setGeography] = useState<(typeof GEOGRAPHY_OPTIONS)[number]["value"]>("all")
+  const [selectedInterestFilters, setSelectedInterestFilters] = useState<string[]>([])
+  const [activeTab, setActiveTab] = useState("filters")
 
-  const [interestsInput, setInterestsInput] = useState("environment, community")
-  const [skillsInput, setSkillsInput] = useState("social media, teaching")
-  const [availability, setAvailability] = useState("weekends")
+  const [profileInterests, setProfileInterests] = useState<string[]>([])
+  const [profileSkills, setProfileSkills] = useState("")
+  const [customInterest, setCustomInterest] = useState("")
+  const [radiusKm, setRadiusKm] = useState(25)
+  const [savingProfile, setSavingProfile] = useState(false)
+  const [profileSaved, setProfileSaved] = useState(false)
 
   const [items, setItems] = useState<Opportunity[]>([])
   const [source, setSource] = useState("")
@@ -163,45 +228,57 @@ export default function ImpactMatchPage() {
     }
   }, [startWatchingLocation])
 
-  // First-run gate: redirect new users with no preferences to onboarding
   useEffect(() => {
     if (!authLoading && user && user.preferences === null) {
-      router.push("/onboarding/interests")
+      setActiveTab("profile")
     }
   }, [authLoading, user, router])
 
-  // Populate inputs from saved preferences when user logs in
   useEffect(() => {
     if (user?.preferences) {
       const p = user.preferences
-      if (p.interests.length > 0) setInterestsInput(p.interests.join(", "))
-      if (p.skills.length > 0) setSkillsInput(p.skills.join(", "))
+      setProfileInterests(p.interests)
+      setProfileSkills(p.skills.join(", "))
+      setRadiusKm(p.radius_km)
+      if (p.location_lat != null && p.location_lng != null) {
+        setUserCoords({ lat: p.location_lat, lng: p.location_lng })
+      }
     }
   }, [user])
 
-  const stats = useMemo(() => {
-    const totalNeeds = items.reduce((acc, item) => acc + item.volunteers_needed, 0)
-    const highUrgency = items.filter((item) => item.urgency === "high").length
-    const causes = new Set(items.map((item) => item.cause)).size
-    return {
-      opportunities: items.length,
-      totalNeeds,
-      highUrgency,
-      causes,
-    }
-  }, [items])
+  const availableInterestFilters = useMemo(() => {
+    const savedInterests = user?.preferences?.interests ?? []
+    return Array.from(new Set([...INTEREST_SUGGESTIONS, ...savedInterests, ...profileInterests].map(normalizeTag).filter(Boolean)))
+  }, [profileInterests, user])
 
   const filteredItems = useMemo(() => {
-    let result = remoteOnly ? items.filter((item) => /remote|virtual|online/i.test(item.description)) : items
+    let result = items.filter((item) => matchesInterestFilters(item, selectedInterestFilters))
+
+    if (geography === "remote") {
+      result = result.filter((item) => /remote|virtual|online/i.test(`${item.description} ${item.location}`))
+    }
+
+    if (geography === "map-ready") {
+      result = result.filter((item) => hasCoordinates(item))
+    }
+
+    if (geography === "nearby" && userCoords) {
+      result = result.filter(
+        (item) => hasCoordinates(item) && haversineKm(userCoords.lat, userCoords.lng, item.latitude, item.longitude) <= radiusKm,
+      )
+    }
+
     if (userCoords) {
       result = [...result].sort((a, b) => {
-        const dA = (a.latitude - userCoords.lat) ** 2 + (a.longitude - userCoords.lng) ** 2
-        const dB = (b.latitude - userCoords.lat) ** 2 + (b.longitude - userCoords.lng) ** 2
+        const dA = hasCoordinates(a) ? haversineKm(userCoords.lat, userCoords.lng, a.latitude, a.longitude) : Number.POSITIVE_INFINITY
+        const dB = hasCoordinates(b) ? haversineKm(userCoords.lat, userCoords.lng, b.latitude, b.longitude) : Number.POSITIVE_INFINITY
         return dA - dB
       })
     }
     return result
-  }, [items, remoteOnly, userCoords])
+  }, [geography, items, radiusKm, selectedInterestFilters, userCoords])
+
+  const nearbyEnabled = geography === "nearby"
 
   async function discoverOpportunities() {
     setLoading(true)
@@ -210,11 +287,12 @@ export default function ImpactMatchPage() {
     try {
       const url = new URL(`${API_BASE}/v1/opportunities`)
       url.searchParams.set("q", query)
-      url.searchParams.set("limit", "16")
+      url.searchParams.set("limit", String(LIST_OPPORTUNITY_LIMIT))
       if (cause) url.searchParams.set("category", cause)
-      if (userCoords) {
+      if (nearbyEnabled && userCoords) {
         url.searchParams.set("lat", String(userCoords.lat))
         url.searchParams.set("lng", String(userCoords.lng))
+        url.searchParams.set("radius_km", String(radiusKm))
       }
 
       const response = await fetch(url.toString())
@@ -227,6 +305,43 @@ export default function ImpactMatchPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  async function saveRecommendationProfile() {
+    if (!user) {
+      await login({ email: "", password: "" })
+      return
+    }
+
+    setSavingProfile(true)
+    setProfileSaved(false)
+    const prefs: UserPreferences = {
+      interests: profileInterests.map(normalizeTag),
+      skills: parseTags(profileSkills),
+      location_lat: userCoords?.lat ?? null,
+      location_lng: userCoords?.lng ?? null,
+      radius_km: radiusKm,
+    }
+
+    try {
+      await updatePreferences(prefs)
+      setProfileSaved(true)
+      if (selectedInterestFilters.length === 0 && prefs.interests.length > 0) {
+        setSelectedInterestFilters(prefs.interests.slice(0, 3))
+      }
+      window.setTimeout(() => setProfileSaved(false), 3000)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not save recommendation profile")
+    } finally {
+      setSavingProfile(false)
+    }
+  }
+
+  function addCustomInterest() {
+    const value = normalizeTag(customInterest)
+    if (!value) return
+    setProfileInterests((current) => (current.includes(value) ? current : [...current, value]))
+    setCustomInterest("")
   }
 
   async function runAiMatch() {
@@ -275,132 +390,323 @@ export default function ImpactMatchPage() {
         <div className="grid gap-4 lg:grid-cols-[1.1fr_1fr]">
           <div className="rounded-2xl border border-[#b9d5f7] bg-white p-4">
             <h2 className="text-lg font-semibold">Smart discovery</h2>
-            <p className="mt-1 text-sm text-[#4676aa]">Search and filter opportunities, then run AI matching for ranked results.</p>
+            <p className="mt-1 text-sm text-[#4676aa]">Switch between search filters and your recommendation profile without leaving discovery.</p>
 
-            <div className="mt-4 grid gap-3">
-              <input
-                className="w-full rounded-md border border-[#b9d5f7] px-3 py-2 text-sm"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search causes or opportunities"
-              />
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
+              <TabsList className="grid h-auto w-full grid-cols-2 rounded-xl bg-[#eef6ff] p-1">
+                <TabsTrigger value="filters" className="rounded-lg py-2 data-[state=active]:bg-white data-[state=active]:text-[#143d73]">
+                  Search filters
+                </TabsTrigger>
+                <TabsTrigger value="profile" className="rounded-lg py-2 data-[state=active]:bg-white data-[state=active]:text-[#143d73]">
+                  Recommendation profile
+                </TabsTrigger>
+              </TabsList>
 
-              <div className="grid gap-3 md:grid-cols-2">
-                <select
-                  className="rounded-md border border-[#b9d5f7] px-3 py-2 text-sm"
-                  value={cause}
-                  onChange={(e) => setCause(e.target.value)}
-                >
-                  {CAUSE_OPTIONS.map((option) => (
-                    <option key={option} value={option}>
-                      {toLabel(option)}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  className="rounded-md border border-[#b9d5f7] px-3 py-2 text-sm"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Location"
-                />
-              </div>
+              <TabsContent value="filters" className="mt-4 grid gap-4">
+                <div>
+                  <label className="text-sm font-medium text-[#143d73]">Search bar</label>
+                  <input
+                    className="mt-1 w-full rounded-md border border-[#b9d5f7] px-3 py-2 text-sm"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search opportunities, causes, or organizations"
+                  />
+                </div>
 
-              <div className="grid gap-3 md:grid-cols-2">
-                <input
-                  className="rounded-md border border-[#b9d5f7] px-3 py-2 text-sm"
-                  value={interestsInput}
-                  onChange={(e) => setInterestsInput(e.target.value)}
-                  placeholder="Interests: environment, education"
-                />
-                <input
-                  className="rounded-md border border-[#b9d5f7] px-3 py-2 text-sm"
-                  value={skillsInput}
-                  onChange={(e) => setSkillsInput(e.target.value)}
-                  placeholder="Skills: social media, design"
-                />
-              </div>
+                <div className="grid gap-3 md:grid-cols-2">
+                  <div>
+                    <label className="text-sm font-medium text-[#143d73]">Cause</label>
+                    <select
+                      className="mt-1 w-full rounded-md border border-[#b9d5f7] px-3 py-2 text-sm"
+                      value={cause}
+                      onChange={(e) => setCause(e.target.value)}
+                    >
+                      {CAUSE_OPTIONS.map((option) => (
+                        <option key={option} value={option}>
+                          {toLabel(option)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-[#143d73]">Geographical feature</label>
+                    <div className="mt-1 flex flex-wrap gap-2">
+                      {GEOGRAPHY_OPTIONS.map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => setGeography(option.value)}
+                          className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                            geography === option.value
+                              ? "border-[#2f6fd1] bg-[#2f6fd1] text-white"
+                              : "border-[#b9d5f7] bg-white text-[#2f6fd1] hover:bg-[#edf7ff]"
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <select
-                  className="rounded-md border border-[#b9d5f7] px-3 py-2 text-sm"
-                  value={availability}
-                  onChange={(e) => setAvailability(e.target.value)}
-                >
-                  <option value="weekends">Weekends</option>
-                  <option value="weekdays-evenings">Weekday evenings</option>
-                  <option value="anytime">Anytime</option>
-                </select>
+                <div>
+                  <div className="flex items-center justify-between gap-3">
+                    <label className="text-sm font-medium text-[#143d73]">Filter by interests</label>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedInterestFilters([])}
+                      className="text-xs font-medium text-[#4676aa] hover:text-[#2f6fd1]"
+                    >
+                      Clear interest filters
+                    </button>
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {availableInterestFilters.map((interest) => (
+                      <button
+                        key={interest}
+                        type="button"
+                        onClick={() => setSelectedInterestFilters((current) => toggleTag(current, interest))}
+                        className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                          selectedInterestFilters.includes(interest)
+                            ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                            : "border-[#b9d5f7] bg-white text-[#4676aa] hover:bg-[#edf7ff]"
+                        }`}
+                      >
+                        {toLabel(interest)}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-xs text-[#6C645F]">Interest filters look at titles, descriptions, causes, and listed skills.</p>
+                </div>
 
-                <label className="inline-flex items-center gap-2 text-sm">
-                  <input type="checkbox" checked={remoteOnly} onChange={(e) => setRemoteOnly(e.target.checked)} />
-                  Remote only
-                </label>
-              </div>
-
-              <div className="flex flex-wrap gap-3">
-                <button
-                  onClick={() => void discoverOpportunities()}
-                  className="rounded-full bg-[#2f6fd1] px-5 py-2 text-sm font-medium text-white"
-                  disabled={loading}
-                >
-                  {loading && !aiMatching ? "Loading..." : "Discover opportunities"}
-                </button>
-                <button
-                  onClick={() => void runAiMatch()}
-                  className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
-                    aiMatching
-                      ? "border border-purple-400 bg-purple-50 text-purple-700"
-                      : isAiResult
-                        ? "border border-purple-300 bg-purple-50 text-purple-700"
-                        : "border border-[#9ec4ef] bg-white hover:border-[#7ab3f2] hover:bg-[#edf7ff]"
-                  }`}
-                  disabled={loading || !token}
-                  title={!token ? "Sign in to use AI matching" : undefined}
-                >
-                  {aiMatching ? (
-                    <span className="inline-flex items-center gap-1.5">
-                      <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                      </svg>
-                      Matching...
+                <div className="rounded-xl border border-[#d9e8fb] bg-[#f7fbff] p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-medium text-[#143d73]">Nearby radius</p>
+                      <p className="text-xs text-[#4676aa]">Used when “Nearby” is active and also saved for AI matching.</p>
+                    </div>
+                    <span className="text-sm font-semibold text-[#143d73]">{radiusKm} km</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={5}
+                    max={100}
+                    value={radiusKm}
+                    onChange={(e) => setRadiusKm(Number(e.target.value))}
+                    className="mt-3 w-full"
+                  />
+                  <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-[#4676aa]">
+                    <button
+                      type="button"
+                      onClick={startWatchingLocation}
+                      className="rounded-full border border-[#b9d5f7] bg-white px-3 py-1.5 font-medium text-[#2f6fd1] hover:bg-[#edf7ff]"
+                    >
+                      {userCoords ? "Refresh live location" : "Use my live location"}
+                    </button>
+                    <span>
+                      {userCoords
+                        ? `Live location active: ${userCoords.lat.toFixed(3)}, ${userCoords.lng.toFixed(3)}`
+                        : "Location not detected yet. Nearby filtering will wait for permission."}
                     </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5">
-                      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M12 2l2.09 6.26L20.18 9l-5 4.27L16.82 20 12 16.9 7.18 20l1.64-6.73L3.82 9l6.09-.74Z" />
-                      </svg>
-                      AI match me
-                    </span>
-                  )}
-                </button>
-              </div>
+                  </div>
+                </div>
 
-              {user?.preferences && user.preferences.interests.length > 0 && (
-                <p className="flex items-center gap-1.5 text-xs text-emerald-600">
-                  <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M20 6L9 17l-5-5" />
-                  </svg>
-                  Using your saved preferences.{" "}
-                  <a href="/profile" className="underline hover:text-emerald-700">Edit</a>
-                </p>
-              )}
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    onClick={() => void discoverOpportunities()}
+                    className="rounded-full bg-[#2f6fd1] px-5 py-2 text-sm font-medium text-white"
+                    disabled={loading}
+                  >
+                    {loading && !aiMatching ? "Loading..." : "Discover opportunities"}
+                  </button>
+                  <button
+                    onClick={() => void runAiMatch()}
+                    className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
+                      aiMatching
+                        ? "border border-purple-400 bg-purple-50 text-purple-700"
+                        : isAiResult
+                          ? "border border-purple-300 bg-purple-50 text-purple-700"
+                          : "border border-[#9ec4ef] bg-white hover:border-[#7ab3f2] hover:bg-[#edf7ff]"
+                    }`}
+                    disabled={loading || !token}
+                    title={!token ? "Sign in to use AI matching" : undefined}
+                  >
+                    {aiMatching ? (
+                      <span className="inline-flex items-center gap-1.5">
+                        <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Matching...
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5">
+                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M12 2l2.09 6.26L20.18 9l-5 4.27L16.82 20 12 16.9 7.18 20l1.64-6.73L3.82 9l6.09-.74Z" />
+                        </svg>
+                        AI match me
+                      </span>
+                    )}
+                  </button>
+                </div>
+              </TabsContent>
 
-              {source && (
-                <p className="text-xs text-[#4676aa]">
-                  {isAiResult && (
-                    <span className="mr-1.5 inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-semibold text-purple-700">
-                      <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M12 2l2.09 6.26L20.18 9l-5 4.27L16.82 20 12 16.9 7.18 20l1.64-6.73L3.82 9l6.09-.74Z" />
-                      </svg>
-                      AI Ranked
+              <TabsContent value="profile" className="mt-4 grid gap-4">
+                <div className="rounded-xl border border-[#d9e8fb] bg-[#f7fbff] p-4">
+                  <h3 className="text-sm font-semibold text-[#143d73]">Tell us what you care about</h3>
+                  <p className="mt-1 text-sm text-[#4676aa]">Save your interests, skills, and radius here so the recommendation engine can tailor results to you.</p>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-[#143d73]">Interest areas</label>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {INTEREST_SUGGESTIONS.map((interest) => (
+                      <button
+                        key={interest}
+                        type="button"
+                        onClick={() => setProfileInterests((current) => toggleTag(current, interest))}
+                        className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                          profileInterests.includes(interest)
+                            ? "border-[#143d73] bg-[#143d73] text-white"
+                            : "border-[#b9d5f7] bg-white text-[#2f6fd1] hover:bg-[#edf7ff]"
+                        }`}
+                      >
+                        {toLabel(interest)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid gap-3 md:grid-cols-[1fr_auto]">
+                  <input
+                    className="rounded-md border border-[#b9d5f7] px-3 py-2 text-sm"
+                    value={customInterest}
+                    onChange={(e) => setCustomInterest(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault()
+                        addCustomInterest()
+                      }
+                    }}
+                    placeholder="Add a custom interest like food security or coding"
+                  />
+                  <button
+                    type="button"
+                    onClick={addCustomInterest}
+                    className="rounded-md border border-[#b9d5f7] px-4 py-2 text-sm font-medium text-[#2f6fd1] hover:bg-[#edf7ff]"
+                  >
+                    Add interest
+                  </button>
+                </div>
+
+                {profileInterests.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {profileInterests.map((interest) => (
+                      <span key={interest} className="inline-flex items-center gap-1 rounded-full bg-[#143d73] px-3 py-1 text-xs font-medium text-white">
+                        {toLabel(interest)}
+                        <button
+                          type="button"
+                          onClick={() => setProfileInterests((current) => current.filter((entry) => entry !== interest))}
+                          className="opacity-75 hover:opacity-100"
+                          aria-label={`Remove ${interest}`}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <div>
+                  <label className="text-sm font-medium text-[#143d73]">Skills you can offer</label>
+                  <input
+                    className="mt-1 w-full rounded-md border border-[#b9d5f7] px-3 py-2 text-sm"
+                    value={profileSkills}
+                    onChange={(e) => setProfileSkills(e.target.value)}
+                    placeholder="teaching, event planning, social media, design"
+                  />
+                </div>
+
+                <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
+                  <div>
+                    <label className="text-sm font-medium text-[#143d73]">Preferred travel radius</label>
+                    <p className="mt-1 text-xs text-[#4676aa]">AI matching uses this along with your location to prioritize reachable opportunities.</p>
+                  </div>
+                  <span className="text-sm font-semibold text-[#143d73]">{radiusKm} km</span>
+                </div>
+                <input
+                  type="range"
+                  min={5}
+                  max={100}
+                  value={radiusKm}
+                  onChange={(e) => setRadiusKm(Number(e.target.value))}
+                  className="w-full"
+                />
+
+                <div className="rounded-xl border border-[#d9e8fb] bg-[#f7fbff] p-3 text-sm text-[#4676aa]">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={startWatchingLocation}
+                      className="rounded-full border border-[#b9d5f7] bg-white px-3 py-1.5 text-xs font-medium text-[#2f6fd1] hover:bg-[#edf7ff]"
+                    >
+                      {userCoords ? "Refresh location" : "Allow location"}
+                    </button>
+                    <span>
+                      {userCoords
+                        ? `Location saved from browser: ${userCoords.lat.toFixed(3)}, ${userCoords.lng.toFixed(3)}`
+                        : "No location saved yet. Add it to improve nearby recommendations."}
                     </span>
-                  )}
-                  Source: {source}
-                </p>
-              )}
-              {error && <p className="text-sm text-red-700">Could not fetch opportunities: {error}</p>}
-            </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => void saveRecommendationProfile()}
+                    disabled={savingProfile}
+                    className="rounded-full bg-[#143d73] px-5 py-2 text-sm font-medium text-white disabled:opacity-60"
+                  >
+                    {savingProfile ? "Saving..." : user ? "Save recommendation profile" : "Sign in to save profile"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("filters")}
+                    className="rounded-full border border-[#b9d5f7] bg-white px-5 py-2 text-sm font-medium text-[#2f6fd1] hover:bg-[#edf7ff]"
+                  >
+                    Back to filters
+                  </button>
+                </div>
+
+                {profileSaved && (
+                  <p className="text-sm text-emerald-600">Recommendation profile saved. AI match will use these preferences now.</p>
+                )}
+              </TabsContent>
+            </Tabs>
+
+            {user?.preferences && user.preferences.interests.length > 0 && (
+              <p className="mt-4 flex items-center gap-1.5 text-xs text-emerald-600">
+                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
+                Using your saved preferences. <a href="/profile" className="underline hover:text-emerald-700">Edit full profile</a>
+              </p>
+            )}
+
+            {source && (
+              <p className="mt-3 text-xs text-[#4676aa]">
+                {isAiResult && (
+                  <span className="mr-1.5 inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-semibold text-purple-700">
+                    <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 2l2.09 6.26L20.18 9l-5 4.27L16.82 20 12 16.9 7.18 20l1.64-6.73L3.82 9l6.09-.74Z" />
+                    </svg>
+                    AI Ranked
+                  </span>
+                )}
+                Source: {source}
+              </p>
+            )}
+            {error && <p className="mt-2 text-sm text-red-700">Could not fetch opportunities: {error}</p>}
           </div>
 
           <div className="rounded-2xl border border-[#b9d5f7] bg-white p-4">

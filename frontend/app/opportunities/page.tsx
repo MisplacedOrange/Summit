@@ -3,26 +3,9 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Header } from "@/components/header"
-import { supabase } from "@/lib/supabase"
+import type { V1OpportunityRead } from "@/lib/utils"
 
-type Opportunity = {
-  id: string
-  title: string
-  description: string
-  cause_category: string | null
-  location_text: string | null
-  location_lat: number | null
-  location_lng: number | null
-  event_date: string | null
-  event_time: string | null
-  volunteers_needed: number | null
-  volunteers_signed: number
-  skills_required: string[]
-  source_url: string | null
-  image_url: string | null
-  is_scraped: boolean
-  created_at: string | null
-}
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000"
 
 const CAUSE_COLORS: Record<string, { bg: string; text: string }> = {
   environment: { bg: "bg-emerald-100", text: "text-emerald-700" },
@@ -51,7 +34,7 @@ const URGENCY_STYLE: Record<string, { bg: string; text: string }> = {
 const PAGE_SIZE = 24
 
 export default function OpportunitiesPage() {
-  const [items, setItems] = useState<Opportunity[]>([])
+  const [items, setItems] = useState<V1OpportunityRead[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState("")
@@ -64,26 +47,23 @@ export default function OpportunitiesPage() {
       setLoading(true)
       setError(null)
       try {
-        let query = supabase
-          .from("opportunities")
-          .select("*", { count: "exact" })
-          .order("created_at", { ascending: false })
-          .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1)
+        const url = new URL(`${API_BASE}/v1/opportunities`)
+        url.searchParams.set("limit", String(PAGE_SIZE))
+        url.searchParams.set("offset", String(page * PAGE_SIZE))
 
         if (search.trim()) {
-          query = query.or(
-            `title.ilike.%${search.trim()}%,description.ilike.%${search.trim()}%`
-          )
+          url.searchParams.set("q", search.trim())
         }
         if (causeFilter) {
-          query = query.eq("cause_category", causeFilter)
+          url.searchParams.set("category", causeFilter)
         }
 
-        const { data, error: sbError, count } = await query
+        const response = await fetch(url.toString())
+        if (!response.ok) throw new Error(`Server error ${response.status}`)
 
-        if (sbError) throw new Error(sbError.message)
-        setItems((data as Opportunity[]) ?? [])
-        setTotal(count ?? 0)
+        const data = (await response.json()) as { total: number; items: V1OpportunityRead[] }
+        setItems(data.items)
+        setTotal(data.total)
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load opportunities")
       } finally {
