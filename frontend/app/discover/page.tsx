@@ -279,8 +279,7 @@ function SearchHeaderSection({
   return (
     <section className="sticky top-16 isolate z-[80] border-y border-[#2f547d]/80 bg-[#071a31]/80 backdrop-blur-xl">
       <div className="mx-auto w-full max-w-[1680px] px-4 py-3 md:px-6 xl:px-8">
-        <div className="rounded-[28px] border border-[#34597f] bg-[#0c2a49]/80 px-3 py-3 shadow-[0_14px_36px_rgba(0,0,0,0.35)] backdrop-blur-xl">
-          <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <div className="relative min-w-[320px] flex-1">
               <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#6f9bca]">
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -412,43 +411,7 @@ function SearchHeaderSection({
             </button>
           </div>
 
-          <div className="mt-3 flex flex-wrap items-center gap-2 px-1">
-            {CAUSE_OPTIONS.map((option) => {
-              const isActive = cause === option
-              return (
-                <button
-                  key={option || "all"}
-                  type="button"
-                  onClick={() => setCause(option)}
-                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                    isActive
-                      ? "border-[#48a3ff]/70 bg-[#1d4b78] text-[#e4f2ff]"
-                      : "border-[#3d6188] bg-[#103558]/70 text-[#9dc2e6] hover:bg-[#184268] hover:text-[#e4f2ff]"
-                  }`}
-                  aria-pressed={isActive}
-                >
-                  {option ? toLabel(option) : "All causes"}
-                </button>
-              )
-            })}
-          </div>
-
-          {source && (
-            <p className="mt-3 px-1 text-xs text-[#8bb3dc]">
-              {isAiResult && (
-                <span className="mr-1.5 inline-flex items-center gap-1 rounded-full bg-violet-500/20 px-2 py-0.5 text-[10px] font-semibold text-violet-200">
-                  <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 2l2.09 6.26L20.18 9l-5 4.27L16.82 20 12 16.9 7.18 20l1.64-6.73L3.82 9l6.09-.74Z" />
-                  </svg>
-                  AI Ranked
-                </span>
-              )}
-              Source: {source}
-              {userCoords ? ` • Live: ${userCoords.lat.toFixed(2)}, ${userCoords.lng.toFixed(2)}` : ""}
-            </p>
-          )}
           {error && <p className="mt-2 px-1 text-sm text-rose-300">Could not fetch opportunities: {error}</p>}
-        </div>
       </div>
     </section>
   )
@@ -619,7 +582,7 @@ function LocalImpactMapCard({
       <div className="mt-4 overflow-hidden rounded-xl border border-[#315781]">
         <OpportunityMap
           items={filteredItems.slice(0, MAP_OPPORTUNITY_LIMIT)}
-          className="h-[380px] w-full"
+          className="h-[520px] w-full"
           userLocation={userCoords}
           onLocateMe={startWatchingLocation}
         />
@@ -940,24 +903,26 @@ export default function SummitPage() {
     <main className="min-h-screen bg-[radial-gradient(circle_at_12%_8%,rgba(26,124,235,0.2),transparent_34%),radial-gradient(circle_at_88%_78%,rgba(0,205,178,0.14),transparent_32%),linear-gradient(180deg,#07162a_0%,#081b33_45%,#061120_100%)] text-[#d9ebff]">
       <Header />
 
-      <SearchHeaderSection
-        loading={loading}
-        isAiResult={isAiResult}
-        query={query}
-        setQuery={setQuery}
-        cause={cause}
-        setCause={setCause}
-        geography={geography}
-        setGeography={setGeography}
-        startWatchingLocation={startWatchingLocation}
-        userCoords={userCoords}
-        availableInterestFilters={availableInterestFilters}
-        selectedInterestFilters={selectedInterestFilters}
-        setSelectedInterestFilters={setSelectedInterestFilters}
-        discoverOpportunities={discoverOpportunities}
-        source={source}
-        error={error}
-      />
+      {activeTab !== "profile" && (
+        <SearchHeaderSection
+          loading={loading}
+          isAiResult={isAiResult}
+          query={query}
+          setQuery={setQuery}
+          cause={cause}
+          setCause={setCause}
+          geography={geography}
+          setGeography={setGeography}
+          startWatchingLocation={startWatchingLocation}
+          userCoords={userCoords}
+          availableInterestFilters={availableInterestFilters}
+          selectedInterestFilters={selectedInterestFilters}
+          setSelectedInterestFilters={setSelectedInterestFilters}
+          discoverOpportunities={discoverOpportunities}
+          source={source}
+          error={error}
+        />
+      )}
 
       <section className="mx-auto mt-4 w-full max-w-[1680px] px-4 pb-16 md:px-6 xl:px-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="gap-4">
@@ -971,29 +936,11 @@ export default function SummitPage() {
           </TabsList>
 
           <TabsContent value="discover" className="space-y-4">
-            <div className="grid gap-4 xl:grid-cols-[420px_minmax(0,1fr)] xl:items-start">
-              <RecommendationProfileCard
-                profileInterests={profileInterests}
-                setProfileInterests={setProfileInterests}
-                customInterest={customInterest}
-                setCustomInterest={setCustomInterest}
-                addCustomInterest={addCustomInterest}
-                profileSkills={profileSkills}
-                setProfileSkills={setProfileSkills}
-                startWatchingLocation={startWatchingLocation}
-                userCoords={userCoords}
-                saveRecommendationProfile={saveRecommendationProfile}
-                savingProfile={savingProfile}
-                user={user}
-                profileSaved={profileSaved}
-              />
-
-              <LocalImpactMapCard
-                filteredItems={filteredItems}
-                userCoords={userCoords}
-                startWatchingLocation={startWatchingLocation}
-              />
-            </div>
+            <LocalImpactMapCard
+              filteredItems={filteredItems}
+              userCoords={userCoords}
+              startWatchingLocation={startWatchingLocation}
+            />
 
             <div className="rounded-2xl border border-[#315781] bg-[linear-gradient(145deg,rgba(13,42,72,0.98),rgba(9,29,53,0.95))] p-4">
               <h2 className="text-lg font-semibold text-[#e7f2ff]">
