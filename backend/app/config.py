@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     CLOUDINARY_CLOUD_NAME: str = ""
     CLOUDINARY_API_KEY: str = ""
     CLOUDINARY_API_SECRET: str = ""
+    DISCORD_WEBHOOK_URL: str = ""
 
     ENVIRONMENT: str = "development"
     ALLOWED_ORIGINS: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])

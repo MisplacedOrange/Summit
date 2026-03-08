@@ -28,6 +28,7 @@ class OpportunityRead(BaseModel):
 
     id: str
     organization_id: str | None
+    organization_name: str | None = None
     title: str
     description: str
     cause_category: str | None

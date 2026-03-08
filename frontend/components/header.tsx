@@ -4,12 +4,14 @@ import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
+import { useUser } from "@auth0/nextjs-auth0/client"
 
 import { useAuth } from "@/app/auth-context"
 import { Button } from "@/components/ui/button"
 
 export function Header() {
   const { user, loading } = useAuth()
+  const { user: auth0User, isLoading: auth0Loading } = useUser()
   const pathname = usePathname()
   const isHomePage = pathname === "/"
   const [isScrolled, setIsScrolled] = useState(false)
@@ -30,7 +32,14 @@ export function Header() {
   // Determine header styles based on page and scroll state
   const isTransparent = isHomePage && !isScrolled
   const isGlassmorphism = isHomePage && isScrolled
-  const displayName = user?.full_name?.trim() || user?.email?.split("@")[0] || "Profile"
+  const isAuthenticated = Boolean(auth0User || user)
+  const isAuthLoading = loading || auth0Loading
+  const displayName =
+    auth0User?.name?.trim() ||
+    auth0User?.email?.split("@")[0] ||
+    user?.full_name?.trim() ||
+    user?.email?.split("@")[0] ||
+    "Profile"
 
   return (
     <header
@@ -45,72 +54,78 @@ export function Header() {
       }`}
     >
       <div className="max-w-[1060px] mx-auto px-4">
-        <nav className="flex items-center justify-between py-4">
-          <div className="flex items-center space-x-8">
-            <Link href="/" className="flex items-center space-x-2">
-              <Image
-                src="/assets/images/summit.svg"
-                alt="Summit Logo"
-                width={24}
-                height={24}
-                className={`transition-all duration-300 ${
-                  isTransparent ? "brightness-0 invert" : "drop-shadow-[0_0_8px_rgba(70,148,255,0.28)]"
-                }`}
-              />
-              <span
-                className={`font-semibold text-lg transition-colors duration-300 ${
-                  isTransparent ? "text-white" : "text-[#143d73]"
-                }`}
-              >
-                Summit
-              </span>
+        <nav className="relative flex items-center justify-between py-4">
+          {/* Left: Logo */}
+          <Link href="/" className="flex items-center space-x-2">
+            <Image
+              src="/assets/images/summit.svg"
+              alt="Summit Logo"
+              width={24}
+              height={24}
+              className={`transition-all duration-300 ${
+                isTransparent ? "brightness-0 invert" : "drop-shadow-[0_0_8px_rgba(70,148,255,0.28)]"
+              }`}
+            />
+            <span
+              className={`font-semibold text-lg transition-colors duration-300 ${
+                isTransparent ? "text-white" : "text-[#143d73]"
+              }`}
+            >
+              Summit
+            </span>
+          </Link>
+
+          {/* Center: Nav links (absolutely centered) */}
+          <div className="absolute left-1/2 hidden -translate-x-1/2 items-center space-x-6 md:flex">
+            <Link
+              href="/"
+              className={`text-sm font-medium transition-colors duration-300 ${
+                isTransparent
+                  ? "text-white hover:text-white/80"
+                  : "text-[#1f4f89] hover:text-[#2f6cb3]"
+              }`}
+            >
+              Home
             </Link>
-            <div className="hidden md:flex items-center space-x-6">
-              <Link
-                href="/"
-                className={`text-sm font-medium transition-colors duration-300 ${
-                  isTransparent
-                    ? "text-white hover:text-white/80"
-                    : "text-[#1f4f89] hover:text-[#2f6cb3]"
-                }`}
-              >
-                Home
-              </Link>
-              <Link
-                href="/dashboard"
-                className={`text-sm font-medium transition-colors duration-300 ${
-                  isTransparent
-                    ? "text-white hover:text-white/80"
-                    : "text-[#1f4f89] hover:text-[#2f6cb3]"
-                }`}
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/opportunities"
-                className={`text-sm font-medium transition-colors duration-300 ${
-                  isTransparent
-                    ? "text-white hover:text-white/80"
-                    : "text-[#1f4f89] hover:text-[#2f6cb3]"
-                }`}
-              >
-                Opportunities
-              </Link>
-            </div>
+            <Link
+              href="/dashboard"
+              className={`text-sm font-medium transition-colors duration-300 ${
+                isTransparent
+                  ? "text-white hover:text-white/80"
+                  : "text-[#1f4f89] hover:text-[#2f6cb3]"
+              }`}
+            >
+              Dashboard
+            </Link>
           </div>
+
+          {/* Right: Auth buttons */}
           <div className="flex items-center gap-2">
-            {!loading && user ? (
-              <Button
-                asChild
-                variant="ghost"
-                className={`transition-colors duration-300 ${
-                  isTransparent
-                    ? "text-white hover:bg-white/10"
-                    : "text-[#1f4f89] hover:bg-[#dcecff]"
-                }`}
-              >
-                <Link href="/profile">{displayName}</Link>
-              </Button>
+            {!isAuthLoading && isAuthenticated ? (
+              <>
+                <Button
+                  asChild
+                  variant="ghost"
+                  className={`transition-colors duration-300 ${
+                    isTransparent
+                      ? "text-white hover:bg-white/10"
+                      : "text-[#1f4f89] hover:bg-[#dcecff]"
+                  }`}
+                >
+                  <Link href="/profile">{displayName}</Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="ghost"
+                  className={`transition-colors duration-300 ${
+                    isTransparent
+                      ? "text-white hover:bg-white/10"
+                      : "text-[#37322f] hover:bg-[#37322f]/5"
+                  }`}
+                >
+                  <a href="/api/auth/logout?returnTo=/">Logout</a>
+                </Button>
+              </>
             ) : (
               <>
                 <Button
@@ -122,7 +137,7 @@ export function Header() {
                       : "text-[#37322f] hover:bg-[#37322f]/5"
                   }`}
                 >
-                  <Link href="/login">Log in</Link>
+                  <a href="/api/auth/login?returnTo=/dashboard">Log in</a>
                 </Button>
                 <Button
                   asChild
@@ -132,7 +147,7 @@ export function Header() {
                       : "bg-[#2f6fd1] text-white hover:bg-[#2159b0]"
                   }`}
                 >
-                  <Link href="/signup">Sign up</Link>
+                  <a href="/api/auth/login?screen_hint=signup&returnTo=/dashboard">Sign up</a>
                 </Button>
               </>
             )}

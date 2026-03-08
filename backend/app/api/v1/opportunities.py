@@ -4,6 +4,7 @@ from datetime import date, datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, status
 from sqlalchemy import and_, func, or_, select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
@@ -42,7 +43,7 @@ async def list_opportunities(
     if date_to:
         filters.append(Opportunity.event_date <= date_to)
 
-    stmt = select(Opportunity)
+    stmt = select(Opportunity).options(selectinload(Opportunity.organization))
     count_stmt = select(func.count(Opportunity.id))
     if filters:
         stmt = stmt.where(and_(*filters))
@@ -62,7 +63,13 @@ async def list_opportunities(
         ]
 
     total = await db.scalar(count_stmt) or 0
-    return OpportunityListResponse(total=int(total), items=rows)
+    enriched = [
+        OpportunityRead.model_validate(row).model_copy(
+            update={"organization_name": row.organization.name if row.organization else None}
+        )
+        for row in rows
+    ]
+    return OpportunityListResponse(total=int(total), items=enriched)
 
 
 @router.get("/map", response_model=list[OpportunityMapPin])

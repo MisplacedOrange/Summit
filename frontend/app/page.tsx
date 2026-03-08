@@ -3,6 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { useAuth } from "./auth-context"
+import { Header } from "@/components/header"
 
 const FEATURES = [
   {
@@ -67,87 +68,48 @@ export default function LandingPage() {
 
   return (
     <main className="min-h-screen bg-[#eef6ff] text-[#143d73]">
-      {/* Nav */}
-      <nav className="mx-auto flex max-w-[1100px] items-center justify-between px-4 py-5 md:px-6">
-        <span className="text-lg font-semibold text-[#124383]">Summit ImpactMatch</span>
-        <div className="flex items-center gap-3">
-          {user ? (
-            <>
-              <Link href="/profile" className="text-sm font-medium text-[#1b4f90] hover:underline">
-                Profile
-              </Link>
-              <Link
-                href="/discover"
-                className="rounded-full bg-[#2f6fd1] px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-[#245cb0]"
-              >
-                Go to Dashboard
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="rounded-full border border-[#9fc4ef] bg-white px-5 py-2 text-sm font-medium text-[#1d4f8a] transition-colors hover:bg-[#e8f3ff]"
-              >
-                Log in
-              </Link>
-              <Link
-                href="/signup"
-                className="rounded-full bg-[#2f6fd1] px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-[#245cb0]"
-              >
-                Sign up
-              </Link>
-            </>
-          )}
-        </div>
-      </nav>
+      <Header />
 
       {/* Hero */}
-      <section className="mx-auto max-w-[1100px] px-4 pt-12 pb-16 text-center md:px-6 md:pt-20 md:pb-24">
-        <span className="inline-flex rounded-full border border-[#a9caf1] bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-[#2f67ac]">
-          AI-Powered Volunteer Matching
-        </span>
-        <h1 className="mx-auto mt-6 max-w-3xl text-3xl font-semibold leading-tight sm:text-4xl md:text-6xl">
-          Find meaningful volunteer hours with{" "}
-          <span className="font-[family-name:var(--font-instrument-serif)] italic text-[#2f73c9]">real local impact.</span>
-        </h1>
-        <p className="mx-auto mt-5 max-w-2xl text-base text-[#456f9f] md:text-lg">
-          Discover opportunities from nonprofits, local businesses, and volunteer events in one place.
-          Let AI match you to the causes that matter most.
-        </p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-          {user ? (
-            <Link
-              href="/discover"
-              className="rounded-full bg-[#2f6fd1] px-7 py-3 text-sm font-medium text-white shadow-lg transition-all hover:bg-[#245cb0] hover:shadow-xl"
-            >
-              Explore Opportunities
-            </Link>
-          ) : (
-            <Link
-              href="/signup"
-              className="rounded-full bg-[#2f6fd1] px-7 py-3 text-sm font-medium text-white shadow-lg transition-all hover:bg-[#245cb0] hover:shadow-xl"
-            >
-              Create Free Account
-            </Link>
-          )}
-          <a
-            href="#features"
-            className="rounded-full border border-[#9fc4ef] bg-white px-7 py-3 text-sm font-medium text-[#1d4f8a] transition-colors hover:bg-[#e8f3ff]"
+      <section className="relative h-screen overflow-hidden">
+        {/* Background image */}
+        <img
+          src="/assets/images/mountain.webp"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover object-top"
+        />
+
+        {/* Overlay — top for navbar readability, bottom for headline readability */}
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
+
+        {/* SUMMIT — white, translucent, fades at bottom, above center */}
+        <div className="pointer-events-none absolute inset-0 z-20 flex select-none flex-col items-center justify-center pb-[35vh]">
+          <span
+            className="block w-full text-center leading-none text-white opacity-20"
+            style={{
+              fontSize: "22vw",
+              letterSpacing: "-0.04em",
+              fontFamily: "sans-serif",
+              fontWeight: 900,
+              WebkitMaskImage: "linear-gradient(to bottom, black 30%, transparent 100%)",
+              maskImage: "linear-gradient(to bottom, black 30%, transparent 100%)",
+            }}
           >
-            See how it works
-          </a>
+            SUMMIT
+          </span>
         </div>
 
-        <div className="relative mx-auto mt-10 max-w-5xl overflow-hidden rounded-3xl border border-[#87b5ec] bg-white/80 p-3 shadow-[0_18px_60px_rgba(49,116,204,0.28)]">
-          <Image
-            src="/assets/images/hero-vibrant-orb.svg"
-            alt="Vibrant Summit platform preview"
-            width={960}
-            height={640}
-            className="h-auto w-full rounded-2xl"
-            priority
-          />
+        {/* Bottom-left headline */}
+        <div className="absolute bottom-0 left-0 z-30 px-8 pb-14 md:px-16 lg:px-24">
+          <h1
+            className="max-w-3xl text-4xl leading-tight text-white md:text-5xl lg:text-6xl"
+            style={{ fontFamily: "'Times New Roman', Times, serif", fontStyle: "italic" }}
+          >
+            Climb Higher
+            <br />
+            Reach your <b>SUMMIT</b>.
+          </h1>
         </div>
       </section>
 

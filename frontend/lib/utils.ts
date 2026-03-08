@@ -12,6 +12,7 @@ export function cn(...inputs: ClassValue[]) {
 export interface V1OpportunityRead {
   id: string
   organization_id: string | null
+  organization_name: string | null
   title: string
   description: string
   cause_category: string | null

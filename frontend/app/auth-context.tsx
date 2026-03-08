@@ -27,6 +27,19 @@ type LoginInput = {
   password: string
 }
 
+type Auth0SessionUser = {
+  sub: string
+  email: string
+  name?: string | null
+  picture?: string | null
+  role?: "student" | "organization"
+}
+
+type Auth0SessionResponse = {
+  user: Auth0SessionUser | null
+  accessToken?: string | null
+}
+
 type AuthContextValue = {
   user: AuthUser | null
   token: string | null
@@ -59,20 +72,81 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let cancelled = false
 
+    async function loadProfileFromToken(accessToken: string, picture?: string | null) {
+      const profileRes = await fetch(`${API_BASE}/v1/users/me`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+      if (!profileRes.ok) {
+        throw new Error("Failed to fetch profile")
+      }
+      const profile = (await profileRes.json()) as AuthUser
+      if (picture) {
+        profile.picture = picture
+      }
+      return profile
+    }
+
+    async function syncAuth0Session() {
+      const sessionRes = await fetch("/api/auth/me", { cache: "no-store" })
+      if (!sessionRes.ok) {
+        return false
+      }
+
+      const session = (await sessionRes.json()) as Auth0SessionResponse
+      if (!session.user?.sub || !session.user?.email) {
+        return false
+      }
+
+      const exchangeRes = await fetch(`${API_BASE}/v1/auth/exchange`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          auth0_id: session.user.sub,
+          email: session.user.email,
+          full_name: session.user.name ?? null,
+          role: session.user.role ?? "student",
+        }),
+      })
+
+      if (!exchangeRes.ok) {
+        return false
+      }
+
+      const exchangeData = await exchangeRes.json().catch(() => ({})) as { access_token?: string }
+      if (!exchangeData.access_token) {
+        return false
+      }
+
+      localStorage.setItem("im_token", exchangeData.access_token)
+      setToken(exchangeData.access_token)
+
+      const profile = await loadProfileFromToken(exchangeData.access_token, session.user.picture ?? null)
+      if (!cancelled) {
+        setUser(profile)
+      }
+      return true
+    }
+
     async function init() {
+      try {
+        const synced = await syncAuth0Session()
+        if (synced) {
+          return
+        }
+      } catch {
+        // fall through to stored token fallback
+      }
+
       const stored = localStorage.getItem("im_token")
       if (stored) {
         try {
-          const profileRes = await fetch(`${API_BASE}/v1/users/me`, {
-            headers: { Authorization: `Bearer ${stored}` },
-          })
-          if (profileRes.ok && !cancelled) {
-            const profile = await profileRes.json()
+          const profile = await loadProfileFromToken(stored)
+          if (!cancelled) {
             setUser(profile)
             setToken(stored)
           }
         } catch {
-          // ignore
+          localStorage.removeItem("im_token")
         }
       }
 
@@ -85,46 +159,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const login = useCallback(async ({ email, password }: LoginInput) => {
-    if (!email?.trim() || !password) {
-      throw new Error("Email and password are required")
-    }
-
-    const response = await fetch(`${API_BASE}/v1/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    })
-
-    const data = await response.json().catch(() => ({}))
-    if (!response.ok) {
-      throw new Error(data.detail ?? "Unable to sign in")
-    }
-
-    const accessToken = data.access_token
-    if (!accessToken) {
-      throw new Error("Login succeeded but no token was returned")
-    }
-
-    localStorage.setItem("im_token", accessToken)
-    setToken(accessToken)
-
-    const profileRes = await fetch(`${API_BASE}/v1/users/me`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
-    if (!profileRes.ok) {
-      throw new Error("Login succeeded but profile fetch failed")
-    }
-
-    const profile = (await profileRes.json()) as AuthUser
-    setUser(profile)
+  const login = useCallback(async (_input: LoginInput) => {
+    window.location.assign("/api/auth/login?returnTo=/dashboard")
   }, [])
 
   const logout = useCallback(() => {
     localStorage.removeItem("im_token")
     setToken(null)
     setUser(null)
-    window.location.assign("/")
+    window.location.assign("/api/auth/logout?returnTo=/")
   }, [])
 
   const refreshProfile = useCallback(async () => {

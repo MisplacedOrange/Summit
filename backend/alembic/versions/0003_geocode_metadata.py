@@ -3,6 +3,9 @@
 Revision ID: 0003_geocode_metadata
 Revises: 0002_cloudinary_images
 Create Date: 2026-03-07
+
+NOTE: This migration was applied directly to the Supabase DB before the file
+was committed locally. This stub reconstructs the chain so Alembic can track it.
 """
 from alembic import op
 import sqlalchemy as sa
@@ -14,7 +17,7 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.add_column("opportunities", sa.Column("geocode_source", sa.String(20), nullable=True))
+    op.add_column("opportunities", sa.Column("geocode_source", sa.String(length=80), nullable=True))
     op.add_column("opportunities", sa.Column("geocode_confidence", sa.Float(), nullable=True))
     op.add_column("opportunities", sa.Column("geocoded_at", sa.DateTime(timezone=True), nullable=True))
 

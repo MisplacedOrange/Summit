@@ -267,87 +267,9 @@ export default function ImpactMatchPage() {
     <main className="min-h-screen bg-[#eef6ff] text-[#143d73]">
       <Header />
 
-      <section className="mx-auto max-w-[1100px] px-4 pb-10 pt-24 md:px-6">
-        <div className="rounded-3xl border border-[#b6d4f7] bg-white/85 p-6 shadow-[0_14px_40px_rgba(52,122,212,0.2)] backdrop-blur">
-          <div className="flex items-start justify-between">
-            <p className="inline-flex rounded-full border border-[#9fc4ef] bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#2e6dae]">
-              Summit ImpactMatch
-            </p>
-            {user ? (
-              <div className="flex items-center gap-2">
-                <a
-                  href="/profile"
-                  className="inline-flex items-center gap-2 rounded-full border border-[#9fc4ef] bg-white px-3 py-1.5 text-sm font-medium text-[#1f5a9b] hover:bg-[#eaf4ff] transition-colors"
-                >
-                  {user.picture ? (
-                    <img src={user.picture} alt="" className="h-6 w-6 rounded-full" referrerPolicy="no-referrer" />
-                  ) : (
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#2f6fd1] text-[10px] font-bold text-white">
-                      {user.full_name?.[0]?.toUpperCase() ?? user.email[0].toUpperCase()}
-                    </span>
-                  )}
-                  {user.full_name ?? user.email.split("@")[0]}
-                </a>
-                <button
-                  onClick={logout}
-                  className="rounded-full border border-[#9fc4ef] bg-white px-3 py-1.5 text-xs font-medium hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-colors"
-                >
-                  Sign out
-                </button>
-              </div>
-            ) : (
-              <Link
-                href="/login"
-                className="rounded-full bg-[#2f6fd1] px-4 py-1.5 text-sm font-medium text-white"
-              >
-                Sign in
-              </Link>
-            )}
-          </div>
-          <h1 className="mt-4 text-2xl font-semibold leading-tight sm:text-3xl md:text-5xl">
-            Find meaningful volunteer hours with real local impact.
-          </h1>
-          <p className="mt-3 max-w-3xl text-sm text-[#4676aa] md:text-base">
-            Discover opportunities from nonprofits, local businesses, and volunteer events in one place. Use AI matching
-            to rank options by your interests, skills, availability, and location.
-          </p>
 
-          <div className="mt-5 overflow-hidden rounded-2xl border border-[#9fc4ef] bg-white p-2">
-            <Image
-              src="/assets/images/discover-gradient-grid.svg"
-              alt="Colorful discovery dashboard illustration"
-              width={960}
-              height={560}
-              className="h-auto w-full rounded-xl"
-            />
-          </div>
-        </div>
-      </section>
 
-      <section className="mx-auto grid max-w-[1100px] gap-3 px-4 grid-cols-2 md:grid-cols-4 md:gap-4 md:px-6">
-        {loading && items.length === 0 ? (
-          <>{Array.from({ length: 4 }).map((_, i) => <SkeletonStat key={i} />)}</>
-        ) : (
-          <>
-            <div className="rounded-xl border border-[#b6d4f7] bg-white p-4 transition-all duration-300">
-              <p className="text-xs text-[#4676aa]">Opportunities</p>
-              <p className="text-2xl font-semibold">{stats.opportunities}</p>
-            </div>
-            <div className="rounded-xl border border-[#b6d4f7] bg-white p-4 transition-all duration-300">
-              <p className="text-xs text-[#4676aa]">Spots needed</p>
-              <p className="text-2xl font-semibold">{stats.totalNeeds}</p>
-            </div>
-            <div className="rounded-xl border border-[#b6d4f7] bg-white p-4 transition-all duration-300">
-              <p className="text-xs text-[#4676aa]">High urgency</p>
-              <p className="text-2xl font-semibold">{stats.highUrgency}</p>
-            </div>
-            <div className="rounded-xl border border-[#b6d4f7] bg-white p-4 transition-all duration-300">
-              <p className="text-xs text-[#4676aa]">Categories</p>
-              <p className="text-2xl font-semibold">{stats.causes}</p>
-            </div>
-          </>
-        )}
-      </section>
+
 
       <section className="mx-auto mt-4 max-w-[1100px] px-4 pb-16 md:px-6">
         <div className="grid gap-4 lg:grid-cols-[1.1fr_1fr]">
