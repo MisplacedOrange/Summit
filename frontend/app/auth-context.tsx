@@ -4,6 +4,8 @@ import { createContext, useCallback, useContext, useEffect, useState } from "rea
 import type React from "react"
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000"
+const TOKEN_STORAGE_KEY = "im_token"
+const USER_STORAGE_KEY = "im_user"
 
 export type UserPreferences = {
   interests: string[]
@@ -77,7 +79,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
       if (!profileRes.ok) {
-        throw new Error("Failed to fetch profile")
+        const error = new Error("Failed to fetch profile") as Error & { status?: number }
+        error.status = profileRes.status
+        throw error
       }
       const profile = (await profileRes.json()) as AuthUser
       if (picture) {
@@ -87,7 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     async function syncAuth0Session() {
-      const sessionRes = await fetch("/api/auth/me", { cache: "no-store" })
+      const sessionRes = await fetch("/api/auth/me", { cache: "no-store", credentials: "include" })
       if (!sessionRes.ok) {
         return false
       }
@@ -117,11 +121,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return false
       }
 
-      localStorage.setItem("im_token", exchangeData.access_token)
+      localStorage.setItem(TOKEN_STORAGE_KEY, exchangeData.access_token)
       setToken(exchangeData.access_token)
 
       const profile = await loadProfileFromToken(exchangeData.access_token, session.user.picture ?? null)
       if (!cancelled) {
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(profile))
         setUser(profile)
       }
       return true
@@ -129,6 +134,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     async function init() {
       try {
+        const storedUserRaw = localStorage.getItem(USER_STORAGE_KEY)
+        if (storedUserRaw) {
+          try {
+            setUser(JSON.parse(storedUserRaw) as AuthUser)
+          } catch {
+            localStorage.removeItem(USER_STORAGE_KEY)
+          }
+        }
+
+        const storedToken = localStorage.getItem(TOKEN_STORAGE_KEY)
+        if (storedToken) {
+          setToken(storedToken)
+        }
+
         try {
           const synced = await syncAuth0Session()
           if (synced) {
@@ -138,16 +157,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // fall through to stored token fallback
         }
 
-        const stored = localStorage.getItem("im_token")
+        const stored = localStorage.getItem(TOKEN_STORAGE_KEY)
         if (stored) {
           try {
             const profile = await loadProfileFromToken(stored)
             if (!cancelled) {
+              localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(profile))
               setUser(profile)
               setToken(stored)
             }
-          } catch {
-            localStorage.removeItem("im_token")
+          } catch (error) {
+            const status = (error as { status?: number }).status
+            // Only clear persisted auth when backend confirms token is invalid.
+            if (status === 401 || status === 403) {
+              localStorage.removeItem(TOKEN_STORAGE_KEY)
+              localStorage.removeItem(USER_STORAGE_KEY)
+              if (!cancelled) {
+                setToken(null)
+                setUser(null)
+              }
+            }
           }
         }
       } finally {
@@ -166,7 +195,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const logout = useCallback(() => {
-    localStorage.removeItem("im_token")
+    localStorage.removeItem(TOKEN_STORAGE_KEY)
+    localStorage.removeItem(USER_STORAGE_KEY)
     setToken(null)
     setUser(null)
     window.location.assign("/api/auth/logout?returnTo=/")
@@ -180,7 +210,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       })
       if (res.ok) {
         const profile = await res.json()
-        setUser((prev) => prev ? { ...profile, picture: prev.picture } : profile)
+        setUser((prev) => {
+          const next = prev ? { ...profile, picture: prev.picture } : profile
+          localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(next))
+          return next
+        })
       }
     } catch {
       // ignore
@@ -200,7 +234,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       })
       if (!res.ok) throw new Error("Failed to save preferences")
       const updated = await res.json() as AuthUser
-      setUser((prev) => prev ? { ...updated, picture: prev.picture } : updated)
+      setUser((prev) => {
+        const next = prev ? { ...updated, picture: prev.picture } : updated
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(next))
+        return next
+      })
     },
     [token],
   )
