@@ -74,7 +74,7 @@ export default function LandingPage() {
   const headlineOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0])
   const missionOpacity = useTransform(scrollYProgress, [0.15, 0.35, 0.55], [0, 1, 1])
   const missionY = useTransform(scrollYProgress, [0.15, 0.35], [40, 0])
-  const blackOpacity = useTransform(scrollYProgress, [0.89, 0.99], [0, 0.9])
+  const blackOpacity = useTransform(scrollYProgress, [0.77, 0.99], [0, 0.9])
 
   return (
     <main className="min-h-screen bg-[#eef6ff] text-[#143d73]">

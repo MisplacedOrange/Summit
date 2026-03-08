@@ -60,7 +60,7 @@ export function Header() {
           {/* Left: Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <Image
-              src="/assets/images/summit.png"
+              src="/assets/images/summit.svg"
               alt="Summit Logo"
               width={24}
               height={24}
