@@ -2,14 +2,7 @@ from __future__ import annotations
 
 from datetime import date
 import math
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
 import re
->>>>>>> Stashed changes
-=======
-import re
->>>>>>> Stashed changes
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -194,27 +187,6 @@ def _score_opportunity(
     bounded_score = max(0.0, min(1.0, final_score))
     reason = _build_reason(opportunity, interest_matches, skill_matches, proximity_score, demand_score)
     return bounded_score, reason
-<<<<<<< Updated upstream
-
-
-def _cosine_similarity(left: list[float], right: list[float]) -> float:
-    if not left or not right:
-        return 0.0
-
-    size = min(len(left), len(right))
-    if size == 0:
-        return 0.0
-
-    a = left[:size]
-    b = right[:size]
-    dot = sum(x * y for x, y in zip(a, b))
-    norm_a = math.sqrt(sum(x * x for x in a))
-    norm_b = math.sqrt(sum(y * y for y in b))
-    if norm_a == 0 or norm_b == 0:
-        return 0.0
-    return dot / (norm_a * norm_b)
-=======
->>>>>>> Stashed changes
 
 
 async def get_recommendations(
@@ -226,48 +198,11 @@ async def get_recommendations(
     if len(embedding) == 0:
         await update_user_embedding(db, preferences)
         embedding = _coerce_embedding(preferences.embedding)
-
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    knn_limit = min(limit * 3, 100)
-    dialect_name = db.get_bind().dialect.name
-
-    if dialect_name == "postgresql":
-        # Use pgvector's native <=> operator for fast KNN in production.
-        vec_literal = "[" + ",".join(str(v) for v in embedding) + "]"
-        stmt = (
-            select(
-                Opportunity,
-                (1 - Opportunity.embedding.cosine_distance(text(f"'{vec_literal}'::vector"))).label("cosine_sim"),
-            )
-            .where(Opportunity.embedding.is_not(None))
-            .order_by(Opportunity.embedding.cosine_distance(text(f"'{vec_literal}'::vector")))
-            .limit(knn_limit)
-        )
-        result = await db.execute(stmt)
-        candidates = [(row[0], float(row[1])) for row in result.all()]
-    else:
-        # SQLite/dev fallback: compute cosine similarity in Python.
-        result = await db.execute(select(Opportunity).where(Opportunity.embedding.is_not(None)))
-        opportunities = list(result.scalars().all())
-        scored = [
-            (opp, _cosine_similarity(embedding, _coerce_embedding(opp.embedding)))
-            for opp in opportunities
-        ]
-        scored.sort(key=lambda item: item[1], reverse=True)
-        candidates = scored[:knn_limit]
-=======
-=======
->>>>>>> Stashed changes
     stmt = select(Opportunity)
     result = await db.execute(stmt)
     opportunities = list(result.scalars().all())
     if not opportunities:
         return []
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
     await _ensure_opportunity_embeddings(db, opportunities)
 
