@@ -51,6 +51,7 @@ export interface LegacyOpportunity {
 export function mapOpportunityRead(
   v1: V1OpportunityRead,
   matchPct = 0,
+  matchReason = "",
 ): LegacyOpportunity {
   const n = v1.volunteers_needed ?? 0
   const urgency: "low" | "medium" | "high" = n > 10 ? "high" : n > 5 ? "medium" : "low"
@@ -67,7 +68,7 @@ export function mapOpportunityRead(
     skills: v1.skills_required ?? [],
     urgency,
     match_pct: matchPct,
-    match_reason: "",
+    match_reason: matchReason,
     latitude: v1.location_lat ?? 0,
     longitude: v1.location_lng ?? 0,
   }

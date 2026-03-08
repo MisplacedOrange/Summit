@@ -36,7 +36,11 @@ type Opportunity = {
 }
 
 type V1ListResponse = { total: number; items: V1OpportunityRead[] }
+<<<<<<< Updated upstream
 type V1RecommendationResponse = { items: Array<{ opportunity: V1OpportunityRead; score: number; reason?: string }> }
+=======
+type V1RecommendationResponse = { items: Array<{ opportunity: V1OpportunityRead; score: number; reason: string }> }
+>>>>>>> Stashed changes
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000"
 const MAP_OPPORTUNITY_LIMIT = 100
@@ -907,7 +911,11 @@ export default function ImpactMatchPage() {
       if (!response.ok) throw new Error(`Backend returned ${response.status}`)
       const data: V1RecommendationResponse = await response.json()
       const mapped = data.items.map((item) =>
+<<<<<<< Updated upstream
         mapOpportunityRead(item.opportunity, Math.round(item.score * 100), item.reason ?? ""),
+=======
+        mapOpportunityRead(item.opportunity, Math.round(item.score * 100), item.reason),
+>>>>>>> Stashed changes
       )
       setItems(mapped)
       setSource("AI Matched")

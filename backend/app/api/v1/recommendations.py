@@ -29,5 +29,5 @@ async def recommendations(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Preferences unavailable")
 
     scored = await get_recommendations(db, preference)
-    items = [RecommendationItem(opportunity=opp, score=score) for opp, score in scored]
+    items = [RecommendationItem(opportunity=opp, score=score, reason=reason) for opp, score, reason in scored]
     return RecommendationResponse(items=items)
