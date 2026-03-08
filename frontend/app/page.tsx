@@ -241,6 +241,29 @@ export default function LandingPage() {
           ))}
         </div>
       </section>
+
+      {/* Features */}
+      <section id="features" className="mx-auto max-w-[1100px] px-4 py-16 md:px-6 md:py-24">
+        <h2 className="text-center text-2xl font-semibold sm:text-3xl">
+          Everything you need to make an impact
+        </h2>
+        <p className="mx-auto mt-3 max-w-xl text-center text-sm text-[#4876aa] md:text-base">
+          From intelligent matching to interactive maps, ImpactMatch makes it effortless to find and track volunteer work.
+        </p>
+        <div className="mt-12 grid gap-6 sm:grid-cols-2">
+          {FEATURES.map((f) => (
+            <div
+              key={f.title}
+              className="rounded-2xl border border-[#c2daf8] bg-white p-6 transition-shadow duration-200 hover:shadow-md"
+            >
+              <div className="inline-flex rounded-xl bg-[#deecff] p-3 text-[#235b9f]">{f.icon}</div>
+              <h3 className="mt-4 text-lg font-semibold">{f.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-[#4876aa]">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Cause tags */}
       <section className="border-y border-[#c2daf8] bg-white/70 backdrop-blur">
         <div className="mx-auto max-w-[1100px] px-4 py-12 text-center md:px-6">
