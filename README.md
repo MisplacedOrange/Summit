@@ -56,8 +56,6 @@ GET /v1/recommendations
 
 ---
 
-## Local Development
-
 ### Prerequisites
 
 - Python 3.11+
