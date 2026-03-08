@@ -469,7 +469,7 @@ function RecommendationProfileCard({
             type="button"
             onClick={() => void saveRecommendationProfile()}
             disabled={savingProfile}
-            className="rounded-full bg-[linear-gradient(135deg,#2ed3ff,#2f6fd1)] px-5 py-2 text-sm font-medium text-white shadow-[0_8px_24px_rgba(27,126,225,0.4)] disabled:opacity-60"
+            className="rounded-full bg-white px-5 py-2 text-sm font-medium text-black shadow-[0_8px_24px_rgba(255,255,255,0.15)] disabled:opacity-60"
           >
             {savingProfile ? "Saving..." : user ? "Save recommendation profile" : "Sign in to save profile"}
           </button>
@@ -584,7 +584,7 @@ function OpportunityCard({ item, isAiResult }: { item: Opportunity; isAiResult: 
         href={item.url}
         target="_blank"
         rel="noreferrer"
-        className="mt-4 inline-flex rounded-full bg-[linear-gradient(135deg,#2ed3ff,#2f6fd1)] px-4 py-2 text-xs font-medium text-white transition-all hover:scale-[1.02]"
+        className="mt-4 inline-flex rounded-full bg-white px-4 py-2 text-xs font-medium text-black transition-all hover:scale-[1.02]"
       >
         View opportunity
       </a>

@@ -135,7 +135,7 @@ export default function LandingPage() {
             style={{ opacity: missionOpacity, y: missionY }}
           >
             <p
-              className="max-w-2xl text-xl leading-relaxed text-white md:text-xl"
+              className="max-w-2xl text-2xl leading-relaxed text-white md:text-3xl lg:text-4xl"
               style={{ fontFamily: "'Times New Roman', Times, serif", fontStyle: "italic" }}
             >
               To connect students with high impact local service through advanced matching and location-based technology.
