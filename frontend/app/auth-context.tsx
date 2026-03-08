@@ -129,28 +129,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     async function init() {
       try {
-        const synced = await syncAuth0Session()
-        if (synced) {
-          return
-        }
-      } catch {
-        // fall through to stored token fallback
-      }
-
-      const stored = localStorage.getItem("im_token")
-      if (stored) {
         try {
-          const profile = await loadProfileFromToken(stored)
-          if (!cancelled) {
-            setUser(profile)
-            setToken(stored)
+          const synced = await syncAuth0Session()
+          if (synced) {
+            return
           }
         } catch {
-          localStorage.removeItem("im_token")
+          // fall through to stored token fallback
         }
-      }
 
-      if (!cancelled) setLoading(false)
+        const stored = localStorage.getItem("im_token")
+        if (stored) {
+          try {
+            const profile = await loadProfileFromToken(stored)
+            if (!cancelled) {
+              setUser(profile)
+              setToken(stored)
+            }
+          } catch {
+            localStorage.removeItem("im_token")
+          }
+        }
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
     }
 
     void init()
