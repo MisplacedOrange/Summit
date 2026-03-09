@@ -1,7 +1,5 @@
 # Summit
 
-> Built at the Hack Canada Hackathon at the Spur Innovation Centre.
-
 Summit helps Canadian high schoolers fulfill their community service hour requirements by connecting them with volunteer opportunities that actually match their interests. We built a full-stack platform where students can browse, filter, and get AI-ranked recommendations for opportunities near them so their volunteer hours become meaningful experiences rather than a checkbox.
 
 ---
