@@ -59,7 +59,7 @@
     "react-day-picker": "9.8.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.60.0",
-    "react-leaflet": "^4.2.1",
+    "react-leaflet": "^5.0.0",
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.4",
     "sonner": "^1.7.4",
