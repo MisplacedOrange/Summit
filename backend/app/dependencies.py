@@ -36,17 +36,6 @@ async def get_current_user(
 
     token = credentials.credentials
     try:
-        # Development fallback: accept a static local token.
-        if token == "test-token":
-            result = await db.execute(select(User).order_by(User.created_at.asc()).limit(1))
-            user = result.scalar_one_or_none()
-            if user is None:
-                user = User(auth0_id="auth0|local", email="local@example.com", full_name="Local User", role="student")
-                db.add(user)
-                await db.commit()
-                await db.refresh(user)
-            return user
-
         # Backend-issued local JWT tokens.
         local_payload = decode_local_access_token(token)
         if local_payload is not None:

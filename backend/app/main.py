@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
@@ -19,9 +20,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.v1.router import api_router
 from app.config import settings
 from app.db.base import Base
-from app.db.session import get_db
-from app.db.session import engine
+from app.db.session import engine, get_db
 from app.models.opportunity import Opportunity
+from app.models.user import User
 from app.services.gemini import gemini_service
 import app.models  # noqa: F401
 
@@ -84,16 +85,46 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     yield
 
 
-app = FastAPI(title="Summit API", version="1.0.0", lifespan=lifespan)
+app = FastAPI(
+    title="Summit API",
+    version="1.0.0",
+    lifespan=lifespan,
+    docs_url=None if settings.ENVIRONMENT == "production" else "/docs",
+    redoc_url=None if settings.ENVIRONMENT == "production" else "/redoc",
+)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS,
-    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?$",
+    allow_origin_regex=r"^https://(localhost|127\.0\.0\.1)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+_SENSITIVE_QUERY_PARAMS = frozenset({
+    "token", "access_token", "refresh_token", "id_token", "api_key", "apikey",
+    "secret", "password", "pwd", "auth", "authorization", "bearer",
+    "session", "session_id", "cookie", "csrf", "state",
+})
+
+
+def _redact_query_string(query_string: str) -> str:
+    """Redact sensitive query parameters before logging to external webhooks."""
+    if not query_string:
+        return ""
+    parts = []
+    for param in query_string.split("&"):
+        if "=" in param:
+            k, _, v = param.partition("=")
+            if k.lower() in _SENSITIVE_QUERY_PARAMS:
+                parts.append(f"{k}=[REDACTED]")
+            else:
+                parts.append(param)
+        else:
+            parts.append(param)
+    return "&".join(parts)
 
 
 async def _send_request_to_discord(request: Request, status_code: int, duration_ms: float) -> None:
@@ -103,8 +134,9 @@ async def _send_request_to_discord(request: Request, status_code: int, duration_
 
     client_ip = request.client.host if request.client else "unknown"
     user_agent = request.headers.get("user-agent", "unknown")[:300]
-    query_string = request.url.query
-    path = request.url.path + (f"?{query_string}" if query_string else "")
+    # Redact tokens and secrets from query string before sending to Discord
+    safe_query = _redact_query_string(request.url.query)
+    path = request.url.path + (f"?{safe_query}" if safe_query else "")
 
     color = 0x2F6FD1
     if status_code >= 500:
@@ -351,7 +383,8 @@ async def legacy_discover(
 # Embedding helpers & in-memory cache for AI matching
 # ---------------------------------------------------------------------------
 
-_embedding_cache: dict[str, list[float]] = {}
+_embedding_cache: OrderedDict[str, list[float]] = OrderedDict()
+_EMBEDDING_CACHE_MAX = 500
 
 
 def _cosine_similarity(a: list[float], b: list[float]) -> float:
@@ -366,12 +399,20 @@ def _cosine_similarity(a: list[float], b: list[float]) -> float:
 
 
 async def _get_embedding(text: str) -> list[float]:
-    """Return a cached embedding or compute one via Gemini / fallback."""
+    """Return a cached embedding or compute one via Gemini / fallback.
+
+    Uses an LRU cache bounded to _EMBEDDING_CACHE_MAX entries to prevent
+    unbounded memory growth on long-running servers.
+    """
     key = hashlib.sha256(text.encode()).hexdigest()
     if key in _embedding_cache:
+        _embedding_cache.move_to_end(key)
         return _embedding_cache[key]
     emb = await gemini_service.embed(text)
     _embedding_cache[key] = emb
+    _embedding_cache.move_to_end(key)
+    if len(_embedding_cache) > _EMBEDDING_CACHE_MAX:
+        _embedding_cache.popitem(last=False)
     return emb
 
 
@@ -589,7 +630,11 @@ async def read_root() -> dict[str, str]:
 
 
 @app.get("/api/health")
-async def health_check() -> dict[str, str]:
+async def health_check(db: AsyncSession = Depends(get_db)) -> dict[str, str]:
+    try:
+        await db.execute(select(User).limit(1))
+    except Exception as exc:
+        return {"status": "degraded", "error": type(exc).__name__}
     return {"status": "ok"}
 
 

@@ -1,7 +1,17 @@
+import os
 from functools import lru_cache
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def _is_placeholder(value: str) -> bool:
+    cleaned = (value or "").strip()
+    return not cleaned or cleaned in {
+        "change-me-in-production",
+        "INSECURE-DEV-ONLY-CHANGE-ME-IN-PROD",
+        "your-secret-key",
+    }
 
 
 class Settings(BaseSettings):
@@ -14,7 +24,7 @@ class Settings(BaseSettings):
     SUPABASE_URL: str = ""
     SUPABASE_ANON_KEY: str = ""
 
-    APP_JWT_SECRET: str = "change-me-in-production"
+    APP_JWT_SECRET: str = "INSECURE-DEV-ONLY-CHANGE-ME-IN-PROD"
     APP_JWT_EXPIRE_HOURS: int = 24
 
     GEMINI_API_KEY: str = ""
@@ -39,3 +49,7 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
+
+# Fail fast in production if using an insecure default
+if settings.ENVIRONMENT == "production" and _is_placeholder(settings.APP_JWT_SECRET):
+    raise RuntimeError("APP_JWT_SECRET must be set to a strong random value in production")
